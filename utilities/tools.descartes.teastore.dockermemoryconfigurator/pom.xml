@@ -34,7 +34,7 @@
 	<parent>
 		<groupId>tools.descartes.teastore</groupId>
 		<artifactId>parent</artifactId>
-		<version>${teastoreversion}</version>
-		<relativePath>../..</relativePath>
+		<version>${revision}</version>
+		<relativePath>../../pom.xml</relativePath>
 	</parent>
 </project>

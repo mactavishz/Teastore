@@ -16,12 +16,12 @@
 		<dependency>
 			<groupId>tools.descartes.teastore</groupId>
 			<artifactId>registryclient</artifactId>
-			<version>${teastoreversion}</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>tools.descartes.teastore</groupId>
 			<artifactId>kieker.probes</artifactId>
-			<version>${teastoreversion}</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
@@ -70,7 +70,7 @@
 	<parent>
 		<groupId>tools.descartes.teastore</groupId>
 		<artifactId>parent</artifactId>
-		<version>${teastoreversion}</version>
-		<relativePath>../..</relativePath>
+		<version>${revision}</version>
+		<relativePath>../../pom.xml</relativePath>
 	</parent>
 </project>

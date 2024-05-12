@@ -14,7 +14,7 @@
 		<dependency>
 			<groupId>tools.descartes.teastore</groupId>
 			<artifactId>entities</artifactId>
-			<version>${teastoreversion}</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>net.kieker-monitoring</groupId>
@@ -29,11 +29,6 @@
 		<dependency>
 			<groupId>org.glassfish.jersey.containers</groupId>
 			<artifactId>jersey-container-servlet</artifactId>
-			<version>3.0.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish.jersey.media</groupId>
-			<artifactId>jersey-media-json-jackson</artifactId>
 			<version>3.0.2</version>
 		</dependency>
 		<dependency>
@@ -116,7 +111,7 @@
 	<parent>
 		<groupId>tools.descartes.teastore</groupId>
 		<artifactId>parent</artifactId>
-		<version>${teastoreversion}</version>
-		<relativePath>../..</relativePath>
+		<version>${revision}</version>
+		<relativePath>../../pom.xml</relativePath>
 	</parent>
 </project>
