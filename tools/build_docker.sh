@@ -15,7 +15,7 @@ while getopts 'pr:' flag; do
   esac
 done
 
-if [ $DEPLOY == 1 ]
+if [[ $DEPLOY = 1 ]]
 then
 	docker run -it --rm --privileged tonistiigi/binfmt --install all
 	docker buildx create --use --name mybuilder
