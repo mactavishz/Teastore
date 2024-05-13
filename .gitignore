@@ -15,4 +15,7 @@ interfaces/tools.descartes.teastore.entities/.classpath
 /e2e-tests/cypress/screenshots
 target/
 
-.DS_Store
+**/.DS_Store
+.pdfignore.yaml
+code.pdf
+codetopdf.py
