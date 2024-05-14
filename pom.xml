@@ -4,6 +4,8 @@
 
 	<properties>
 		<revision>1.4.2</revision>
+		<docker.network>teastore-network</docker.network>
+		<docker.registry>descartes</docker.registry>
 	</properties>
 
 	<prerequisites>
@@ -47,7 +49,6 @@
 								<encoding>UTF-8</encoding>
 								<consoleOutput>true</consoleOutput>
 								<failsOnError>true</failsOnError>
-								<linkXRef>false</linkXRef>
 								<violationSeverity>warning</violationSeverity>
 							</configuration>
 							<goals>

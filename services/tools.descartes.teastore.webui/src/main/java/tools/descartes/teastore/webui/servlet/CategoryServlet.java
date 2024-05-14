@@ -23,17 +23,17 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import tools.descartes.teastore.registryclient.Service;
-import tools.descartes.teastore.registryclient.loadbalancers.LoadBalancerTimeoutException;
-import tools.descartes.teastore.registryclient.loadbalancers.ServiceLoadBalancer;
-import tools.descartes.teastore.registryclient.rest.HttpWrapper;
-import tools.descartes.teastore.registryclient.rest.LoadBalancedCRUDOperations;
-import tools.descartes.teastore.registryclient.rest.LoadBalancedImageOperations;
-import tools.descartes.teastore.registryclient.rest.LoadBalancedStoreOperations;
-import tools.descartes.teastore.registryclient.rest.ResponseWrapper;
-import tools.descartes.teastore.entities.Category;
-import tools.descartes.teastore.entities.ImageSizePreset;
-import tools.descartes.teastore.entities.Product;
+// import tools.descartes.teastore.registryclient.Service;
+// import tools.descartes.teastore.registryclient.loadbalancers.LoadBalancerTimeoutException;
+// import tools.descartes.teastore.registryclient.loadbalancers.ServiceLoadBalancer;
+// import tools.descartes.teastore.registryclient.rest.HttpWrapper;
+// import tools.descartes.teastore.registryclient.rest.LoadBalancedCRUDOperations;
+// import tools.descartes.teastore.registryclient.rest.LoadBalancedImageOperations;
+// import tools.descartes.teastore.registryclient.rest.LoadBalancedStoreOperations;
+// import tools.descartes.teastore.registryclient.rest.ResponseWrapper;
+// import tools.descartes.teastore.entities.Category;
+// import tools.descartes.teastore.entities.ImageSizePreset;
+// import tools.descartes.teastore.entities.Product;
 
 /**
  * Servlet implementation for the web view of "Category".
@@ -60,19 +60,20 @@ public class CategoryServlet extends AbstractUIServlet {
    */
   @Override
   protected void handleGETRequest(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException, LoadBalancerTimeoutException {
+      throws ServletException, IOException {
     if (request.getParameter("category") != null) {
       checkforCookie(request, response);
       long categoryID = Long.parseLong(request.getParameter("category"));
 
-      Category category = LoadBalancedCRUDOperations.getEntity(Service.PERSISTENCE, "categories",
-          Category.class, categoryID);
-
-      int products = Integer.parseInt(ServiceLoadBalancer.loadBalanceRESTOperation(
-          Service.PERSISTENCE, "products", Product.class,
-          client -> ResponseWrapper.wrap(HttpWrapper
-              .wrap(client.getEndpointTarget().path("count").path(String.valueOf(categoryID)))
-              .get()).readEntity(String.class)));
+      // Category category = LoadBalancedCRUDOperations.getEntity(Service.PERSISTENCE, "categories",
+      //     Category.class, categoryID);
+      //
+      // int products = Integer.parseInt(ServiceLoadBalancer.loadBalanceRESTOperation(
+      //     Service.PERSISTENCE, "products", Product.class,
+      //     client -> ResponseWrapper.wrap(HttpWrapper
+      //         .wrap(client.getEndpointTarget().path("count").path(String.valueOf(categoryID)))
+      //         .get()).readEntity(String.class)));
+      int products = 0;
 
       int numberProducts = INITIAL_PRODUCT_DISPLAY_COUNT;
       if (request.getAttribute("numberProducts") != null) {
@@ -90,22 +91,22 @@ public class CategoryServlet extends AbstractUIServlet {
 
       ArrayList<String> navigation = createNavigation(products, page, numberProducts);
 
-      List<Product> productlist = LoadBalancedCRUDOperations.getEntities(Service.PERSISTENCE,
-          "products", Product.class, "category", categoryID, (page - 1) * numberProducts,
-          numberProducts);
-      request.setAttribute("productImages",
-          LoadBalancedImageOperations.getProductPreviewImages(productlist));
-      request.setAttribute("storeIcon",
-          LoadBalancedImageOperations.getWebImage("icon", ImageSizePreset.ICON.getSize()));
-      request.setAttribute("CategoryList", LoadBalancedCRUDOperations
-          .getEntities(Service.PERSISTENCE, "categories", Category.class, -1, -1));
-      request.setAttribute("title", "TeaStore Categorie " + category.getName());
-
-      request.setAttribute("Productslist", productlist);
-
-      request.setAttribute("category", category.getName());
-      request.setAttribute("login",
-          LoadBalancedStoreOperations.isLoggedIn(getSessionBlob(request)));
+      // List<Product> productlist = LoadBalancedCRUDOperations.getEntities(Service.PERSISTENCE,
+      //     "products", Product.class, "category", categoryID, (page - 1) * numberProducts,
+      //     numberProducts);
+      // request.setAttribute("productImages",
+      //     LoadBalancedImageOperations.getProductPreviewImages(productlist));
+      // request.setAttribute("storeIcon",
+      //     LoadBalancedImageOperations.getWebImage("icon", ImageSizePreset.ICON.getSize()));
+      // request.setAttribute("CategoryList", LoadBalancedCRUDOperations
+      //     .getEntities(Service.PERSISTENCE, "categories", Category.class, -1, -1));
+      // request.setAttribute("title", "TeaStore Categorie " + category.getName());
+      //
+      // request.setAttribute("Productslist", productlist);
+      //
+      // request.setAttribute("category", category.getName());
+      // request.setAttribute("login",
+      //     LoadBalancedStoreOperations.isLoggedIn(getSessionBlob(request)));
       request.setAttribute("categoryID", categoryID);
       request.setAttribute("currentnumber", numberProducts);
       request.setAttribute("pagination", navigation);
@@ -122,7 +123,7 @@ public class CategoryServlet extends AbstractUIServlet {
    */
   @Override
   protected void handlePOSTRequest(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException, LoadBalancerTimeoutException {
+      throws ServletException, IOException {
     if (request.getParameter("number") != null && request.getParameter("page") != null
         && request.getParameter("category") != null) {
       redirect(

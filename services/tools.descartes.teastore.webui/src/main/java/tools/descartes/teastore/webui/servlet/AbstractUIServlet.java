@@ -27,14 +27,14 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+// import com.fasterxml.jackson.core.JsonProcessingException;
+// import com.fasterxml.jackson.databind.ObjectMapper;
 
-import tools.descartes.teastore.registryclient.Service;
-import tools.descartes.teastore.registryclient.loadbalancers.LoadBalancerTimeoutException;
-import tools.descartes.teastore.registryclient.util.NotFoundException;
-import tools.descartes.teastore.entities.Category;
-import tools.descartes.teastore.entities.message.SessionBlob;
+// import tools.descartes.teastore.registryclient.Service;
+// import tools.descartes.teastore.registryclient.loadbalancers.LoadBalancerTimeoutException;
+// import tools.descartes.teastore.registryclient.util.NotFoundException;
+// import tools.descartes.teastore.entities.Category;
+// import tools.descartes.teastore.entities.message.SessionBlob;
 
 /**
  * Abstract servlet for the webUI.
@@ -98,24 +98,24 @@ public abstract class AbstractUIServlet extends HttpServlet {
 	 * @param request servlet request
 	 * @return SessionBlob
 	 */
-	protected SessionBlob getSessionBlob(HttpServletRequest request) {
-		if (request.getCookies() != null) {
-			for (Cookie cook : request.getCookies()) {
-				if (cook.getName().equals(BLOB)) {
-					ObjectMapper o = new ObjectMapper();
-					try {
-						SessionBlob blob = o.readValue(URLDecoder.decode(cook.getValue(), "UTF-8"), SessionBlob.class);
-						if (blob != null) {
-						return blob;
-						} 
-					} catch (IOException e) {
-						throw new IllegalStateException("Cookie corrupted!");
-					}
-				}
-			}
-		}
-		return new SessionBlob();
-	}
+	// protected SessionBlob getSessionBlob(HttpServletRequest request) {
+	// 	if (request.getCookies() != null) {
+	// 		for (Cookie cook : request.getCookies()) {
+	// 			if (cook.getName().equals(BLOB)) {
+	// 				ObjectMapper o = new ObjectMapper();
+	// 				try {
+	// 					SessionBlob blob = o.readValue(URLDecoder.decode(cook.getValue(), "UTF-8"), SessionBlob.class);
+	// 					if (blob != null) {
+	// 					return blob;
+	// 					}
+	// 				} catch (IOException e) {
+	// 					throw new IllegalStateException("Cookie corrupted!");
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// 	return new SessionBlob();
+	// }
 
 	/**
 	 * Saves the SessionBlob as Cookie. Throws an IllegalStateException if the
@@ -124,15 +124,15 @@ public abstract class AbstractUIServlet extends HttpServlet {
 	 * @param blob session blob
 	 * @param response servlet response
 	 */
-	protected void saveSessionBlob(SessionBlob blob, HttpServletResponse response) {
-		ObjectMapper o = new ObjectMapper();
-		try {
-			Cookie cookie = new Cookie(BLOB, URLEncoder.encode(o.writeValueAsString(blob), "UTF-8"));
-			response.addCookie(cookie);
-		} catch (JsonProcessingException | UnsupportedEncodingException e) {
-			throw new IllegalStateException("Could not save blob!");
-		}
-	}
+	// protected void saveSessionBlob(SessionBlob blob, HttpServletResponse response) {
+	// 	ObjectMapper o = new ObjectMapper();
+	// 	try {
+	// 		Cookie cookie = new Cookie(BLOB, URLEncoder.encode(o.writeValueAsString(blob), "UTF-8"));
+	// 		response.addCookie(cookie);
+	// 	} catch (JsonProcessingException | UnsupportedEncodingException e) {
+	// 		throw new IllegalStateException("Could not save blob!");
+	// 	}
+	// }
 
 	/**
 	 * Destroys the SessionBlob. Throws an IllegalStateException if the SessionBlob
@@ -141,16 +141,16 @@ public abstract class AbstractUIServlet extends HttpServlet {
 	 * @param blob session blob
 	 * @param response servlet response
 	 */
-	protected void destroySessionBlob(SessionBlob blob, HttpServletResponse response) {
-		ObjectMapper o = new ObjectMapper();
-		try {
-			Cookie cookie = new Cookie(BLOB, URLEncoder.encode(o.writeValueAsString(blob), "UTF-8"));
-			cookie.setMaxAge(0);
-			response.addCookie(cookie);
-		} catch (JsonProcessingException | UnsupportedEncodingException e) {
-			throw new IllegalStateException("Could not destroy blob!");
-		}
-	}
+	// protected void destroySessionBlob(SessionBlob blob, HttpServletResponse response) {
+	// 	ObjectMapper o = new ObjectMapper();
+	// 	try {
+	// 		Cookie cookie = new Cookie(BLOB, URLEncoder.encode(o.writeValueAsString(blob), "UTF-8"));
+	// 		cookie.setMaxAge(0);
+	// 		response.addCookie(cookie);
+	// 	} catch (JsonProcessingException | UnsupportedEncodingException e) {
+	// 		throw new IllegalStateException("Could not destroy blob!");
+	// 	}
+	// }
 
 	/**
 	 * Redirects to the target and creates an Cookie.
@@ -221,13 +221,17 @@ public abstract class AbstractUIServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		try {
+			System.out.println("GET request: " + request.getRequestURI());
 			handleGETRequest(request, response);
-		} catch (LoadBalancerTimeoutException e) {
-			serveTimoutResponse(request, response, e.getTargetService());
-		} catch (NotFoundException e) {
-			serveNotFoundException(request, response, e);
+		// }
+		// catch (LoadBalancerTimeoutException e) {
+		// 	serveTimoutResponse(request, response, e.getTargetService());
+		// } catch (NotFoundException e) {
+		// 	serveNotFoundException(request, response, e);
 		} catch (Exception e) {
-			serveExceptionResponse(request, response, e);
+			// serveExceptionResponse(request, response, e);
+			System.err.println(e.getMessage());
+			request.getRequestDispatcher("WEB-INF/pages/error.jsp").forward(request, response);
 		}
 
 	}
@@ -245,12 +249,14 @@ public abstract class AbstractUIServlet extends HttpServlet {
 		try {
 
 			handlePOSTRequest(request, response);
-		} catch (LoadBalancerTimeoutException e) {
-			serveTimoutResponse(request, response, e.getTargetService());
-		} catch (NotFoundException e) {
-			serveNotFoundException(request, response, e);
+		// } catch (LoadBalancerTimeoutException e) {
+		// 	serveTimoutResponse(request, response, e.getTargetService());
+		// } catch (NotFoundException e) {
+		// 	serveNotFoundException(request, response, e);
 		} catch (Exception e) {
-			serveExceptionResponse(request, response, e);
+			// serveExceptionResponse(request, response, e);
+			System.err.println(e.getMessage());
+			request.getRequestDispatcher("WEB-INF/pages/error.jsp").forward(request, response);
 		}
 	}
 
@@ -269,7 +275,7 @@ public abstract class AbstractUIServlet extends HttpServlet {
 	 *             Exception on timeouts and load balancer errors.
 	 */
 	protected void handlePOSTRequest(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException, LoadBalancerTimeoutException {
+			throws ServletException, IOException {
 		handleGETRequest(request, response);
 	}
 
@@ -288,51 +294,51 @@ public abstract class AbstractUIServlet extends HttpServlet {
 	 *             Exception on timeouts and load balancer errors.
 	 */
 	protected abstract void handleGETRequest(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException, LoadBalancerTimeoutException;
+			throws ServletException, IOException;
 
-	private void serveTimoutResponse(HttpServletRequest request, HttpServletResponse response, Service service)
-			throws ServletException, IOException {
-		response.setStatus(408);
-		request.setAttribute("CategoryList", new ArrayList<Category>());
-		request.setAttribute("storeIcon", "");
-		request.setAttribute("errorImage", "");
-		request.setAttribute("title", "TeaStore Timeout");
-		request.setAttribute("messagetitle", "408: Timout waiting for Service: " + service.getServiceName());
-		request.setAttribute("messageparagraph", "WebUI got a timeout waiting for service \"" + service.getServiceName()
-				+ "\" to respond. Note the that service may itself have been waiting for another service.");
-		request.setAttribute("login", false);
-		request.getRequestDispatcher("WEB-INF/pages/error.jsp").forward(request, response);
-	}
+	// private void serveTimoutResponse(HttpServletRequest request, HttpServletResponse response, Service service)
+	// 		throws ServletException, IOException {
+	// 	response.setStatus(408);
+	// 	request.setAttribute("CategoryList", new ArrayList<Category>());
+	// 	request.setAttribute("storeIcon", "");
+	// 	request.setAttribute("errorImage", "");
+	// 	request.setAttribute("title", "TeaStore Timeout");
+	// 	request.setAttribute("messagetitle", "408: Timout waiting for Service: " + service.getServiceName());
+	// 	request.setAttribute("messageparagraph", "WebUI got a timeout waiting for service \"" + service.getServiceName()
+	// 			+ "\" to respond. Note the that service may itself have been waiting for another service.");
+	// 	request.setAttribute("login", false);
+	// 	request.getRequestDispatcher("WEB-INF/pages/error.jsp").forward(request, response);
+	// }
 
-	private void serveExceptionResponse(HttpServletRequest request, HttpServletResponse response, Exception e)
-			throws ServletException, IOException {
-		StringWriter sw = new StringWriter();
-		e.printStackTrace(new PrintWriter(sw));
-		String exceptionAsString = sw.toString();
-		response.setStatus(500);
-		request.setAttribute("CategoryList", new ArrayList<Category>());
-		request.setAttribute("storeIcon", "");
-		request.setAttribute("errorImage", "");
-		request.setAttribute("title", "TeaStore Timeout");
-		request.setAttribute("messagetitle", "500: Internal Exception: " + e.getMessage());
-		request.setAttribute("messageparagraph", exceptionAsString);
-		request.setAttribute("login", false);
-		request.getRequestDispatcher("WEB-INF/pages/error.jsp").forward(request, response);
-	}
+	// private void serveExceptionResponse(HttpServletRequest request, HttpServletResponse response, Exception e)
+	// 		throws ServletException, IOException {
+	// 	StringWriter sw = new StringWriter();
+	// 	e.printStackTrace(new PrintWriter(sw));
+	// 	String exceptionAsString = sw.toString();
+	// 	response.setStatus(500);
+	// 	request.setAttribute("CategoryList", new ArrayList<Category>());
+	// 	request.setAttribute("storeIcon", "");
+	// 	request.setAttribute("errorImage", "");
+	// 	request.setAttribute("title", "TeaStore Timeout");
+	// 	request.setAttribute("messagetitle", "500: Internal Exception: " + e.getMessage());
+	// 	request.setAttribute("messageparagraph", exceptionAsString);
+	// 	request.setAttribute("login", false);
+	// 	request.getRequestDispatcher("WEB-INF/pages/error.jsp").forward(request, response);
+	// }
 
-	private void serveNotFoundException(HttpServletRequest request, HttpServletResponse response, Exception e)
-			throws ServletException, IOException {
-		StringWriter sw = new StringWriter();
-		e.printStackTrace(new PrintWriter(sw));
-		String exceptionAsString = sw.toString();
-		response.setStatus(404);
-		request.setAttribute("CategoryList", new ArrayList<Category>());
-		request.setAttribute("storeIcon", "");
-		request.setAttribute("errorImage", "");
-		request.setAttribute("title", "TeaStore Timeout");
-		request.setAttribute("messagetitle", "404: Not Found Exception: " + e.getMessage());
-		request.setAttribute("messageparagraph", exceptionAsString);
-		request.setAttribute("login", false);
-		request.getRequestDispatcher("WEB-INF/pages/error.jsp").forward(request, response);
-	}
+	// private void serveNotFoundException(HttpServletRequest request, HttpServletResponse response, Exception e)
+	// 		throws ServletException, IOException {
+	// 	StringWriter sw = new StringWriter();
+	// 	e.printStackTrace(new PrintWriter(sw));
+	// 	String exceptionAsString = sw.toString();
+	// 	response.setStatus(404);
+	// 	request.setAttribute("CategoryList", new ArrayList<Category>());
+	// 	request.setAttribute("storeIcon", "");
+	// 	request.setAttribute("errorImage", "");
+	// 	request.setAttribute("title", "TeaStore Timeout");
+	// 	request.setAttribute("messagetitle", "404: Not Found Exception: " + e.getMessage());
+	// 	request.setAttribute("messageparagraph", exceptionAsString);
+	// 	request.setAttribute("login", false);
+	// 	request.getRequestDispatcher("WEB-INF/pages/error.jsp").forward(request, response);
+	// }
 }

@@ -24,12 +24,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.core.MediaType;
 
-import tools.descartes.teastore.registryclient.RegistryClient;
-import tools.descartes.teastore.registryclient.Service;
-import tools.descartes.teastore.registryclient.loadbalancers.LoadBalancerTimeoutException;
-import tools.descartes.teastore.registryclient.loadbalancers.ServiceLoadBalancer;
-import tools.descartes.teastore.registryclient.rest.LoadBalancedImageOperations;
-import tools.descartes.teastore.entities.ImageSizePreset;
+// import tools.descartes.teastore.registryclient.RegistryClient;
+// import tools.descartes.teastore.registryclient.Service;
+// import tools.descartes.teastore.registryclient.loadbalancers.LoadBalancerTimeoutException;
+// import tools.descartes.teastore.registryclient.loadbalancers.ServiceLoadBalancer;
+// import tools.descartes.teastore.registryclient.rest.LoadBalancedImageOperations;
+// import tools.descartes.teastore.entities.ImageSizePreset;
 
 /**
  * Servlet to show database and other service status.
@@ -52,35 +52,35 @@ public class StatusServlet extends AbstractUIServlet {
    */
   @Override
   protected void handleGETRequest(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException, LoadBalancerTimeoutException {
+      throws ServletException, IOException {
     checkforCookie(request, response);
     String iconImage = null;
-    try {
-      iconImage = LoadBalancedImageOperations.getWebImage("icon", ImageSizePreset.ICON.getSize());
-    } catch (NullPointerException e) {
-
-    }
+    // try {
+    //   iconImage = LoadBalancedImageOperations.getWebImage("icon", ImageSizePreset.ICON.getSize());
+    // } catch (NullPointerException e) {
+    //
+    // }
     request.setAttribute("storeIcon", iconImage);
     request.setAttribute("title", "TeaStore Status");
 
     boolean noregistry = false;
-    try {
-      request.setAttribute("webuiservers",
-          RegistryClient.getClient().getServersForService(Service.WEBUI));
-      request.setAttribute("authenticationservers",
-          RegistryClient.getClient().getServersForService(Service.AUTH));
-      request.setAttribute("persistenceservers",
-          RegistryClient.getClient().getServersForService(Service.PERSISTENCE));
-      request.setAttribute("imageservers",
-          RegistryClient.getClient().getServersForService(Service.IMAGE));
-      request.setAttribute("recommenderservers",
-          RegistryClient.getClient().getServersForService(Service.RECOMMENDER));
-      request.setAttribute("dbfinished", isDatabaseFinished());
-      request.setAttribute("imagefinished", isImageFinished());
-      request.setAttribute("recommenderfinished", isRecommenderFinished());
-    } catch (NullPointerException e) {
-      noregistry = true;
-    }
+    // try {
+    //   request.setAttribute("webuiservers",
+    //       RegistryClient.getClient().getServersForService(Service.WEBUI));
+    //   request.setAttribute("authenticationservers",
+    //       RegistryClient.getClient().getServersForService(Service.AUTH));
+    //   request.setAttribute("persistenceservers",
+    //       RegistryClient.getClient().getServersForService(Service.PERSISTENCE));
+    //   request.setAttribute("imageservers",
+    //       RegistryClient.getClient().getServersForService(Service.IMAGE));
+    //   request.setAttribute("recommenderservers",
+    //       RegistryClient.getClient().getServersForService(Service.RECOMMENDER));
+    //   request.setAttribute("dbfinished", isDatabaseFinished());
+    //   request.setAttribute("imagefinished", isImageFinished());
+    //   request.setAttribute("recommenderfinished", isRecommenderFinished());
+    // } catch (NullPointerException e) {
+    noregistry = true;
+    // }
     request.setAttribute("noregistry", noregistry);
 
     request.getRequestDispatcher("WEB-INF/pages/status.jsp").forward(request, response);
@@ -92,12 +92,12 @@ public class StatusServlet extends AbstractUIServlet {
    * @return status
    */
   private boolean isDatabaseFinished() {
-    String finished = ServiceLoadBalancer.loadBalanceRESTOperation(Service.PERSISTENCE,
-        "generatedb", String.class, client -> client.getEndpointTarget().path("finished")
-            .request(MediaType.TEXT_PLAIN).get().readEntity(String.class));
-    if (finished != null) {
-      return Boolean.parseBoolean(finished);
-    }
+    // String finished = ServiceLoadBalancer.loadBalanceRESTOperation(Service.PERSISTENCE,
+    //     "generatedb", String.class, client -> client.getEndpointTarget().path("finished")
+    //         .request(MediaType.TEXT_PLAIN).get().readEntity(String.class));
+    // if (finished != null) {
+    //   return Boolean.parseBoolean(finished);
+    // }
     return false;
   }
 
@@ -107,16 +107,16 @@ public class StatusServlet extends AbstractUIServlet {
    * @return status
    */
   private boolean isImageFinished() {
-    List<String> finishedMessages = ServiceLoadBalancer.multicastRESTOperation(Service.IMAGE,
-        "image", String.class, client -> client.getEndpointTarget().path("finished")
-            .request(MediaType.APPLICATION_JSON).get().readEntity(String.class));
-    if (finishedMessages != null && !finishedMessages.isEmpty()) {
-      boolean finished = true;
-      for (String finishedMessage : finishedMessages) {
-        finished = finished && Boolean.parseBoolean(finishedMessage);
-      }
-      return finished;
-    }
+    // List<String> finishedMessages = ServiceLoadBalancer.multicastRESTOperation(Service.IMAGE,
+    //     "image", String.class, client -> client.getEndpointTarget().path("finished")
+    //         .request(MediaType.APPLICATION_JSON).get().readEntity(String.class));
+    // if (finishedMessages != null && !finishedMessages.isEmpty()) {
+    //   boolean finished = true;
+    //   for (String finishedMessage : finishedMessages) {
+    //     finished = finished && Boolean.parseBoolean(finishedMessage);
+    //   }
+    //   return finished;
+    // }
     return false;
   }
 
@@ -126,13 +126,13 @@ public class StatusServlet extends AbstractUIServlet {
    * @return status
    */
   private boolean isRecommenderFinished() {
-    List<String> finishedMessages = ServiceLoadBalancer.multicastRESTOperation(Service.RECOMMENDER,
-        "train", String.class, client -> client.getEndpointTarget().path("isready")
-            .request(MediaType.TEXT_PLAIN).get().readEntity(String.class));
-    if (finishedMessages != null && !finishedMessages.isEmpty()) {
-      return finishedMessages.stream().map(b -> Boolean.parseBoolean(b)).reduce(Boolean.TRUE,
-          (a, b) -> a && b);
-    }
+    // List<String> finishedMessages = ServiceLoadBalancer.multicastRESTOperation(Service.RECOMMENDER,
+    //     "train", String.class, client -> client.getEndpointTarget().path("isready")
+    //         .request(MediaType.TEXT_PLAIN).get().readEntity(String.class));
+    // if (finishedMessages != null && !finishedMessages.isEmpty()) {
+    //   return finishedMessages.stream().map(b -> Boolean.parseBoolean(b)).reduce(Boolean.TRUE,
+    //       (a, b) -> a && b);
+    // }
     return false;
   }
 
