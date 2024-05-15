@@ -2,28 +2,22 @@
     <!-- tag::features[] -->
     <featureManager>
         <feature>jakartaee-10.0</feature>
-        <feature>mpHealth-4.0</feature>
-        <feature>mpMetrics-5.1</feature>
-<!--        <feature>cdi-4.0</feature>-->
-        <!-- tag::mpHealth[] -->
-<!--        <feature>mpHealth-4.0</feature>-->
-        <!-- end::mpHealth[] -->
-<!--        <feature>mpConfig-3.1</feature>-->
+        <feature>microProfile-6.1</feature>
     </featureManager>
     <!-- end::features[] -->
-
     <variable name="http.port" defaultValue="8080"/>
     <variable name="https.port" defaultValue="8443"/>
+    <variable name="context.root" defaultValue="/tools.descartes.teastore.webui"/>
 
     <!-- tag::webApplication[] -->
-    <webApplication location="tools.descartes.teastore.webui.war" contextRoot="/tools.descartes.teastore.webui" />
+    <webApplication location="tools.descartes.teastore.webui.war" contextRoot="${context.root}"/>
     <!-- end::webApplication[] -->
     <mpMetrics authentication="false"/>
 
     <!-- tag::logging[] -->
-    <logging traceSpecification="com.ibm.ws.microprofile.health.*=all" />
+    <logging traceSpecification="com.ibm.ws.microprofile.health.*=all"/>
     <!-- end::logging[] -->
 
     <httpEndpoint host="*" httpPort="${http.port}" httpsPort="${https.port}"
-        id="defaultHttpEndpoint"/>
+                  id="defaultHttpEndpoint"/>
 </server>
