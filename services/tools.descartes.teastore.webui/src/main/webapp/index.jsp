@@ -1,1 +1,1 @@
-<% response.sendRedirect("/tools.descartes.teastore.webui/index"); %>
+<%  response.sendRedirect("/tools.descartes.teastore.webui/index"); %>
