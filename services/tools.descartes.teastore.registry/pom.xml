@@ -20,7 +20,6 @@
         <dependency>
             <groupId>tools.descartes.teastore</groupId>
             <artifactId>entities</artifactId>
-<!--            <version>${project.version}</version>-->
         </dependency>
         <dependency>
             <groupId>jakarta.platform</groupId>
@@ -55,8 +54,8 @@
                 <artifactId>liberty-maven-plugin</artifactId>
                 <version>3.10.2</version>
                 <configuration>
-<!--                    -p ${liberty.var.http.port}:${liberty.var.http.port}-->
                     <containerRunOpts>
+                        -p ${liberty.var.http.port}:${liberty.var.http.port}
                         --network ${docker.network} --name
                         ${project.artifactId}
                     </containerRunOpts>

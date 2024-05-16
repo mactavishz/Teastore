@@ -24,6 +24,10 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
+import org.eclipse.microprofile.metrics.annotation.Counted;
+import org.eclipse.microprofile.metrics.annotation.Timed;
+
+
 /**
  * Rest endpoint for the registry.
  * @author Simon
@@ -40,6 +44,17 @@ public class RegistryREST {
 	 */
 	@PUT
 	@Path("{name}/{location}")
+	@Timed(
+			name = "registerTimer",
+			tags = {"method=put"},
+			absolute = true,
+			description = "Time and frequency to register a service."
+	)
+	@Counted(
+			name = "registerCounter",
+			absolute = true,
+			description = "Number of times a service has been registered."
+	)
 	public Response register(@PathParam("name") final String name, @PathParam("location") final String location) {
 		boolean success = Registry.getRegistryInstance().register(name, location);
 		if (success) {
@@ -56,6 +71,17 @@ public class RegistryREST {
 	 */
 	@DELETE
 	@Path("{name}/{location}")
+	@Timed(
+			name = "unregisterTimer",
+			tags = {"method=delete"},
+			absolute = true,
+			description = "Time and frequency to unregister a service."
+	)
+	@Counted(
+			name = "unregisterCounter",
+			absolute = true,
+			description = "Number of times a service has been unregistered."
+	)
 	public Response unregister(@PathParam("name") final String name, @PathParam("location") final String location) {
 		boolean success = Registry.getRegistryInstance().unregister(name, location);
 		if (success) {
@@ -71,6 +97,17 @@ public class RegistryREST {
 	 */
 	@GET
 	@Path("{name}")
+	@Timed(
+			name = "getInstancesTimer",
+			tags = {"method=get"},
+			absolute = true,
+			description = "Time and frequency to get all instances of a service."
+	)
+	@Counted(
+			name = "getInstancesCounter",
+			absolute = true,
+			description = "Number of times all instances of a service have been requested."
+	)
 	public Response getInstances(@PathParam("name") final String name) {
 		List<String> locations = Registry.getRegistryInstance().getLocations(name);
 		return Response.status(Response.Status.OK).entity(locations).build();
