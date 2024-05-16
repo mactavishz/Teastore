@@ -21,6 +21,11 @@
         <dependencies>
             <dependency>
                 <groupId>tools.descartes.teastore</groupId>
+                <artifactId>registryclient</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>tools.descartes.teastore</groupId>
                 <artifactId>entities</artifactId>
                 <version>${revision}</version>
             </dependency>
