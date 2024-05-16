@@ -8,6 +8,9 @@ All resources are in the namespace `teastore`.
 # start
 kubectl apply -k ./
 
+# update
+kubectl apply -k ./
+
 # stop
 kubectl delete -k ./
 ```
