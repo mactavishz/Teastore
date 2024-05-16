@@ -1,0 +1,11 @@
+resources:
+  - namespace.yaml
+  - db.yaml
+  - registry.yaml
+  - persistence.yaml
+  - auth.yaml
+  - image.yaml
+  - recommender.yaml
+  - webui.yaml
+
+namespace: teastore
