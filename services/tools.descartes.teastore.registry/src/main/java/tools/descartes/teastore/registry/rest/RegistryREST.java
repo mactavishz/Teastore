@@ -28,7 +28,7 @@ import jakarta.ws.rs.core.Response.Status;
  * Rest endpoint for the registry.
  * @author Simon
  */
-@Path("services")
+@Path("/services")
 @Produces({ "application/json" })
 public class RegistryREST {
 
