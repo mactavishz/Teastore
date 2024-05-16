@@ -20,9 +20,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-// import tools.descartes.teastore.registryclient.loadbalancers.LoadBalancerTimeoutException;
-// import tools.descartes.teastore.registryclient.rest.LoadBalancedStoreOperations;
-// import tools.descartes.teastore.entities.message.SessionBlob;
+import tools.descartes.teastore.registryclient.loadbalancers.LoadBalancerTimeoutException;
+import tools.descartes.teastore.registryclient.rest.LoadBalancedStoreOperations;
+import tools.descartes.teastore.entities.message.SessionBlob;
 
 /**
  * Servlet for handling the login actions.
@@ -45,7 +45,7 @@ public class LoginActionServlet extends AbstractUIServlet {
 	 */
 	@Override
 	protected void handleGETRequest(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+			throws ServletException, IOException, LoadBalancerTimeoutException {
 
 		redirect("/", response);
 
@@ -56,35 +56,35 @@ public class LoginActionServlet extends AbstractUIServlet {
 	 */
 	@Override
 	protected void handlePOSTRequest(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+			throws ServletException, IOException, LoadBalancerTimeoutException {
 		boolean login = false;
-		// if (request.getParameter("username") != null && request.getParameter("password") != null) {
-		// 	SessionBlob blob = LoadBalancedStoreOperations.login(getSessionBlob(request),
-		// 			request.getParameter("username"), request.getParameter("password"));
-		// 	login = (blob != null && blob.getSID() != null);
-		//
-		// 	if (login) {
-		// 		saveSessionBlob(blob, response);
-		// 		if (request.getParameter("referer") != null
-		// 				&& request.getParameter("referer").contains("tools.descartes.teastore.webui/cart")) {
-		// 			redirect("/cart", response, MESSAGECOOKIE, SUCESSLOGIN);
-		// 		} else {
-		// 			redirect("/", response, MESSAGECOOKIE, SUCESSLOGIN);
-		// 		}
-		//
-		// 	} else {
-		// 		redirect("/login", response, ERRORMESSAGECOOKIE, WRONGCREDENTIALS);
-		// 	}
+		if (request.getParameter("username") != null && request.getParameter("password") != null) {
+			SessionBlob blob = LoadBalancedStoreOperations.login(getSessionBlob(request),
+					request.getParameter("username"), request.getParameter("password"));
+			login = (blob != null && blob.getSID() != null);
 
-		// } else if (request.getParameter("logout") != null) {
-		// 	SessionBlob blob = LoadBalancedStoreOperations.logout(getSessionBlob(request));
-		// 	saveSessionBlob(blob, response);
-		// 	destroySessionBlob(blob, response);
-		// 	redirect("/", response, MESSAGECOOKIE, SUCESSLOGOUT);
-		//
-		// } else {
-		// 	handleGETRequest(request, response);
-		// }
+			if (login) {
+				saveSessionBlob(blob, response);
+				if (request.getParameter("referer") != null
+						&& request.getParameter("referer").contains("tools.descartes.teastore.webui/cart")) {
+					redirect("/cart", response, MESSAGECOOKIE, SUCESSLOGIN);
+				} else {
+					redirect("/", response, MESSAGECOOKIE, SUCESSLOGIN);
+				}
+
+			} else {
+				redirect("/login", response, ERRORMESSAGECOOKIE, WRONGCREDENTIALS);
+			}
+
+		} else if (request.getParameter("logout") != null) {
+			SessionBlob blob = LoadBalancedStoreOperations.logout(getSessionBlob(request));
+			saveSessionBlob(blob, response);
+			destroySessionBlob(blob, response);
+			redirect("/", response, MESSAGECOOKIE, SUCESSLOGOUT);
+
+		} else {
+			handleGETRequest(request, response);
+		}
 
 	}
 

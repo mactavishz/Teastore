@@ -25,10 +25,10 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-// import tools.descartes.teastore.registryclient.loadbalancers.LoadBalancerTimeoutException;
-// import tools.descartes.teastore.registryclient.rest.LoadBalancedStoreOperations;
-// import tools.descartes.teastore.entities.OrderItem;
-// import tools.descartes.teastore.entities.message.SessionBlob;
+import tools.descartes.teastore.registryclient.loadbalancers.LoadBalancerTimeoutException;
+import tools.descartes.teastore.registryclient.rest.LoadBalancedStoreOperations;
+import tools.descartes.teastore.entities.OrderItem;
+import tools.descartes.teastore.entities.message.SessionBlob;
 
 /**
  * Servlet for handling all cart actions.
@@ -52,41 +52,41 @@ public class CartActionServlet extends AbstractUIServlet {
 	 */
 	@Override
 	protected void handleGETRequest(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+			throws ServletException, IOException, LoadBalancerTimeoutException {
 		for (Object paramo : request.getParameterMap().keySet()) {
-			// String param = (String) paramo;
-			// if (param.contains("addToCart")) {
-			// 	long productID = Long.parseLong(request.getParameter("productid"));
-			// 	SessionBlob blob = LoadBalancedStoreOperations.addProductToCart(getSessionBlob(request), productID);
-			// 	saveSessionBlob(blob, response);
-			// 	redirect("/cart", response, MESSAGECOOKIE, String.format(ADDPRODUCT, productID));
-			// 	break;
-			// } else if (param.contains("removeProduct")) {
-			// 	long productID = Long.parseLong(param.substring("removeProduct_".length()));
-			// 	SessionBlob blob = LoadBalancedStoreOperations.removeProductFromCart(getSessionBlob(request),
-			// 			productID);
-			// 	saveSessionBlob(blob, response);
-			// 	redirect("/cart", response, MESSAGECOOKIE, String.format(REMOVEPRODUCT, productID));
-			// 	break;
-			// } else if (param.contains("updateCartQuantities")) {
-			// 	List<OrderItem> orderItems = getSessionBlob(request).getOrderItems();
-			// 	updateOrder(request, orderItems, response);
-			// 	redirect("/cart", response, MESSAGECOOKIE, CARTUPDATED);
-			// 	break;
-			// } else if (param.contains("proceedtoCheckout")) {
-			// 	if (LoadBalancedStoreOperations.isLoggedIn(getSessionBlob(request))) {
-			// 		List<OrderItem> orderItems = getSessionBlob(request).getOrderItems();
-			// 		updateOrder(request, orderItems, response);
-			// 		redirect("/order", response);
-			// 	} else {
-			// 		redirect("/login", response);
-			// 	}
-			// 	break;
-			// } else if (param.contains("confirm")) {
-			// 	confirmOrder(request, response);
-			// 	break;
-			// }
-			System.out.println("GET request: " + paramo);
+			String param = (String) paramo;
+			if (param.contains("addToCart")) {
+				long productID = Long.parseLong(request.getParameter("productid"));
+				SessionBlob blob = LoadBalancedStoreOperations.addProductToCart(getSessionBlob(request), productID);
+				saveSessionBlob(blob, response);
+				redirect("/cart", response, MESSAGECOOKIE, String.format(ADDPRODUCT, productID));
+				break;
+			} else if (param.contains("removeProduct")) {
+				long productID = Long.parseLong(param.substring("removeProduct_".length()));
+				SessionBlob blob = LoadBalancedStoreOperations.removeProductFromCart(getSessionBlob(request),
+						productID);
+				saveSessionBlob(blob, response);
+				redirect("/cart", response, MESSAGECOOKIE, String.format(REMOVEPRODUCT, productID));
+				break;
+			} else if (param.contains("updateCartQuantities")) {
+				List<OrderItem> orderItems = getSessionBlob(request).getOrderItems();
+				updateOrder(request, orderItems, response);
+				redirect("/cart", response, MESSAGECOOKIE, CARTUPDATED);
+				break;
+			} else if (param.contains("proceedtoCheckout")) {
+				if (LoadBalancedStoreOperations.isLoggedIn(getSessionBlob(request))) {
+					List<OrderItem> orderItems = getSessionBlob(request).getOrderItems();
+					updateOrder(request, orderItems, response);
+					redirect("/order", response);
+				} else {
+					redirect("/login", response);
+				}
+				break;
+			} else if (param.contains("confirm")) {
+				confirmOrder(request, response);
+				break;
+			}
+
 		}
 
 	}
@@ -105,16 +105,16 @@ public class CartActionServlet extends AbstractUIServlet {
 			redirect("/order", response);
 		} else {
 
-			// SessionBlob blob = getSessionBlob(request);
-			// long price = 0;
-			// for (OrderItem item : blob.getOrderItems()) {
-			// 	price += item.getQuantity() * item.getUnitPriceInCents();
-			// }
-			// blob = LoadBalancedStoreOperations.placeOrder(getSessionBlob(request), infos[0] + " " + infos[1], infos[2],
-			// 		infos[3], infos[4],
-			// 		YearMonth.parse(infos[6], DTF).atDay(1).format(DateTimeFormatter.ISO_LOCAL_DATE), price, infos[5]);
-			// saveSessionBlob(blob, response);
-			// redirect("/", response, MESSAGECOOKIE, ORDERCONFIRMED);
+			SessionBlob blob = getSessionBlob(request);
+			long price = 0;
+			for (OrderItem item : blob.getOrderItems()) {
+				price += item.getQuantity() * item.getUnitPriceInCents();
+			}
+			blob = LoadBalancedStoreOperations.placeOrder(getSessionBlob(request), infos[0] + " " + infos[1], infos[2],
+					infos[3], infos[4],
+					YearMonth.parse(infos[6], DTF).atDay(1).format(DateTimeFormatter.ISO_LOCAL_DATE), price, infos[5]);
+			saveSessionBlob(blob, response);
+			redirect("/", response, MESSAGECOOKIE, ORDERCONFIRMED);
 		}
 
 	}
@@ -148,15 +148,15 @@ public class CartActionServlet extends AbstractUIServlet {
 	 * @param orderItems
 	 * @param response
 	 */
-	private void updateOrder(HttpServletRequest request, List<Integer> orderItems, HttpServletResponse response) {
-		// SessionBlob blob = getSessionBlob(request);
-		// for (OrderItem orderItem : orderItems) {
-		// 	if (request.getParameter("orderitem_" + orderItem.getProductId()) != null) {
-		// 		blob = LoadBalancedStoreOperations.updateQuantity(blob, orderItem.getProductId(),
-		// 				Integer.parseInt(request.getParameter("orderitem_" + orderItem.getProductId())));
-		// 	}
-		// }
-		// saveSessionBlob(blob, response);
+	private void updateOrder(HttpServletRequest request, List<OrderItem> orderItems, HttpServletResponse response) {
+		SessionBlob blob = getSessionBlob(request);
+		for (OrderItem orderItem : orderItems) {
+			if (request.getParameter("orderitem_" + orderItem.getProductId()) != null) {
+				blob = LoadBalancedStoreOperations.updateQuantity(blob, orderItem.getProductId(),
+						Integer.parseInt(request.getParameter("orderitem_" + orderItem.getProductId())));
+			}
+		}
+		saveSessionBlob(blob, response);
 	}
 
 }

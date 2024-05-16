@@ -17,11 +17,11 @@ import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
 
-// import io.opentracing.util.GlobalTracer;
-// import tools.descartes.teastore.registryclient.RegistryClient;
-// import tools.descartes.teastore.registryclient.Service;
-// import tools.descartes.teastore.registryclient.loadbalancers.ServiceLoadBalancer;
-// import tools.descartes.teastore.registryclient.tracing.Tracing;
+import io.opentracing.util.GlobalTracer;
+import tools.descartes.teastore.registryclient.RegistryClient;
+import tools.descartes.teastore.registryclient.Service;
+import tools.descartes.teastore.registryclient.loadbalancers.ServiceLoadBalancer;
+import tools.descartes.teastore.registryclient.tracing.Tracing;
 
 /**
  * Application Lifecycle Listener implementation class Registry Client Startup.
@@ -42,8 +42,7 @@ public class WebuiStartup implements ServletContextListener {
      * @param event The servlet context event at destruction.
      */
     public void contextDestroyed(ServletContextEvent event)  {
-    	// RegistryClient.getClient().unregister(event.getServletContext().getContextPath());
-        System.out.println("WebUI destroyed");
+    	RegistryClient.getClient().unregister(event.getServletContext().getContextPath());
     }
 
 	/**
@@ -51,11 +50,10 @@ public class WebuiStartup implements ServletContextListener {
      * @param event The servlet context event at initialization.
      */
     public void contextInitialized(ServletContextEvent event) {
-        // GlobalTracer.register(Tracing.init(Service.WEBUI.getServiceName()));
-    	// ServiceLoadBalancer.preInitializeServiceLoadBalancers(Service.AUTH, Service.IMAGE,
-    	// 		Service.PERSISTENCE, Service.RECOMMENDER);
-    	// RegistryClient.getClient().register(event.getServletContext().getContextPath());
-        System.out.println("WebUI started");
+        GlobalTracer.register(Tracing.init(Service.WEBUI.getServiceName()));
+    	ServiceLoadBalancer.preInitializeServiceLoadBalancers(Service.AUTH, Service.IMAGE,
+    			Service.PERSISTENCE, Service.RECOMMENDER);
+    	RegistryClient.getClient().register(event.getServletContext().getContextPath());
     }
 
 }
