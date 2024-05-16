@@ -17,6 +17,27 @@ spec:
     run: teastore-webui
 
 ---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: teastore-webui-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web # only http for now
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: teastore-webui
+            port:
+              number: 8080
+
+---
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
