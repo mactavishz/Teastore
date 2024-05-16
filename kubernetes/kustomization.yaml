@@ -1,0 +1,8 @@
+resources:
+  - db.yaml
+  - registry.yaml
+  - persistence.yaml
+  - auth.yaml
+  - image.yaml
+  - recommender.yaml
+  - webui.yaml
