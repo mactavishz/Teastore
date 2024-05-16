@@ -1,0 +1,71 @@
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: teastore-webui
+  labels:
+    app: teastore
+    run: teastore-webui
+spec:
+  # type: NodePort
+  type: ClusterIP
+  ports:
+    - port: 8080
+      # nodePort: 30080
+      protocol: TCP
+  selector:
+    run: teastore-webui
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: teastore-webui-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web # only http for now
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: teastore-webui
+            port:
+              number: 8080
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: teastore-webui
+  labels:
+    app: teastore
+    run: teastore-webui
+spec:
+  selector:
+    matchLabels:
+      app: teastore
+      run: teastore-webui
+  template:
+    metadata:
+      labels:
+        app: teastore
+        run: teastore-webui
+    spec:
+      containers:
+        - name: teastore-webui
+          image: descartesresearch/teastore-webui
+          ports:
+            - containerPort: 8080
+          env:
+            - name: HOST_NAME
+              value: "teastore-webui"
+            - name: REGISTRY_HOST
+              value: "teastore-registry"
+
+---
