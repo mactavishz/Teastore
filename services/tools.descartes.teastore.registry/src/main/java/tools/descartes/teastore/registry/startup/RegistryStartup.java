@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tools.descartes.teastore.registry.rest;
+package tools.descartes.teastore.registry.startup;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -23,6 +23,7 @@ import jakarta.servlet.annotation.WebListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.descartes.teastore.registry.rest.Registry;
 
 /**
  * Application Lifecycle Listener implementation class Registry Client Startup.

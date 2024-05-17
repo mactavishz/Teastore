@@ -1,0 +1,75 @@
+services:
+  registry:
+    build:
+      context: ./services/tools.descartes.teastore.registry
+      dockerfile: Dockerfile
+    expose:
+      - "8080"
+  db:
+    image: descartesresearch/teastore-db
+    expose:
+      - "3306"
+    ports:
+      - "3306:3306"
+  persistence:
+    image: descartesresearch/teastore-persistence
+    depends_on:
+      - registry
+      - db
+    expose:
+      - "8080"
+    environment:
+      HOST_NAME: "persistence"
+      REGISTRY_HOST: "registry"
+      DB_HOST: "db"
+      DB_PORT: "3306"
+  auth:
+    image: descartesresearch/teastore-auth
+    depends_on:
+      - registry
+      - persistence
+    expose:
+      - "8080"
+    environment:
+      HOST_NAME: "auth"
+      REGISTRY_HOST: "registry"
+  image:
+    image: descartesresearch/teastore-image
+    depends_on:
+      - registry
+      - persistence
+    expose:
+      - "8080"
+    environment:
+      HOST_NAME: "image"
+      REGISTRY_HOST: "registry"
+  recommender:
+    image: descartesresearch/teastore-recommender
+    depends_on:
+      - registry
+      - persistence
+    expose:
+      - "8080"
+    environment:
+      HOST_NAME: "recommender"
+      REGISTRY_HOST: "registry"
+  webui:
+    image: descartesresearch/teastore-webui
+    depends_on:
+      - registry
+      - auth
+      - image
+      - persistence
+      - recommender
+    expose:
+      - "8080"
+    environment:
+      HOST_NAME: "webui"
+      REGISTRY_HOST: "registry"
+    ports:
+      - "8080:8080"
+
+networks:
+  default:
+    external: true
+    name: teastore-network

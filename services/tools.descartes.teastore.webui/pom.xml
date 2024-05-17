@@ -16,7 +16,6 @@
 		<dependency>
 			<groupId>tools.descartes.teastore</groupId>
 			<artifactId>registryclient</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>tools.descartes.teastore</groupId>
