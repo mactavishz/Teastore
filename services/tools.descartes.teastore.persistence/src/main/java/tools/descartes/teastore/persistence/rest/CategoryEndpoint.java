@@ -18,7 +18,6 @@ import java.util.List;
 
 import jakarta.ws.rs.Path;
 
-import jakarta.ws.rs.Produces;
 import tools.descartes.teastore.persistence.domain.CategoryRepository;
 import tools.descartes.teastore.persistence.repository.DataGenerator;
 import tools.descartes.teastore.registryclient.util.AbstractCRUDEndpoint;
