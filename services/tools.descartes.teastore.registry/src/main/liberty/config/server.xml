@@ -1,4 +1,4 @@
-<server description="Sample Liberty server">
+<server description="TeaStore Registry">
     <!-- tag::features[] -->
     <featureManager>
         <feature>jakartaee-10.0</feature>
