@@ -43,16 +43,16 @@ services:
     environment:
       HOST_NAME: "image"
       REGISTRY_HOST: "registry"
-  recommender:
-    image: descartesresearch/teastore-recommender
-    depends_on:
-      - registry
-      - persistence
-    expose:
-      - "8080"
-    environment:
-      HOST_NAME: "recommender"
-      REGISTRY_HOST: "registry"
+#  recommender:
+#    image: descartesresearch/teastore-recommender
+#    depends_on:
+#      - registry
+#      - persistence
+#    expose:
+#      - "8080"
+#    environment:
+#      HOST_NAME: "recommender"
+#      REGISTRY_HOST: "registry"
   webui:
     image: descartesresearch/teastore-webui
     depends_on:
@@ -60,7 +60,7 @@ services:
       - auth
       - image
       - persistence
-      - recommender
+#      - recommender
     expose:
       - "8080"
     environment:

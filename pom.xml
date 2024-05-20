@@ -29,6 +29,11 @@
                 <artifactId>entities</artifactId>
                 <version>${revision}</version>
             </dependency>
+            <dependency>
+                <groupId>tools.descartes.teastore</groupId>
+                <artifactId>kieker.probes</artifactId>
+                <version>${revision}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
