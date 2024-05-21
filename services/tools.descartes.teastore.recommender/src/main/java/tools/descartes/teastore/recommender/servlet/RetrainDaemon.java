@@ -14,6 +14,7 @@
 package tools.descartes.teastore.recommender.servlet;
 
 import tools.descartes.teastore.utils.RegistryClient;
+import tools.descartes.teastore.utils.Service;
 
 /**
  * DaemonThread for periodic retraining if required.
@@ -21,9 +22,6 @@ import tools.descartes.teastore.utils.RegistryClient;
  * @author Johannes Grohmann
  */
 public class RetrainDaemon extends Thread {
-
-	private static final String persistenceServiceName = "tools.descartes.teastore.persistence";
-	private static final String recommenderServiceName = "tools.descartes.teastore.recommender";
 	/**
 	 * The time between retraining in milliseconds.
 	 */
@@ -58,9 +56,9 @@ public class RetrainDaemon extends Thread {
 				e.printStackTrace();
 			}
 			// wait for the persistance service and then retrain
-			RegistryClient.runAfterServiceIsAvailable(persistenceServiceName, () -> {
+			RegistryClient.runAfterServiceIsAvailable(Service.PERSISTENCE.getServiceName(), () -> {
 				TrainingSynchronizer.getInstance().retrieveDataAndRetrain();
-			}, recommenderServiceName);
+			}, Service.RECOMMENDER.getServiceName());
 		}
 
 	}
