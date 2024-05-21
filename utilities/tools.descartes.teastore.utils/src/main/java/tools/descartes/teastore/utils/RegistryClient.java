@@ -17,7 +17,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class RegistryClient {
-    private static final Logger LOG = LoggerFactory.getLogger(tools.descartes.teastore.registryclient.RegistryClient.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RegistryClient.class);
     private static final int HEARTBEAT_INTERVAL_MS = 2500;
     private static final String registryURL = "http://registry:8080/tools.descartes.teastore.registry/rest/services/";
 

@@ -1,12 +1,7 @@
 package tools.descartes.teastore.recommender.startup;
 
-// import com.netflix.loadbalancer.Server;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-// import tools.descartes.teastore.registryclient.RegistryClient;
-// import tools.descartes.teastore.registryclient.Service;
-// import tools.descartes.teastore.registryclient.StartupCallback;
 import tools.descartes.teastore.recommender.restclient.RegistryClient;
 
 import java.util.List;
@@ -17,7 +12,7 @@ import java.util.List;
  * @author Simon
  */
 public class StartupCallbackTask implements Runnable {
-    private static final Logger LOG = LoggerFactory.getLogger(RegistryClient.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StartupCallbackTask.class);
 
     private String requestedService;
     private Runnable callback;
