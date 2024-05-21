@@ -18,6 +18,8 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Response;
 
+import org.eclipse.microprofile.metrics.annotation.Counted;
+import org.eclipse.microprofile.metrics.annotation.Timed;
 import tools.descartes.teastore.recommender.algorithm.IRecommender;
 import tools.descartes.teastore.recommender.servlet.TrainingSynchronizer;
 import tools.descartes.teastore.entities.Order;
@@ -48,6 +50,8 @@ public class TrainEndpoint {
 	 *         if the operation failed.
 	 */
 	@GET
+	@Counted(name = "trainCount", absolute = true, description = "How many times the recommendation algorithm was trained.")
+	@Timed(name = "trainTimer", tags = {"method=get"}, absolute = true, description = "Time and frequency to train the recommendation algorithm.")
 	public Response train() {
 		try {
 			long start = System.currentTimeMillis();
@@ -77,6 +81,8 @@ public class TrainEndpoint {
 	 */
 	@GET
 	@Path("timestamp")
+	@Timed(name = "timestampTimer", tags = {"method=get"}, absolute = true, description = "Time and frequency to get the timestamp of the last training.")
+	@Counted(name = "timestampCount", absolute = true, description = "How many times the timestamp of the last training was requested.")
 	public Response getTimeStamp() {
 		if (TrainingSynchronizer.getInstance().getMaxTime() == TrainingSynchronizer.DEFAULT_MAX_TIME_VALUE) {
 			return Response.status(Response.Status.PRECONDITION_FAILED.getStatusCode())
@@ -98,6 +104,8 @@ public class TrainEndpoint {
 	 */
 	@GET
 	@Path("isready")
+	@Timed(name = "isreadyTimer", tags = {"method=get"}, absolute = true, description = "Time and frequency to check if the recommender is ready.")
+	@Counted(name = "isreadyCount", absolute = true, description = "How many times the recommender was checked for readiness.")
 	public Response isReady() {
 		if (TrainingSynchronizer.getInstance().isReady()) {
 			return Response.ok(true).build();

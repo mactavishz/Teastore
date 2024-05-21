@@ -23,10 +23,14 @@
 
 	</properties>
 	<dependencies>
-		<!-- Internal Dependencies -->
 		<dependency>
 			<groupId>tools.descartes.teastore</groupId>
-			<artifactId>registryclient</artifactId>
+			<artifactId>entities</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>tools.descartes.teastore</groupId>
+			<artifactId>utils</artifactId>
 		</dependency>
 
 		<dependency>
@@ -71,6 +75,8 @@
                     <containerRunOpts>
 						-p ${local.http.port}:${liberty.var.http.port}
                         -p ${local.https.port}:${liberty.var.https.port}
+						--env-file ${project.basedir}/env/dev.env
+						--env-file ${project.parent.basedir}/env/dev.env
                         --network ${docker.network} --name
                         ${project.artifactId}
                     </containerRunOpts>
