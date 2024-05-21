@@ -24,18 +24,14 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import tools.descartes.teastore.utils.NotFoundException;
+import tools.descartes.teastore.recommender.restclient.PersistenceClient;
 import tools.descartes.teastore.recommender.algorithm.RecommenderSelector;
-import tools.descartes.teastore.registryclient.Service;
-import tools.descartes.teastore.registryclient.loadbalancers.LoadBalancerTimeoutException;
-import tools.descartes.teastore.registryclient.loadbalancers.ServiceLoadBalancer;
-import tools.descartes.teastore.registryclient.rest.LoadBalancedCRUDOperations;
-import tools.descartes.teastore.registryclient.util.NotFoundException;
 import tools.descartes.teastore.entities.Order;
 import tools.descartes.teastore.entities.OrderItem;
 
@@ -133,21 +129,15 @@ public final class TrainingSynchronizer {
 		// not answering.
 		Iterator<Integer> waitTimes = PERSISTENCE_CREATION_WAIT_TIME.iterator();
 		while (true) {
-			Response result = null;
+			boolean result;
 			try {
-				result = ServiceLoadBalancer.loadBalanceRESTOperation(Service.PERSISTENCE, "generatedb", String.class,
-						client -> client.getService().path(client.getApplicationURI()).path(client.getEndpointURI())
-								.path("finished").request().get());
-
-								if (result != null && Boolean.parseBoolean(result.readEntity(String.class))) {
-									break;
+				result = PersistenceClient.isPersistenceAvailable();
+				if (result) {
+					break;
 				}
-			} catch (NullPointerException | NotFoundException | LoadBalancerTimeoutException e) {
+			} catch (NullPointerException | NotFoundException e) {
 				// continue waiting as usual
-			} finally {
-				if (result != null) {
-					result.close();
-				}
+				LOG.error("Persistence not reachable. Waiting for next try.", e);
 			}
 			try {
 				int nextWaitTime;
@@ -181,20 +171,20 @@ public final class TrainingSynchronizer {
 		List<Order> orders = null;
 		// retrieve
 		try {
-			items = LoadBalancedCRUDOperations.getEntities(Service.PERSISTENCE, "orderitems", OrderItem.class, -1, -1);
+			items = PersistenceClient.getOrderItems(-1, -1);
 			long noItems = items.size();
 			LOG.trace("Retrieved " + noItems + " orderItems, starting retrieving of orders now.");
-		} catch (NotFoundException | LoadBalancerTimeoutException e) {
+		} catch (NotFoundException e) {
 			// set ready anyway to avoid deadlocks
 			setReady(true);
 			LOG.error("Database retrieving failed.");
 			return -1;
 		}
 		try {
-			orders = LoadBalancedCRUDOperations.getEntities(Service.PERSISTENCE, "orders", Order.class, -1, -1);
+			orders = PersistenceClient.getOrders(-1, -1);
 			long noOrders = orders.size();
 			LOG.trace("Retrieved " + noOrders + " orders, starting training now.");
-		} catch (NotFoundException | LoadBalancerTimeoutException e) {
+		} catch (NotFoundException e) {
 			// set ready anyway to avoid deadlocks
 			setReady(true);
 			LOG.error("Database retrieving failed.");
@@ -211,10 +201,7 @@ public final class TrainingSynchronizer {
 
 	private void filterLists(List<OrderItem> orderItems, List<Order> orders) {
 		// since we are not registered ourselves, we can multicast to all services
-		List<Response> maxTimeResponses = ServiceLoadBalancer.multicastRESTOperation(Service.RECOMMENDER,
-				"train/timestamp", Response.class,
-				client -> client.getService().path(client.getApplicationURI()).path(client.getEndpointURI())
-						.request(MediaType.TEXT_PLAIN).accept(MediaType.TEXT_PLAIN).get());
+		List<Response> maxTimeResponses = PersistenceClient.getTrainTimestamps();
 		for (Response response : maxTimeResponses) {
 			if (response == null) {
 				LOG.warn("One service response was null and is therefore not available for time-check.");

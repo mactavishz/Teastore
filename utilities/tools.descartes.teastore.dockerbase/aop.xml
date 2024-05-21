@@ -20,7 +20,7 @@
 		<exclude within="tools.descartes.teastore.persistence.rest.DatabaseGenerationEndpoint" />
 		<exclude within="tools.descartes.teastore.recommender.servlet.IndexServlet" />
 		<exclude within="tools.descartes.teastore.recommender.servlet.RetrainDaemon" />
-		<exclude within="tools.descartes.teastore.recommender.servlet.RecommenderStartup" />
+		<exclude within="tools.descartes.teastore.recommender.startup.RecommenderStartup" />
 		<exclude within="tools.descartes.teastore.recommender.rest.TrainEndPoint" />
 		<exclude within="tools.descartes.teastore.recommender.algorithm.impl.UseFallBackException" />
 		<exclude within="tools.descartes.teastore.recommender.algorithm.OrderItemSet" />
