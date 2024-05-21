@@ -1,4 +1,4 @@
-package tools.descartes.teastore.recommender.restclient;
+package tools.descartes.teastore.utils;
 
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.Client;
@@ -9,7 +9,6 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tools.descartes.teastore.recommender.startup.StartupCallbackTask;
 
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -19,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 public class RegistryClient {
     private static final Logger LOG = LoggerFactory.getLogger(RegistryClient.class);
     private static final int HEARTBEAT_INTERVAL_MS = 2500;
-    private static final String registryURL = "http://registry:8080/tools.descartes.teastore.registry/rest/services/";
+    private static final String registryURL = Service.getRegistryURL();
 
     private static ScheduledExecutorService heartbeatScheduler = Executors
             .newSingleThreadScheduledExecutor();
@@ -38,7 +37,7 @@ public class RegistryClient {
         try {
             Client client = ClientBuilder.newClient();
             Response response = client.target(registryURL)
-                    .path("/" + targetService + "/").request(MediaType.APPLICATION_JSON)
+                    .path(targetService).request(MediaType.APPLICATION_JSON)
                     .get();
             list = response.readEntity(new GenericType<List<String>>() {
             });

@@ -1,8 +1,7 @@
-package tools.descartes.teastore.recommender.startup;
+package tools.descartes.teastore.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tools.descartes.teastore.recommender.restclient.RegistryClient;
 
 import java.util.List;
 
@@ -35,7 +34,6 @@ public class StartupCallbackTask implements Runnable {
     public void run() {
         try {
             List<String> servers;
-            boolean msgLogged = false;
             do {
                 servers = RegistryClient.getServersForService(requestedService);
                 if (servers == null || servers.isEmpty()) {
