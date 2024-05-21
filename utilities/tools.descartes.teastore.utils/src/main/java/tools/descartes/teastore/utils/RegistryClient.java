@@ -20,9 +20,9 @@ public class RegistryClient {
     private static final int HEARTBEAT_INTERVAL_MS = 2500;
     private static final String registryURL = Service.getRegistryURL();
 
-    private static final ScheduledExecutorService heartbeatScheduler = Executors
+    private static ScheduledExecutorService heartbeatScheduler = Executors
             .newSingleThreadScheduledExecutor();
-    private static final ScheduledExecutorService availabilityScheduler = Executors
+    private static ScheduledExecutorService availabilityScheduler = Executors
             .newSingleThreadScheduledExecutor();
 
     public static void runAfterServiceIsAvailable(String requestedService, Runnable callback,
@@ -34,9 +34,11 @@ public class RegistryClient {
 
     public static List<String> getServersForService(String targetService) {
         List<String> list = null;
-        try (Client client = ClientBuilder.newClient(); Response response = client.target(registryURL)
-                .path(targetService).request(MediaType.APPLICATION_JSON)
-                .get()) {
+        try {
+            Client client = ClientBuilder.newClient();
+            Response response = client.target(registryURL)
+                    .path(targetService).request(MediaType.APPLICATION_JSON)
+                    .get();
             list = response.readEntity(new GenericType<List<String>>() {
             });
         } catch (ProcessingException e) {
@@ -47,11 +49,13 @@ public class RegistryClient {
     }
 
     public static boolean unregisterOnce(String serviceName, String serverName) {
-        try (Client client = ClientBuilder.newClient(); Response response = client.target(registryURL)
-                .path(serviceName)
-                .path(serverName).request(MediaType.APPLICATION_JSON)
-                .delete()) {
-            return (response.getStatus() == Response.Status.OK.getStatusCode());
+        try {
+            Client client = ClientBuilder.newClient();
+            Response res = client.target(registryURL)
+                    .path(serviceName)
+                    .path(serverName).request(MediaType.APPLICATION_JSON)
+                    .delete();
+            return (res.getStatus() == Response.Status.OK.getStatusCode());
         } catch (ProcessingException e) {
             e.printStackTrace();
             return false;
@@ -59,10 +63,12 @@ public class RegistryClient {
     }
 
     public static boolean registerOnce(String serviceName, String serverName) {
-        try (Client client = ClientBuilder.newClient(); Response res = client.target(registryURL)
-                .path(serviceName)
-                .path(serverName).request(MediaType.APPLICATION_JSON)
-                .put(Entity.text(""));) {
+        try {
+            Client client = ClientBuilder.newClient();
+            Response res = client.target(registryURL)
+                    .path(serviceName)
+                    .path(serverName).request(MediaType.APPLICATION_JSON)
+                    .put(Entity.text(""));
             return (res.getStatus() == Response.Status.OK.getStatusCode());
         } catch (ProcessingException e) {
             e.printStackTrace();

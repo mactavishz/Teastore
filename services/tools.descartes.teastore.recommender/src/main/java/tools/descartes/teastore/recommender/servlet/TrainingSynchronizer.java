@@ -201,40 +201,29 @@ public final class TrainingSynchronizer {
 
 	private void filterLists(List<OrderItem> orderItems, List<Order> orders) {
 		// since we are not registered ourselves, we can multicast to all services
-		List<Response> maxTimeResponses = new ArrayList<>();
-		try {
-			maxTimeResponses = PersistenceClient.getTrainTimestamps();
-			for (Response response : maxTimeResponses) {
-				if (response == null) {
-					LOG.warn("One service response was null and is therefore not available for time-check.");
-				} else if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-					// only consider if status was fine
-					long milliTS = response.readEntity(Long.class);
-					if (maxTime != TrainingSynchronizer.DEFAULT_MAX_TIME_VALUE && maxTime != milliTS) {
-						LOG.warn("Services disagree about timestamp: " + maxTime + " vs " + milliTS
-								+ ". Therfore using the minimum.");
-					}
-					maxTime = Math.min(maxTime, milliTS);
-				} else {
-					// release connection by buffering entity
-					response.bufferEntity();
-					LOG.warn("Service " + response + "was not available for time-check.");
+		List<Response> maxTimeResponses = PersistenceClient.getTrainTimestamps();
+		for (Response response : maxTimeResponses) {
+			if (response == null) {
+				LOG.warn("One service response was null and is therefore not available for time-check.");
+			} else if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+				// only consider if status was fine
+				long milliTS = response.readEntity(Long.class);
+				if (maxTime != TrainingSynchronizer.DEFAULT_MAX_TIME_VALUE && maxTime != milliTS) {
+					LOG.warn("Services disagree about timestamp: " + maxTime + " vs " + milliTS
+							+ ". Therfore using the minimum.");
 				}
+				maxTime = Math.min(maxTime, milliTS);
+			} else {
+				// release connection by buffering entity
+				response.bufferEntity();
+				LOG.warn("Service " + response + "was not available for time-check.");
 			}
-			if (maxTime == Long.MIN_VALUE) {
-				// we are the only known service
-				// therefore we find max and set it
-				for (Order or : orders) {
-					maxTime = Math.max(maxTime, toMillis(or.getTime()));
-				}
-			}
-		} catch (Exception e) {
-			LOG.error("Error while retrieving timestamps from services.", e);
-		} finally {
-			for (Response response : maxTimeResponses) {
-				if (response != null) {
-					response.close();
-				}
+		}
+		if (maxTime == Long.MIN_VALUE) {
+			// we are the only known service
+			// therefore we find max and set it
+			for (Order or : orders) {
+				maxTime = Math.max(maxTime, toMillis(or.getTime()));
 			}
 		}
 		filterForMaxtimeStamp(orderItems, orders);

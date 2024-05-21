@@ -32,6 +32,13 @@
 			<groupId>tools.descartes.teastore</groupId>
 			<artifactId>utils</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>jakarta.activation</groupId>
+			<artifactId>jakarta.activation-api</artifactId>
+			<version>2.0.1</version>
+		</dependency>
+
 		<!-- ADD THIS, REMOVE THE OLD VERSION OF JAKARTA -->
         <dependency>
             <groupId>jakarta.platform</groupId>

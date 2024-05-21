@@ -84,7 +84,7 @@ public class RecommenderStartup implements ServletContextListener {
 				LOG.info("Recommender loop time not set. Disabling periodic retraining.");
 			}
 		} catch (EnvVarNotFoundException | NumberFormatException e) {
-			LOG.error("Could not start retraining daemon, " + e.getMessage());
+			LOG.info("Recommender loop time not set. Disabling periodic retraining.");
 		}
 	}
 
