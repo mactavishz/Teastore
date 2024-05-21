@@ -7,35 +7,4 @@
 	<welcome-file-list>
 		<welcome-file>index</welcome-file>
 	</welcome-file-list>
-	<env-entry>
-		<env-entry-name>recommenderLoopTime</env-entry-name>
-		<env-entry-type>java.lang.Long</env-entry-type>
-		<env-entry-value>0</env-entry-value>
-	</env-entry>
-	<env-entry>
-		<env-entry-name>recommenderAlgorithm</env-entry-name>
-		<env-entry-type>java.lang.String</env-entry-type>
-		<env-entry-value>SlopeOne</env-entry-value>
-	</env-entry>
-	<env-entry>
-		<env-entry-name>useHostIP</env-entry-name>
-		<env-entry-type>java.lang.String</env-entry-type>
-		<env-entry-value>false</env-entry-value>
-	</env-entry>
-	<env-entry>
-		<env-entry-name>hostName</env-entry-name>
-		<env-entry-type>java.lang.String</env-entry-type>
-		<env-entry-value>recommender</env-entry-value>
-	</env-entry>
-	<env-entry>
-		<env-entry-name>servicePort</env-entry-name>
-		<env-entry-type>java.lang.String</env-entry-type>
-		<env-entry-value>8080</env-entry-value>
-	</env-entry>
-	<env-entry>
-		<env-entry-name>registryURL</env-entry-name>
-		<env-entry-type>java.lang.String</env-entry-type>
-		<env-entry-value>http://registry:8080/tools.descartes.teastore.registry/rest/services/</env-entry-value>
-	</env-entry>
-	<absolute-ordering/>
 </web-app>

@@ -1,9 +1,8 @@
-<server description="TeaStore registry">
+<server description="TeaStore recommender">
     <!-- tag::features[] -->
     <featureManager>
         <feature>jakartaee-10.0</feature>
         <feature>microProfile-6.1</feature>
-<!--        <feature>jndi-1.0</feature>-->
     </featureManager>
     <!-- end::features[] -->
     <variable name="http.port" defaultValue="8080"/>
