@@ -16,23 +16,22 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class RegistryClient {
-    private static final Logger LOG = LoggerFactory.getLogger(RegistryClient.class);
-    private static final int HEARTBEAT_INTERVAL_MS = 2500;
-    private static final String registryURL = Service.getRegistryURL();
+    private final Logger LOG = LoggerFactory.getLogger(RegistryClient.class);
+    private final int HEARTBEAT_INTERVAL_MS = 2500;
+    private final String registryURL = Service.getRegistryURL();
 
-    private static ScheduledExecutorService heartbeatScheduler = Executors
+    private ScheduledExecutorService heartbeatScheduler = Executors
             .newSingleThreadScheduledExecutor();
-    private static ScheduledExecutorService availabilityScheduler = Executors
+    private ScheduledExecutorService availabilityScheduler = Executors
             .newSingleThreadScheduledExecutor();
 
-    public static void runAfterServiceIsAvailable(String requestedService, Runnable callback,
+    public void runAfterServiceIsAvailable(String requestedService, Runnable callback,
                                                   String myService) {
         availabilityScheduler.schedule(new StartupCallbackTask(requestedService, callback, myService),
                 0, TimeUnit.NANOSECONDS);
-        availabilityScheduler.shutdown();
     }
 
-    public static List<String> getServersForService(String targetService) {
+    public List<String> getServersForService(String targetService) {
         List<String> list = null;
         try {
             Client client = ClientBuilder.newClient();
@@ -41,42 +40,49 @@ public class RegistryClient {
                     .get();
             list = response.readEntity(new GenericType<List<String>>() {
             });
+            client.close();
+            response.close();
+            return list;
         } catch (ProcessingException e) {
             return null;
         }
-
-        return list;
     }
 
-    public static boolean unregisterOnce(String serviceName, String serverName) {
+    public boolean unregisterOnce(String serviceName, String serverName) {
         try {
             Client client = ClientBuilder.newClient();
-            Response res = client.target(registryURL)
+            Response response = client.target(registryURL)
                     .path(serviceName)
                     .path(serverName).request(MediaType.APPLICATION_JSON)
                     .delete();
-            return (res.getStatus() == Response.Status.OK.getStatusCode());
+            boolean result = response.getStatus() == Response.Status.OK.getStatusCode();
+            client.close();
+            response.close();
+            return result;
         } catch (ProcessingException e) {
             e.printStackTrace();
             return false;
         }
     }
 
-    public static boolean registerOnce(String serviceName, String serverName) {
+    public boolean registerOnce(String serviceName, String serverName) {
         try {
             Client client = ClientBuilder.newClient();
-            Response res = client.target(registryURL)
+            Response response = client.target(registryURL)
                     .path(serviceName)
                     .path(serverName).request(MediaType.APPLICATION_JSON)
                     .put(Entity.text(""));
-            return (res.getStatus() == Response.Status.OK.getStatusCode());
+            boolean result = response.getStatus() == Response.Status.OK.getStatusCode();
+            client.close();
+            response.close();
+            return result;
         } catch (ProcessingException e) {
             e.printStackTrace();
             return false;
         }
     }
 
-    public static void register(String serviceName, String serverName) {
+    public void register(String serviceName, String serverName) {
         heartbeatScheduler.scheduleAtFixedRate(() -> {
                     boolean ok = registerOnce(serviceName, serverName);
                     if (!ok) {
@@ -88,7 +94,7 @@ public class RegistryClient {
                 HEARTBEAT_INTERVAL_MS, TimeUnit.MILLISECONDS);
     }
 
-    public static void unregister(String serviceName, String serverName) {
+    public void unregister(String serviceName, String serverName) {
         heartbeatScheduler.shutdown();
         availabilityScheduler.shutdown();
         try {

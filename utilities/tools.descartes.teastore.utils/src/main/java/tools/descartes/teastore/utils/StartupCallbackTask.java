@@ -13,6 +13,7 @@ import java.util.List;
 public class StartupCallbackTask implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(StartupCallbackTask.class);
 
+    private RegistryClient client = new RegistryClient();
     private String requestedService;
     private Runnable callback;
     private String myService;
@@ -35,7 +36,7 @@ public class StartupCallbackTask implements Runnable {
         try {
             List<String> servers;
             do {
-                servers = RegistryClient.getServersForService(requestedService);
+                servers = client.getServersForService(requestedService);
                 if (servers == null || servers.isEmpty()) {
                     try {
                         if (servers == null) {
