@@ -19,11 +19,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PersistenceClient {
-    private static final Logger LOG = LoggerFactory.getLogger(PersistenceClient.class);
-    private static final String persistenceRESTEndpoint = Service.getServiceRESTEndpoint(Service.PERSISTENCE, "PERSISTENCE_HOST", "PERSISTENCE_PORT");
-    private static final String recommenderRESTEndpoint = Service.getSelfServiceRESTEndpoint(Service.RECOMMENDER);
+    private final Logger LOG = LoggerFactory.getLogger(PersistenceClient.class);
+    private final String persistenceRESTEndpoint = Service.getServiceRESTEndpoint(Service.PERSISTENCE, "PERSISTENCE_HOST", "PERSISTENCE_PORT");
+    private final String recommenderRESTEndpoint = Service.getSelfServiceRESTEndpoint(Service.RECOMMENDER);
 
-    public static boolean isPersistenceAvailable() {
+    public boolean isPersistenceAvailable() {
         try {
             Client client = ClientBuilder.newClient();
             Response response = client.target(persistenceRESTEndpoint)
@@ -31,14 +31,18 @@ public class PersistenceClient {
                     .path("finished")
                     .request()
                     .get();
-            return Boolean.parseBoolean(response.readEntity(String.class));
+
+            boolean result = Boolean.parseBoolean(response.readEntity(String.class));
+            client.close();
+            response.close();
+            return result;
         } catch (ProcessingException e) {
             e.printStackTrace();
             return false;
         }
     }
 
-    public static List<OrderItem> getOrderItems(int startIndex, int limit) {
+    public List<OrderItem> getOrderItems(int startIndex, int limit) {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(persistenceRESTEndpoint).path("orderitems");
         if (startIndex >= 0) {
@@ -66,10 +70,14 @@ public class PersistenceClient {
         } else if (response != null && response.getStatus() == Response.Status.REQUEST_TIMEOUT.getStatusCode()) {
             throw new TimeoutException();
         }
+        client.close();
+        if (response != null) {
+            response.close();
+        }
         return entities;
     }
 
-    public static List<Order> getOrders(int startIndex, int limit) {
+    public List<Order> getOrders(int startIndex, int limit) {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(persistenceRESTEndpoint).path("orders");
         if (startIndex >= 0) {
@@ -97,15 +105,38 @@ public class PersistenceClient {
         } else if (response != null && response.getStatus() == Response.Status.REQUEST_TIMEOUT.getStatusCode()) {
             throw new TimeoutException();
         }
+        client.close();
+        if (response != null) {
+            response.close();
+        }
         return entities;
     }
 
-    public static List<Response> getTrainTimestamps() {
-       Client client = ClientBuilder.newClient();
+    public List<Long> getTrainTimestamps() {
+        Client client = ClientBuilder.newClient();
         WebTarget target = client.target(recommenderRESTEndpoint).path("train/timestamp");
         Response response = target.request(MediaType.TEXT_PLAIN).accept(MediaType.TEXT_PLAIN).get();
-        List<Response> list = new ArrayList<>();
-        list.add(response);
+        List<Long> list = new ArrayList<>();
+        Long timestamp = null;
+        if (response != null && response.getStatus() == 200) {
+            try {
+                timestamp = response.readEntity(Long.class);
+            } catch (ProcessingException e) {
+                LOG.warn("Response did not conform to expected entity type. List expected.");
+            }
+        } else if (response != null) {
+            response.bufferEntity();
+        }
+        if (response != null && response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
+            throw new NotFoundException();
+        } else if (response != null && response.getStatus() == Response.Status.REQUEST_TIMEOUT.getStatusCode()) {
+            throw new TimeoutException();
+        }
+        client.close();
+        if (response != null) {
+            response.close();
+        }
+        list.add(timestamp);
         return list;
     }
 }

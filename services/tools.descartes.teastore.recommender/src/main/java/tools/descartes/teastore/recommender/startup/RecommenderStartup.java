@@ -35,9 +35,9 @@ public class RecommenderStartup implements ServletContextListener {
 
 	// private static final int REST_READ_TIMOUT = 1750;
 
-	private static final Logger LOG = LoggerFactory.getLogger(RecommenderStartup.class);
-
-	private static final String serverName = Service.getServerName("SERVICE_HOST", "SERVICE_PORT");
+	private final Logger LOG = LoggerFactory.getLogger(RecommenderStartup.class);
+	private final String serverName = Service.getServerName("SERVICE_HOST", "SERVICE_PORT");
+	private final RegistryClient client = new RegistryClient();
 	/**
 	 * Also set this accordingly in RegistryClientStartup.
 	 */
@@ -55,7 +55,7 @@ public class RecommenderStartup implements ServletContextListener {
 	 *            The servlet context event at destruction.
 	 */
 	public void contextDestroyed(ServletContextEvent event) {
-		RegistryClient.unregister(Service.RECOMMENDER.getServiceName(), serverName);
+		client.unregister(Service.RECOMMENDER.getServiceName(), serverName);
 	}
 
 	/**
@@ -65,15 +65,15 @@ public class RecommenderStartup implements ServletContextListener {
 	 */
 	public void contextInitialized(ServletContextEvent event) {
 		LOG.info("Waiting for dependent services to become available.");
-		RegistryClient.runAfterServiceIsAvailable(Service.PERSISTENCE.getServiceName(), () -> {
+		client.runAfterServiceIsAvailable(Service.PERSISTENCE.getServiceName(), () -> {
 			LOG.info("Persistence service is available");
 			TrainingSynchronizer.getInstance().retrieveDataAndRetrain();
-			RegistryClient.register(Service.RECOMMENDER.getServiceName(), serverName);
+			client.register(Service.RECOMMENDER.getServiceName(), serverName);
 		}, Service.RECOMMENDER.getServiceName());
 		try {
-			String looptimeStr = System.getenv("RECOMMENDER_LOOP_TIME");
+			String looptimeStr = System.getenv("RECOMMENDER_RETRAIN_LOOP_TIME");
 			if (looptimeStr == null) {
-				throw new EnvVarNotFoundException("RECOMMENDER_LOOP_TIME");
+				throw new EnvVarNotFoundException("RECOMMENDER_RETRAIN_LOOP_TIME");
 			}
 			long looptime = Long.parseLong(looptimeStr);
 			// if a looptime is specified, a retraining daemon is started

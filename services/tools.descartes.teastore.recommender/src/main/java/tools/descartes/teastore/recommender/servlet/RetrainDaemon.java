@@ -13,6 +13,9 @@
  */
 package tools.descartes.teastore.recommender.servlet;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import tools.descartes.teastore.recommender.restclient.PersistenceClient;
 import tools.descartes.teastore.utils.RegistryClient;
 import tools.descartes.teastore.utils.Service;
 
@@ -22,9 +25,11 @@ import tools.descartes.teastore.utils.Service;
  * @author Johannes Grohmann
  */
 public class RetrainDaemon extends Thread {
+	private final Logger LOG = LoggerFactory.getLogger(RetrainDaemon.class);
 	/**
 	 * The time between retraining in milliseconds.
 	 */
+	private RegistryClient client = new RegistryClient();
 	private long looptime;
 
 	/**
@@ -53,10 +58,11 @@ public class RetrainDaemon extends Thread {
 			try {
 				Thread.sleep(looptime);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				// e.printStackTrace();
+				LOG.error("RetrainDaemon interrupted", e);
 			}
 			// wait for the persistance service and then retrain
-			RegistryClient.runAfterServiceIsAvailable(Service.PERSISTENCE.getServiceName(), () -> {
+			client.runAfterServiceIsAvailable(Service.PERSISTENCE.getServiceName(), () -> {
 				TrainingSynchronizer.getInstance().retrieveDataAndRetrain();
 			}, Service.RECOMMENDER.getServiceName());
 		}
