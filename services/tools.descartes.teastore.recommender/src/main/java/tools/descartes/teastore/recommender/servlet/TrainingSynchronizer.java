@@ -24,20 +24,17 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import tools.descartes.teastore.utils.NotFoundException;
+import tools.descartes.teastore.recommender.restclient.PersistenceClient;
 import tools.descartes.teastore.recommender.algorithm.RecommenderSelector;
-import tools.descartes.teastore.registryclient.Service;
-import tools.descartes.teastore.registryclient.loadbalancers.LoadBalancerTimeoutException;
-import tools.descartes.teastore.registryclient.loadbalancers.ServiceLoadBalancer;
-import tools.descartes.teastore.registryclient.rest.LoadBalancedCRUDOperations;
-import tools.descartes.teastore.registryclient.util.NotFoundException;
 import tools.descartes.teastore.entities.Order;
 import tools.descartes.teastore.entities.OrderItem;
+import tools.descartes.teastore.utils.RegistryClient;
 
 /**
  * This class organizes the communication with the other services and
@@ -63,6 +60,8 @@ public final class TrainingSynchronizer {
 	private static TrainingSynchronizer instance;
 
 	private boolean isReady = false;
+
+	private PersistenceClient persistenceClient = new PersistenceClient();
 
 	/**
 	 * @return the isReady
@@ -133,21 +132,15 @@ public final class TrainingSynchronizer {
 		// not answering.
 		Iterator<Integer> waitTimes = PERSISTENCE_CREATION_WAIT_TIME.iterator();
 		while (true) {
-			Response result = null;
+			boolean result;
 			try {
-				result = ServiceLoadBalancer.loadBalanceRESTOperation(Service.PERSISTENCE, "generatedb", String.class,
-						client -> client.getService().path(client.getApplicationURI()).path(client.getEndpointURI())
-								.path("finished").request().get());
-
-								if (result != null && Boolean.parseBoolean(result.readEntity(String.class))) {
-									break;
+				result = persistenceClient.isPersistenceAvailable();
+				if (result) {
+					break;
 				}
-			} catch (NullPointerException | NotFoundException | LoadBalancerTimeoutException e) {
+			} catch (NullPointerException | NotFoundException e) {
 				// continue waiting as usual
-			} finally {
-				if (result != null) {
-					result.close();
-				}
+				LOG.error("Persistence not reachable. Waiting for next try.", e);
 			}
 			try {
 				int nextWaitTime;
@@ -173,7 +166,7 @@ public final class TrainingSynchronizer {
 	 */
 	public long retrieveDataAndRetrain() {
 		setReady(false);
-		LOG.trace("Retrieving data objects from database...");
+		LOG.info("Retrieving data objects from database...");
 
 		waitForPersistence();
 
@@ -181,20 +174,20 @@ public final class TrainingSynchronizer {
 		List<Order> orders = null;
 		// retrieve
 		try {
-			items = LoadBalancedCRUDOperations.getEntities(Service.PERSISTENCE, "orderitems", OrderItem.class, -1, -1);
+			items = persistenceClient.getOrderItems(-1, -1);
 			long noItems = items.size();
-			LOG.trace("Retrieved " + noItems + " orderItems, starting retrieving of orders now.");
-		} catch (NotFoundException | LoadBalancerTimeoutException e) {
+			LOG.info("Retrieved " + noItems + " orderItems, starting retrieving of orders now.");
+		} catch (NotFoundException e) {
 			// set ready anyway to avoid deadlocks
 			setReady(true);
 			LOG.error("Database retrieving failed.");
 			return -1;
 		}
 		try {
-			orders = LoadBalancedCRUDOperations.getEntities(Service.PERSISTENCE, "orders", Order.class, -1, -1);
+			orders = persistenceClient.getOrders(-1, -1);
 			long noOrders = orders.size();
-			LOG.trace("Retrieved " + noOrders + " orders, starting training now.");
-		} catch (NotFoundException | LoadBalancerTimeoutException e) {
+			LOG.info("Retrieved " + noOrders + " orders, starting training now.");
+		} catch (NotFoundException e) {
 			// set ready anyway to avoid deadlocks
 			setReady(true);
 			LOG.error("Database retrieving failed.");
@@ -204,32 +197,24 @@ public final class TrainingSynchronizer {
 		filterLists(items, orders);
 		// train instance
 		RecommenderSelector.getInstance().train(items, orders);
-		LOG.trace("Finished training, ready for recommendation.");
+		LOG.info("Finished training, ready for recommendation.");
 		setReady(true);
 		return items.size() + orders.size();
 	}
 
 	private void filterLists(List<OrderItem> orderItems, List<Order> orders) {
 		// since we are not registered ourselves, we can multicast to all services
-		List<Response> maxTimeResponses = ServiceLoadBalancer.multicastRESTOperation(Service.RECOMMENDER,
-				"train/timestamp", Response.class,
-				client -> client.getService().path(client.getApplicationURI()).path(client.getEndpointURI())
-						.request(MediaType.TEXT_PLAIN).accept(MediaType.TEXT_PLAIN).get());
-		for (Response response : maxTimeResponses) {
-			if (response == null) {
+		List<Long> maxTimestamps = persistenceClient.getTrainTimestamps();
+		for (Long ts : maxTimestamps) {
+			if (ts == null) {
 				LOG.warn("One service response was null and is therefore not available for time-check.");
-			} else if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-				// only consider if status was fine
-				long milliTS = response.readEntity(Long.class);
+			} else {
+				long milliTS = ts;
 				if (maxTime != TrainingSynchronizer.DEFAULT_MAX_TIME_VALUE && maxTime != milliTS) {
 					LOG.warn("Services disagree about timestamp: " + maxTime + " vs " + milliTS
 							+ ". Therfore using the minimum.");
 				}
 				maxTime = Math.min(maxTime, milliTS);
-			} else {
-				// release connection by buffering entity
-				response.bufferEntity();
-				LOG.warn("Service " + response + "was not available for time-check.");
 			}
 		}
 		if (maxTime == Long.MIN_VALUE) {

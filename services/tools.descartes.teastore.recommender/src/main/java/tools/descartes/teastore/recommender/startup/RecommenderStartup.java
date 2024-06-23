@@ -11,23 +11,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tools.descartes.teastore.recommender.servlet;
+package tools.descartes.teastore.recommender.startup;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.opentracing.util.GlobalTracer;
-import tools.descartes.teastore.registryclient.RegistryClient;
-import tools.descartes.teastore.registryclient.Service;
-import tools.descartes.teastore.registryclient.loadbalancers.ServiceLoadBalancer;
-import tools.descartes.teastore.registryclient.tracing.Tracing;
-import tools.descartes.teastore.registryclient.util.RESTClient;
-
+import tools.descartes.teastore.utils.RegistryClient;
+import tools.descartes.teastore.recommender.servlet.RetrainDaemon;
+import tools.descartes.teastore.recommender.servlet.TrainingSynchronizer;
+import tools.descartes.teastore.utils.EnvVarNotFoundException;
+import tools.descartes.teastore.utils.Service;
 /**
  * Startup Handler for the Recommender Service.
  *
@@ -37,10 +33,11 @@ import tools.descartes.teastore.registryclient.util.RESTClient;
 @WebListener
 public class RecommenderStartup implements ServletContextListener {
 
-	private static final int REST_READ_TIMOUT = 1750;
+	// private static final int REST_READ_TIMOUT = 1750;
 
-	private static final Logger LOG = LoggerFactory.getLogger(RecommenderStartup.class);
-
+	private final Logger LOG = LoggerFactory.getLogger(RecommenderStartup.class);
+	private final String serverName = Service.getServerName("SERVICE_HOST", "SERVICE_PORT");
+	private final RegistryClient client = new RegistryClient();
 	/**
 	 * Also set this accordingly in RegistryClientStartup.
 	 */
@@ -58,7 +55,7 @@ public class RecommenderStartup implements ServletContextListener {
 	 *            The servlet context event at destruction.
 	 */
 	public void contextDestroyed(ServletContextEvent event) {
-		RegistryClient.getClient().unregister(event.getServletContext().getContextPath());
+		client.unregister(Service.RECOMMENDER.getServiceName(), serverName);
 	}
 
 	/**
@@ -67,15 +64,18 @@ public class RecommenderStartup implements ServletContextListener {
 	 *            The servlet context event at initialization.
 	 */
 	public void contextInitialized(ServletContextEvent event) {
-		GlobalTracer.register(Tracing.init(Service.RECOMMENDER.getServiceName()));
-		RESTClient.setGlobalReadTimeout(REST_READ_TIMOUT);
-		ServiceLoadBalancer.preInitializeServiceLoadBalancers(Service.PERSISTENCE);
-		RegistryClient.getClient().runAfterServiceIsAvailable(Service.PERSISTENCE, () -> {
+		LOG.info("Waiting for dependent services to become available.");
+		client.runAfterServiceIsAvailable(Service.PERSISTENCE.getServiceName(), () -> {
+			LOG.info("Persistence service is available");
 			TrainingSynchronizer.getInstance().retrieveDataAndRetrain();
-			RegistryClient.getClient().register(event.getServletContext().getContextPath());
-		}, Service.RECOMMENDER);
+			client.register(Service.RECOMMENDER.getServiceName(), serverName);
+		}, Service.RECOMMENDER.getServiceName());
 		try {
-			long looptime = (Long) new InitialContext().lookup("java:comp/env/recommenderLoopTime");
+			String looptimeStr = System.getenv("RECOMMENDER_RETRAIN_LOOP_TIME");
+			if (looptimeStr == null) {
+				throw new EnvVarNotFoundException("RECOMMENDER_RETRAIN_LOOP_TIME");
+			}
+			long looptime = Long.parseLong(looptimeStr);
 			// if a looptime is specified, a retraining daemon is started
 			if (looptime > 0) {
 				new RetrainDaemon(looptime).start();
@@ -83,10 +83,9 @@ public class RecommenderStartup implements ServletContextListener {
 			} else {
 				LOG.info("Recommender loop time not set. Disabling periodic retraining.");
 			}
-		} catch (NamingException e) {
+		} catch (EnvVarNotFoundException | NumberFormatException e) {
 			LOG.info("Recommender loop time not set. Disabling periodic retraining.");
 		}
-
 	}
 
 }

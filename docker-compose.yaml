@@ -5,6 +5,9 @@ services:
       dockerfile: Dockerfile
     expose:
       - "8080"
+    env_file:
+      - ./services/tools.descartes.teastore.registry/env/dev.env
+      - ./env/dev.env
   db:
     image: descartesresearch/teastore-db
     expose:
@@ -44,15 +47,17 @@ services:
       HOST_NAME: "image"
       REGISTRY_HOST: "registry"
   recommender:
-    image: descartesresearch/teastore-recommender
+    build:
+      context: ./services/tools.descartes.teastore.recommender
+      dockerfile: Dockerfile
     depends_on:
       - registry
       - persistence
     expose:
       - "8080"
-    environment:
-      HOST_NAME: "recommender"
-      REGISTRY_HOST: "registry"
+    env_file:
+      - ./services/tools.descartes.teastore.recommender/env/dev.env
+      - ./env/dev.env
   webui:
     image: descartesresearch/teastore-webui
     depends_on:

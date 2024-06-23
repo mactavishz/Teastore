@@ -73,7 +73,7 @@ public final class RecommenderSelector implements IRecommender {
 	private RecommenderSelector() {
 		fallbackrecommender = new PopularityBasedRecommender();
 		try {
-			String recommendername = (String) new InitialContext().lookup("java:comp/env/recommenderAlgorithm");
+			String recommendername = (String) System.getenv("RECOMMENDER_ALGORITHM");
 			// if a specific algorithm is set, we can use that algorithm
 			if (recommenders.containsKey(recommendername)) {
 				try {
@@ -107,7 +107,7 @@ public final class RecommenderSelector implements IRecommender {
 			e.printStackTrace();
 			LOG.warn("Could not create an instance of the requested recommender. Using fallback.");
 			recommender = fallbackrecommender;
-		} catch (NamingException e) {
+		} catch (Exception e) {
 			// if nothing was set
 			LOG.info("Recommender not set. Using default recommender (SlopeOneRecommeder).");
 			try {

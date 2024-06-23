@@ -59,6 +59,8 @@
                     <containerRunOpts>
                         -p ${local.http.port}:${liberty.var.http.port}
                         -p ${local.https.port}:${liberty.var.https.port}
+                        --env-file ${project.basedir}/env/dev.env
+                        --env-file ${project.parent.basedir}/env/dev.env
                         --network ${docker.network} --name
                         ${project.artifactId}
                     </containerRunOpts>

@@ -1,0 +1,25 @@
+<server description="TeaStore recommender">
+    <!-- tag::features[] -->
+    <featureManager>
+        <feature>jakartaee-10.0</feature>
+        <feature>microProfile-6.1</feature>
+    </featureManager>
+    <!-- end::features[] -->
+    <variable name="http.port" defaultValue="8080"/>
+    <variable name="https.port" defaultValue="8443"/>
+    <!-- YOU NEED TO CHANGE THIS -->
+    <variable name="context.root" defaultValue="/tools.descartes.teastore.recommender"/>
+
+    <!-- tag::webApplication[] -->
+    <!-- YOU NEED TO CHANGE THIS -->
+    <webApplication location="tools.descartes.teastore.recommender.war" contextRoot="${context.root}"/>
+    <!-- end::webApplication[] -->
+    <mpMetrics authentication="false"/>
+
+    <!-- tag::logging[] -->
+    <logging traceSpecification="com.ibm.ws.microprofile.health.*=all"/>
+    <!-- end::logging[] -->
+
+    <httpEndpoint host="*" httpPort="${http.port}" httpsPort="${https.port}"
+                  id="defaultHttpEndpoint"/>
+</server>
