@@ -1,0 +1,27 @@
+services:
+  frontend:
+    container_name: teastore-frontend
+    image: teastore-frontend
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - .:/web:rw
+      - frontend_node_modules:/web/node_modules
+    #    depends_on:
+    #      - registry
+    #      - auth
+    #      - image
+    #      - persistence
+    #      - recommender
+    environment:
+      HOST_NAME: "webui"
+    ports:
+      - "3000:3000"
+      - "3010:3010"
+networks:
+  default:
+    external: true
+    name: teastore-network
+volumes:
+  frontend_node_modules:

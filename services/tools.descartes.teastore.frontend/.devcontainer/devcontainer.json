@@ -1,0 +1,9 @@
+{
+  "name": "teastore-frontend",
+  "dockerComposeFile": [
+      "./docker-compose.dev.yaml" // the docker compose file that we want to run
+  ],
+  "service": "frontend", // The service in docker-compose.yml that we want vs code to use as a dev containers 
+  "shutdownAction": "stopCompose",
+  "workspaceFolder": "/web/"
+}

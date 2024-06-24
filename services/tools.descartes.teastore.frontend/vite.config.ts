@@ -7,4 +7,9 @@ installGlobals();
 
 export default defineConfig({
   plugins: [remix(), tsconfigPaths()],
+  server: {
+    hmr: {
+      port: 3010
+    }
+  }
 });

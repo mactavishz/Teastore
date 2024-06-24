@@ -73,8 +73,27 @@ services:
       REGISTRY_HOST: "registry"
     ports:
       - "8080:8080"
-
+  frontend:
+    build:
+      context: ./services/tools.descartes.teastore.frontend
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./services/tools.descartes.teastore.frontend:/web:rw
+      - frontend_node_modules:/web/node_modules
+#    depends_on:
+#      - registry
+#      - auth
+#      - image
+#      - persistence
+#      - recommender
+    environment:
+      HOST_NAME: "frontend"
+    ports:
+      - "3000:3000"
+      - "3010:3010"
 networks:
   default:
     external: true
     name: teastore-network
+volumes:
+    frontend_node_modules:
