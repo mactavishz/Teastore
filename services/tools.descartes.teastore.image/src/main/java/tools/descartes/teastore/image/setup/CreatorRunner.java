@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.channels.ClosedByInterruptException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Base64;
 import java.util.Random;
@@ -73,6 +74,17 @@ public class CreatorRunner implements Runnable {
     // Resolve path and create a new image
     Path imgFile = workingDir.resolve(String.valueOf(imgID));
 
+    Path newWorkingDir=  Paths.get("images_temp");
+    Path newImgFile = newWorkingDir.resolve(productID + ".png");
+    if (Files.notExists(newWorkingDir)) {
+        try {
+            Files.createDirectories(newWorkingDir);
+        } catch (IOException e) {
+          log.warn("Failed to create directories for path: " + newWorkingDir.toAbsolutePath(), e);
+          return;
+        }
+    }
+
     BufferedImage img = ImageCreator.createImage(shapesPerImage, categoryImage, size, rand);
     ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
@@ -88,6 +100,18 @@ public class CreatorRunner implements Runnable {
       } else {
         log.warn("An exception was thrown during image creation with ID " + String.valueOf(imgID)
             + " to file " + imgFile.toAbsolutePath() + ".", ioException);
+      }
+    }
+
+    try {
+      ImageIO.write(img, "png", newImgFile.toFile());
+    } catch (IOException ioException) {
+      if (!(ioException instanceof ClosedByInterruptException)) {
+        log.warn("An IOException occurred while writing image with ID " + imgID
+                + " to file " + newImgFile.toAbsolutePath() + ".", ioException);
+      } else {
+        log.warn("An exception was thrown during image creation with ID " + imgID
+                + " to file " + newImgFile.toAbsolutePath() + ".", ioException);
       }
     }
 
