@@ -2,6 +2,9 @@ import {
   LoaderFunctionArgs,
   LoaderFunction,
   json,
+  redirect,
+  ActionFunctionArgs,
+  ActionFunction,
 } from "@remix-run/node";
 import {
   useLoaderData
@@ -11,6 +14,7 @@ import ProductItem from "~/components/productItem";
 import CategoryList from "~/components/categoryList";
 import Pagination from "~/components/pagination";
 import { createGETFetcher, createPOSTFetcher } from "~/.server/request"; // Adjust the import path as needed
+import { paginationPageSizeCookie } from "~/.server/cookie";
 import { useContext } from "react";
 import { GlobalStateContext } from "~/context/GlobalStateContext";
 
@@ -103,10 +107,24 @@ export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) =>
     const url = new URL(request.url);
     let categoryId = url.searchParams.get("category");
     let page = url.searchParams.get("page");
-
+    let pageSize: number;
+    
     if (!categoryId) {
-      categoryId = "2";
+      return redirect(`/category?category=2&page=1`);
     }
+    
+    try {
+      const cookieHeader = request.headers.get("Cookie");
+      const cookiePageSize = await paginationPageSizeCookie.parse(cookieHeader)
+      pageSize = parseInt(cookiePageSize || "");
+      if (isNaN(pageSize) || pageSize < 1) {
+        pageSize = INITIAL_PRODUCT_DISPLAY_COUNT;
+      }
+    } catch(err) {
+      pageSize = INITIAL_PRODUCT_DISPLAY_COUNT;
+    }
+    
+
     if (!page) {
       page = "1";
     }
@@ -114,11 +132,10 @@ export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) =>
     const [categoryRes, productCountRes] = await Promise.all([getCategory(categoryId), getProductCountByCategory(categoryId)]);
     const categoryData: Category = await categoryRes.json();
     const productCount = parseInt(await productCountRes.text());
-    const numProductsPerPage = INITIAL_PRODUCT_DISPLAY_COUNT;
-    const maxPages = Math.ceil(productCount / numProductsPerPage);
+    const maxPages = Math.ceil(productCount / pageSize);
     let pageNum = Math.min(parseInt(page), maxPages);
-    const pagination = createNavigation(productCount, pageNum, INITIAL_PRODUCT_DISPLAY_COUNT);
-    const productListRes = await getProductListByCategory(categoryId, pageNum, numProductsPerPage);
+    const pagination = createNavigation(productCount, pageNum, pageSize);
+    const productListRes = await getProductListByCategory(categoryId, pageNum, pageSize);
     const productList = await productListRes.json();
     const productIds = productList.map((product: Product) => product.id.toString());
     const imageRes = await getProductImages(productIds);
@@ -126,15 +143,30 @@ export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) =>
     for (const product of productList) {
       product.image = images[product.id];
     }
-    return json({ category: categoryData, productList, pagination, productCount, pageNum, numProductsPerPage });
+    return json({ category: categoryData, productList, pagination, productCount, pageNum, pageSize }, {
+      headers: {
+        "Set-Cookie": await paginationPageSizeCookie.serialize(pageSize.toString()) 
+      }
+    });
   } catch (error) {
     console.error('Loader error:', error);
     throw new Response("An error occurred", { status: 500 });
   }
 }
 
+export const action: ActionFunction = async ({ request, params }: ActionFunctionArgs) => {
+  const formData = await request.formData();
+  const data = Object.fromEntries(formData);
+  return redirect(`/category?category?category=${data.categoryId}&page=1`, {
+    headers: {
+      "Set-Cookie": await paginationPageSizeCookie.serialize(data.newPageSize)
+    }
+  });
+}
+
+
 export default function CategoryPage() {
-  const { category, productList, pagination, productCount, pageNum } = useLoaderData<typeof loader>();
+  const { category, productList, pagination, pageNum, pageSize } = useLoaderData<typeof loader>();
   const { categoryList } = useContext(GlobalStateContext);
   return (
     <div className="container" id="main">
@@ -155,7 +187,7 @@ export default function CategoryPage() {
           </div>
           <Pagination
             pagination={pagination}
-            productsPerPage={INITIAL_PRODUCT_DISPLAY_COUNT}
+            pageSize={pageSize}
             categoryId={category.id}
             pageNum={pageNum}
             productDisplayCountOptions={PRODUCT_DISPLAY_COUNT_OPTIONS}

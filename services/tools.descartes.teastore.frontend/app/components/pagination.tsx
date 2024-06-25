@@ -1,11 +1,20 @@
+import { useSubmit } from "@remix-run/react";
+import { useRef } from "react";
+
 interface PaginationProps {
   pagination: string[];
   categoryId: number;
   pageNum: number;
   productDisplayCountOptions: number[];
-  productsPerPage: number;
+  pageSize: number;
 }
-export default function Pagination({ pagination, categoryId, pageNum, productDisplayCountOptions, productsPerPage }: PaginationProps) {
+
+export default function Pagination({ pagination, categoryId, pageNum, productDisplayCountOptions, pageSize }: PaginationProps) {
+  const submit = useSubmit();
+  const formRef = useRef<HTMLFormElement>(null);
+  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    submit(event.currentTarget.form);
+  };
   return (
     <div className="row">
       <div className="col-sm-6">
@@ -20,7 +29,7 @@ export default function Pagination({ pagination, categoryId, pageNum, productDis
               displayPageNum = item;
             }
             return (
-              <li className={item == pageNum.toString() ? "active" : ""}>
+              <li className={item == pageNum.toString() ? "active" : ""} key={`page-button-${item}`}>
                 <a href={`/category?category=${categoryId}&page=${displayPageNum}`}>
                   {item}
                 </a>
@@ -30,16 +39,17 @@ export default function Pagination({ pagination, categoryId, pageNum, productDis
         </ul>
       </div>
       <div className="col-sm-6">
-        <form id="formpages">
-          <select name="number" onChange={() => null} defaultValue={productsPerPage}>
+        <form id="formpages" ref={formRef} action="" method="POST">
+          <select name="newPageSize" onChange={handleChange} defaultValue={pageSize}>
             {
               productDisplayCountOptions.map((number: number) => {
                 return (
-                  <option value={number}>{number}</option>
+                  <option key={`paganation-option-${number}`} value={number}>{number}</option>
                 )
               })
             }
           </select> <span> products per page</span>
+          <input name="categoryId" type="text" defaultValue={categoryId} hidden />
         </form>
       </div>
     </div>
