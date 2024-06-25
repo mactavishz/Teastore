@@ -5,6 +5,7 @@ import {
   redirect,
   ActionFunctionArgs,
   ActionFunction,
+  MetaFunction
 } from "@remix-run/node";
 import {
   useLoaderData
@@ -20,6 +21,14 @@ import { GlobalStateContext } from "~/context/GlobalStateContext";
 
 const INITIAL_PRODUCT_DISPLAY_COUNT = 20;
 const PRODUCT_DISPLAY_COUNT_OPTIONS = [5, 10, 20, 30];
+
+export const meta: MetaFunction<typeof loader> = ({
+  data
+}) => {
+  return [
+    { title: `TeaStore Category ${data.category.name}` },
+  ];
+};
 
 function createNavigation(products: number, page: number, numberProducts: number) {
   const navigation: string[] = [];

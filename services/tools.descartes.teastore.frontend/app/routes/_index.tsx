@@ -6,10 +6,6 @@ import { GlobalStateContext } from "~/context/GlobalStateContext";
 export const meta: MetaFunction = () => {
   return [
     { title: "TeaStore Home" },
-    { name: "description", content: "Welcome to TeaStore !" },
-    { name: "viewport", content: "width=device-width, initial-scale=1" },
-    { name: "http-equiv", content: "X-UA-Compatible", "value": "IE=edge" },
-    { name: "charset", content: "utf-8" },
   ];
 };
 
