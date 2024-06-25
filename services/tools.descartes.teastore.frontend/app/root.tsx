@@ -9,7 +9,7 @@ import { LinksFunction, LoaderFunction, json } from "@remix-run/node";
 import Header from "./components/header";
 import Footer from "./components/footer";
 import { useLayoutEffect } from "~/hooks/useLayoutEffect"; // Adjust the import path as needed
-import { createHTTPFetcher } from "~/.server/request"; // Adjust the import path as needed
+import { createGETFetcher, createPOSTFetcher } from "~/.server/request"; // Adjust the import path as needed
 
 export const links: LinksFunction = () => [
   {
@@ -30,14 +30,8 @@ interface iconData {
 }
 
 async function getIcon(): Promise<Response> {
-  const response = await createHTTPFetcher("image", "image/getWebImages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      "icon": "64x64"
-    }),
+  const response = await createPOSTFetcher("image", "image/getWebImages", {
+    icon: "64x64"
   });
   if (!response.ok) {
     throw new Response("Failed to fetch data", { status: response.status });
@@ -46,19 +40,12 @@ async function getIcon(): Promise<Response> {
 }
 
 async function getLoginStatus(): Promise<Response> {
-  const response = await createHTTPFetcher("auth", "useractions/isloggedin", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({}),
-  });
+  const response = await createPOSTFetcher("auth", "useractions/isloggedin", {});
   if (!response.ok) {
     throw new Response("Failed to fetch data", { status: response.status });
   }
   return response;
 }
-
 
 export const loader: LoaderFunction = async () => {
   try {
