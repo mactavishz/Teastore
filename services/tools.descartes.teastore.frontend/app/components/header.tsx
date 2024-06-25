@@ -11,7 +11,7 @@ export default function Header({ storeIcon, login, message, errormessage }: { st
           </button>
           <a className="navbar-brand" href="/">
             <img src={storeIcon} width="30" height="30" className="d-inline-block align-top" alt="" />
-            TeaStore
+            &nbsp; TeaStore
           </a>
         </div>
         <div id="navbar" className="navbar-collapse collapse">
