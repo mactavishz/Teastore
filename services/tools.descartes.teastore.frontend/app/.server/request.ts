@@ -10,6 +10,7 @@ export function buildURL(serviceName: string, path: string): string {
   url = `http://${url}:${port}/tools.descartes.teastore.${serviceName.toLowerCase()}/rest/${path}`;
   return url
 }
+
 export function createPOSTFetcher(serviceName: string, path: string, data: object, fetchOptions: object = {}): Promise<Response> {
   const url = buildURL(serviceName, path);
   return fetch(url, {
@@ -22,7 +23,7 @@ export function createPOSTFetcher(serviceName: string, path: string, data: objec
   })
 }
 
-export function createGETFetcher(serviceName: string, path: string, data: { [x: string]: string | number; }, fetchOptions: object = {}): Promise<Response> {
+export function createGETFetcher(serviceName: string, path: string, data: { [x: string]: string | number; } = {}, fetchOptions: object = {}): Promise<Response> {
   const url = new URL(buildURL(serviceName, path)); 
   
   for (const key in data) {

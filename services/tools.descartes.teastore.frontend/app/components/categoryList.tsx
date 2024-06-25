@@ -1,10 +1,6 @@
-interface Category {
-  id: number;
-  name: string;
-  description: string;
-}
+import type { Category } from "~/types";
 
-export default function CategoryList({ list = [] }) {
+export default function CategoryList({ list = [] }: { list: Category[] }) {
   return (
     <div className="col-sm-3 col-md-3 col-lg-2 sidebar">
       <h3>Categories</h3>
@@ -12,7 +8,7 @@ export default function CategoryList({ list = [] }) {
         {
           list.map((category: Category) => {
             return (
-              <li className="category-item" role="presentation">
+              <li className="category-item" role="presentation" key={category.id}>
                 <a
                   href={`/category?category=${category.id}&page=1`}
                   className="menulink"
