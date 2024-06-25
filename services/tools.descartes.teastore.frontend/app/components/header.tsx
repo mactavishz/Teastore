@@ -10,7 +10,7 @@ export default function Header({ storeIcon, login, message, errormessage }: { st
                 className="icon-bar"></span>
           </button>
           <a className="navbar-brand" href="/">
-            {/* <img src="${storeIcon}" width="30" height="30" className="d-inline-block align-top" alt="" /> */}
+            <img src={storeIcon} width="30" height="30" className="d-inline-block align-top" alt="" />
             TeaStore
           </a>
         </div>

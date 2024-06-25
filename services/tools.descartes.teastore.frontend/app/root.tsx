@@ -2,12 +2,14 @@ import {
   Links,
   Meta,
   Outlet,
-  Scripts
+  Scripts,
+  useLoaderData
 } from "@remix-run/react";
-import type { LinksFunction } from "@remix-run/node";
+import { LinksFunction, LoaderFunction, json } from "@remix-run/node";
 import Header from "./components/header";
 import Footer from "./components/footer";
 import { useLayoutEffect } from "~/hooks/useLayoutEffect"; // Adjust the import path as needed
+import { createHTTPFetcher } from "~/.server/request"; // Adjust the import path as needed
 
 export const links: LinksFunction = () => [
   {
@@ -23,9 +25,62 @@ export const links: LinksFunction = () => [
   },
 ];
 
-export default function App() {
-  useLayoutEffect();
+interface iconData {
+  icon: string
+}
 
+async function getIcon(): Promise<Response> {
+  const response = await createHTTPFetcher("image", "image/getWebImages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      "icon": "64x64"
+    }),
+  });
+  if (!response.ok) {
+    throw new Response("Failed to fetch data", { status: response.status });
+  }
+  return response;
+}
+
+async function getLoginStatus(): Promise<Response> {
+  const response = await createHTTPFetcher("auth", "useractions/isloggedin", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({}),
+  });
+  if (!response.ok) {
+    throw new Response("Failed to fetch data", { status: response.status });
+  }
+  return response;
+}
+
+
+export const loader: LoaderFunction = async () => {
+  try {
+    const [iconRes, loginStatusRes] = await Promise.all([getIcon(), getLoginStatus()]);
+    const iconData: iconData = await iconRes.json();
+    const loginStatusText = await loginStatusRes.text();
+    let loginStatus = false;
+    if (!loginStatusText || loginStatusText.trim() === "") {
+      loginStatus = false;
+    } else {
+      loginStatus = true
+    }
+    return json({ icon: iconData.icon, loginStatus });
+  } catch (error) {
+    console.error('Loader error:', error);
+    throw new Response("An error occurred", { status: 500 });
+  }
+}
+
+export default function App() {
+  const { icon, loginStatus } = useLoaderData<typeof loader>();
+  useLayoutEffect();
   return (
     <html lang="en">
       <head>
@@ -33,7 +88,7 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <Header storeIcon={""} login={false} message={""} errormessage={""} />
+        <Header storeIcon={icon} login={loginStatus} message={""} errormessage={""} />
         <Outlet />
         <Footer></Footer>
         <Scripts />
