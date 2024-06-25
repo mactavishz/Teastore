@@ -18,7 +18,6 @@ export const loader: LoaderFunction = async () => {
   try {
     const categoryListRes = await getCategoryList(); 
     const categoryList = await categoryListRes.json();
-    console.log(categoryList)
     return json({ categoryList });
   } catch (error) {
     console.error('Loader error:', error);
