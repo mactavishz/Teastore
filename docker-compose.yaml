@@ -80,6 +80,9 @@ services:
     volumes:
       - ./services/tools.descartes.teastore.frontend:/web:rw
       - frontend_node_modules:/web/node_modules
+    env_file:
+      - ./env/dev.env
+      - ./services/tools.descartes.teastore.frontend/env/dev.env
 #    depends_on:
 #      - registry
 #      - auth
