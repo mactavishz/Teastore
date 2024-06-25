@@ -1,4 +1,8 @@
 import type { MetaFunction } from "@remix-run/node";
+import { LoaderFunction, json } from "@remix-run/node";
+import CategoryList from "~/components/categoryList";
+import { createGETFetcher } from "~/.server/request";
+import { useLoaderData } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -10,11 +14,36 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+export const loader: LoaderFunction = async () => {
+  try {
+    const categoryListRes = await getCategoryList(); 
+    const categoryList = await categoryListRes.json();
+    console.log(categoryList)
+    return json({ categoryList });
+  } catch (error) {
+    console.error('Loader error:', error);
+    throw new Response("An error occurred", { status: 500 });
+  }
+}
+
+async function getCategoryList(): Promise<Response> {
+  const response = await createGETFetcher("persistence", "categories", {
+    start: -1,
+    max: -1
+  });
+  if (!response.ok) {
+    throw new Response("Failed to fetch data", { status: response.status });
+  }
+  return response;
+}
+
+
 export default function Index() {
+  const { categoryList } = useLoaderData<typeof loader>();
   return (
     <div className="container" id="main">
       <div className="row">
-        {/* <%@include file="categorylist.jsp"%> */}
+        <CategoryList list={categoryList} /> 
         <div id="MainImage" className="col-sm-6 col-lg-8">
           <img className="titleimage" src="/images/front.png" />
         </div>
