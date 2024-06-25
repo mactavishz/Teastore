@@ -3,8 +3,7 @@ import type { GlobalStateContextType, Category } from "~/types";
 
 // Provide a default value that matches the shape of GlobalStateContextType
 const defaultState: GlobalStateContextType = {
-  categoryList: [],
-  setCategoryList: () => {} // No-op function as placeholder
+  categoryList: []
 };
 
 // Create the context with the correct type

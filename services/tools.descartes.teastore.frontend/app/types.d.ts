@@ -19,5 +19,4 @@ export interface Product {
 
 export interface GlobalStateContextType {
   categoryList: Category[];
-  setCategoryList: React.Dispatch<React.SetStateAction<Category[]>>;
 }

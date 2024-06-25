@@ -77,13 +77,13 @@ export const loader: LoaderFunction = async () => {
 }
 
 export default function App() {
-  const { icon, loginStatus, categoryList: data } = useLoaderData<typeof loader>();
-  const [categoryList, setCategoryList] = useState([] as Category[]);
-  useEffect(() => {
-    if (data) {
-      setCategoryList(data);
-    }
-  }, [data, setCategoryList])
+  const { icon, loginStatus, categoryList } = useLoaderData<typeof loader>();
+  // const [categoryList, setCategoryList] = useState([] as Category[]);
+  // useEffect(() => {
+  //   if (data) {
+  //     setCategoryList(data);
+  //   }
+  // }, [data, setCategoryList])
   useLayoutEffect();
   return (
     <html lang="en">
@@ -100,7 +100,7 @@ export default function App() {
       </head>
       <body>
         <Header storeIcon={icon} login={loginStatus} message={""} errormessage={""} />
-        <GlobalStateContext.Provider value={{ categoryList, setCategoryList }}>
+        <GlobalStateContext.Provider value={{ categoryList }}>
           <Outlet />
         </GlobalStateContext.Provider>
         <Footer></Footer>
