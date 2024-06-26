@@ -23,12 +23,13 @@ export function useLayoutEffect() {
     // older versions of IE
     else {
       viewportwidth = document.getElementsByTagName('body')[0].clientWidth,
-      viewportheight = document.getElementsByTagName('body')[0].clientHeight
+        viewportheight = document.getElementsByTagName('body')[0].clientHeight
     }
 
     $("#main").css(
       "min-height",
-      (viewportheight - 75 * 2)
+      (viewportheight - $("#headnav").outerHeight(true) - $("#footnav")
+        .outerHeight(true))
       + "px");
 
     if ($('#navbarbutton').is(':visible')) {

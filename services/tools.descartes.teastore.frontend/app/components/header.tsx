@@ -1,6 +1,15 @@
-export default function Header({ storeIcon, login, message, errormessage }: { storeIcon: string, login: boolean, message: string, errormessage: string }) {
+interface HeaderProps {
+  storeIcon: string;
+  login: boolean;
+  message: string | null;
+  errorMessage: string | null;
+  setMessage: React.Dispatch<React.SetStateAction<string | null>>;
+  setErrorMessage: React.Dispatch<React.SetStateAction<string | null>>;
+}
+
+export default function Header({ storeIcon, login, message, errorMessage, setMessage, setErrorMessage }: HeaderProps) {
   return (
-    <nav id="headnav" className="navbar navbar-default container" style={{ height: "75px"}}>
+    <nav id="headnav" className="navbar navbar-default container">
       <div className="container-fluid">
         <div className="navbar-header">
           <button id="navbarbutton" type="button" className="navbar-toggle collapsed"
@@ -22,7 +31,8 @@ export default function Header({ storeIcon, login, message, errormessage }: { st
                   <>
                     <li>
                       <form action="loginAction" method="POST">
-                        <button type="submit" name="logout" className="logout">Logout</button>
+                        <input type="text" hidden defaultValue="true" name="logout" />
+                        <button type="submit" className="logout">Logout</button>
                       </form>
                     </li>
                     <li>
@@ -44,16 +54,16 @@ export default function Header({ storeIcon, login, message, errormessage }: { st
       {
         message ?
           <div className="alert alert-success alert-dismissable" role="alert">
-            <a href="#" className="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <button type="button" className="close" aria-label="close" onClick={(e) => setMessage(null)}><span aria-hidden="true">&times;</span></button>
             <strong>Success!</strong> {message}
           </div>
           : null
       }
       {
-        errormessage ?
+        errorMessage ?
           <div className="alert alert-warning alert-dismissable" role="alert">
-            <a href="#" className="close" data-dismiss="alert" aria-label="close">&times;</a>
-            <strong>Warning!</strong> {errormessage}
+            <button type="button" className="close" aria-label="close" onClick={() => setErrorMessage(null)}><span aria-hidden="true">&times;</span></button>
+            <strong>Warning!</strong> {errorMessage}
           </div>
           : null
       }
