@@ -5,14 +5,16 @@ import {
   Scripts,
   useLoaderData,
 } from "@remix-run/react";
-import { useState, useEffect } from "react";
-import type { IconData, Category } from "./types";
-import { LinksFunction, LoaderFunction, json } from "@remix-run/node";
+import { useState } from "react";
+import type { Category, IconData } from "./types";
+import { LinksFunction, LoaderFunction, json, LoaderFunctionArgs } from "@remix-run/node";
 import Header from "./components/header";
 import Footer from "./components/footer";
-import { useLayoutEffect } from "~/hooks/useLayoutEffect"; // Adjust the import path as needed
-import { createGETFetcher, createPOSTFetcher } from "~/.server/request"; // Adjust the import path as needed
+import { useLayoutEffect } from "~/hooks/useLayoutEffect"; 
+import { createGETFetcher, createPOSTFetcher } from "~/.server/request";
 import { GlobalStateContext } from '~/context/GlobalStateContext';
+import { sessionBlobCookie, errorMessageCookie, messageCookie } from "~/.server/cookie";
+import SessionBlob  from "~/model/SessionBlob"
 
 export const links: LinksFunction = () => [
   {
@@ -38,8 +40,8 @@ async function getIcon(): Promise<Response> {
   return response;
 }
 
-async function getLoginStatus(): Promise<Response> {
-  const response = await createPOSTFetcher("auth", "useractions/isloggedin", {});
+async function getLoginStatus(blob: SessionBlob): Promise<Response> {
+  const response = await createPOSTFetcher("auth", "useractions/isloggedin", blob);
   if (!response.ok) {
     throw new Response("Failed to fetch data", { status: response.status });
   }
@@ -57,19 +59,32 @@ async function getCategoryList(): Promise<Response> {
   return response;
 }
 
-export const loader: LoaderFunction = async () => {
+export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) => {
+  let message: string | null = null;
+  let errorMessage: string | null = null;
+  let sessionBlob: SessionBlob;
+  let loginStatus: boolean = false;
+  let categoryList: Category[] = [];
   try {
-    const [iconRes, loginStatusRes, categoryListRes] = await Promise.all([getIcon(), getLoginStatus(), getCategoryList()]);
+    const cookieHeader = request.headers.get("Cookie");
+    sessionBlob = await sessionBlobCookie.parse(cookieHeader) || new SessionBlob();
+    errorMessage = await errorMessageCookie.parse(cookieHeader);
+    message = await messageCookie.parse(cookieHeader);
+    const [iconRes, loginStatusRes, categoryListRes] = await Promise.all([getIcon(), getLoginStatus(sessionBlob), getCategoryList()]);
     const iconData: IconData = await iconRes.json();
-    const loginStatusText = await loginStatusRes.text();
-    const categoryList = await categoryListRes.json();
-    let loginStatus = false;
-    if (!loginStatusText || loginStatusText.trim() === "") {
-      loginStatus = false;
-    } else {
+    categoryList = await categoryListRes.json() || [];
+    try {
+      await loginStatusRes.json();
       loginStatus = true
+    } catch (err) {
+      loginStatus = false;
     }
-    return json({ icon: iconData.icon, loginStatus, categoryList });
+    return json({ icon: iconData.icon, loginStatus, categoryList, message, errorMessage }, {
+      headers: [
+        ["Set-Cookie", await errorMessageCookie.serialize(errorMessage, { maxAge: 0})],
+        ["Set-Cookie", await messageCookie.serialize(message, { maxAge: 0 })]
+      ]
+    });
   } catch (error) {
     console.error('Loader error:', error);
     throw new Response("An error occurred", { status: 500 });
@@ -77,7 +92,9 @@ export const loader: LoaderFunction = async () => {
 }
 
 export default function App() {
-  const { icon, loginStatus, categoryList } = useLoaderData<typeof loader>();
+  const { icon, loginStatus, categoryList, errorMessage: defaultErrorMessage, message: defaultMessage } = useLoaderData<typeof loader>();
+  const [message, setMessage] = useState(defaultMessage)
+  const [errorMessage, setErrorMessage] = useState(defaultErrorMessage)
   useLayoutEffect();
   return (
     <html lang="en">
@@ -93,8 +110,15 @@ export default function App() {
         <Links />
       </head>
       <body suppressHydrationWarning={true}>
-        <Header storeIcon={icon} login={loginStatus} message={""} errormessage={""} />
-        <GlobalStateContext.Provider value={{ categoryList }}>
+        <GlobalStateContext.Provider value={{ categoryList, message, errorMessage, setMessage, setErrorMessage }}>
+          <Header
+            storeIcon={icon}
+            login={loginStatus}
+            message={message}
+            errorMessage={errorMessage}
+            setMessage={setMessage}
+            setErrorMessage={setErrorMessage}
+          />
           <Outlet />
         </GlobalStateContext.Provider>
         <Footer></Footer>
