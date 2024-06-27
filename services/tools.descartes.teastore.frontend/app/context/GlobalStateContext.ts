@@ -1,5 +1,5 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
-import type { GlobalStateContextType, Category } from "~/types";
+import { createContext } from 'react';
+import type { GlobalStateContextType } from "~/types";
 
 // Provide a default value that matches the shape of GlobalStateContextType
 const defaultState: GlobalStateContextType = {
@@ -8,6 +8,7 @@ const defaultState: GlobalStateContextType = {
   errorMessage: null,
   setMessage: () => {},
   setErrorMessage: () => {},
+  isLoggedIn: false,
 };
 
 // Create the context with the correct type

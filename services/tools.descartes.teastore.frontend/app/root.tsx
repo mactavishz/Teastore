@@ -12,6 +12,7 @@ import Header from "./components/header";
 import Footer from "./components/footer";
 import { useLayoutEffect } from "~/hooks/useLayoutEffect"; 
 import { createGETFetcher, createPOSTFetcher } from "~/.server/request";
+import { useLoginStatus } from "./.server/loginUtil";
 import { GlobalStateContext } from '~/context/GlobalStateContext';
 import { sessionBlobCookie, errorMessageCookie, messageCookie } from "~/.server/cookie";
 import SessionBlob  from "~/model/SessionBlob"
@@ -40,14 +41,6 @@ async function getIcon(): Promise<Response> {
   return response;
 }
 
-async function getLoginStatus(blob: SessionBlob): Promise<Response> {
-  const response = await createPOSTFetcher("auth", "useractions/isloggedin", blob);
-  if (!response.ok) {
-    throw new Response("Failed to fetch data", { status: response.status });
-  }
-  return response;
-}
-
 async function getCategoryList(): Promise<Response> {
   const response = await createGETFetcher("persistence", "categories", {
     start: -1,
@@ -63,22 +56,15 @@ export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) =>
   let message: string | null = null;
   let errorMessage: string | null = null;
   let sessionBlob: SessionBlob;
-  let loginStatus: boolean = false;
   let categoryList: Category[] = [];
   try {
     const cookieHeader = request.headers.get("Cookie");
     sessionBlob = await sessionBlobCookie.parse(cookieHeader) || new SessionBlob();
     errorMessage = await errorMessageCookie.parse(cookieHeader);
     message = await messageCookie.parse(cookieHeader);
-    const [iconRes, loginStatusRes, categoryListRes] = await Promise.all([getIcon(), getLoginStatus(sessionBlob), getCategoryList()]);
+    const [iconRes, categoryListRes, loginStatus] = await Promise.all([getIcon(), getCategoryList(), useLoginStatus({ request })]);
     const iconData: IconData = await iconRes.json();
     categoryList = await categoryListRes.json() || [];
-    try {
-      await loginStatusRes.json();
-      loginStatus = true
-    } catch (err) {
-      loginStatus = false;
-    }
     return json({ icon: iconData.icon, loginStatus, categoryList, message, errorMessage }, {
       headers: [
         ["Set-Cookie", await errorMessageCookie.serialize(errorMessage, { maxAge: 0})],
@@ -110,7 +96,7 @@ export default function App() {
         <Links />
       </head>
       <body suppressHydrationWarning={true}>
-        <GlobalStateContext.Provider value={{ categoryList, message, errorMessage, setMessage, setErrorMessage }}>
+        <GlobalStateContext.Provider value={{ categoryList, message, errorMessage, setMessage, setErrorMessage, isLoggedIn: loginStatus }}>
           <Header
             storeIcon={icon}
             login={loginStatus}
