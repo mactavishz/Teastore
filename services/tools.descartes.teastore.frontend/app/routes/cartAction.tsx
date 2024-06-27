@@ -3,6 +3,7 @@ import { createPOSTFetcher, createPutFetcher } from "~/.server/request"
 import { SessionBlobType, OrderItemType } from "~/types";
 import SessionBlob from "~/model/SessionBlob";
 import { sessionBlobCookie, errorMessageCookie, messageCookie, getSessionBlob } from "~/.server/cookie";
+import { useLoginStatus  } from "~/.server/loginUtil"
 import appConfig from "~/appConfig";
 
 async function addProductToCart(blob: SessionBlobType, productId: string): Promise<Response> {
@@ -81,6 +82,26 @@ export const action: ActionFunction = async ({ request, params }: ActionFunction
           ["Set-Cookie", await sessionBlobCookie.serialize(sessionBlob)]
         ]
       })
+    } else if (data[`proceedtoCheckout`]) {
+      const loginStatus = await useLoginStatus({ request });
+      if (!loginStatus) {
+        return redirect("/login", {
+          headers: [
+            ["Set-Cookie", await errorMessageCookie.serialize(appConfig.UNAUTHORIZED)]
+          ]
+        })
+      } else {
+        let sessionBlob: SessionBlobType = await getSessionBlob(request) || new SessionBlob();
+        const orderItems = sessionBlob?.orderItems || [];
+        sessionBlob = await updateCartQuantities(formData, sessionBlob, orderItems); 
+        return redirect("/order", {
+          headers: [
+            ["Set-Cookie", await sessionBlobCookie.serialize(sessionBlob)]
+          ]
+        })
+      }
+    } else if (data[`confirm`]) {
+      // TODO: implement confirm order
     }
   } catch (err) {
     console.error(err)
