@@ -16,6 +16,10 @@ export default {
 	 */
 	SUCESSLOGOUT: "You are logged out!",
 	/**
+	 * Text for unauthorized access.
+	 */
+	UNAUTHORIZED: "You are not authorized! Please login first!",
+	/**
 	 * Text for wrong credentials.
 	 */
 	WRONGCREDENTIALS: "You used wrong credentials!",
