@@ -144,7 +144,10 @@ export default function CartPage() {
             }
           </form>
         </div>
-        <Recommendation products={recommendedProducts} />
+        {
+          recommendedProducts.length > 0 ?
+          <Recommendation products={recommendedProducts} /> : null
+        }
       </div>
     </div>
   )
