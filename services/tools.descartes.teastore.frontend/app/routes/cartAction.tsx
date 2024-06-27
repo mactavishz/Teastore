@@ -1,6 +1,6 @@
 import { redirect, ActionFunction, ActionFunctionArgs } from "@remix-run/node";
-import { createPOSTFetcher } from "~/.server/request"
-import { SessionBlobType } from "~/types";
+import { createPOSTFetcher, createPutFetcher } from "~/.server/request"
+import { SessionBlobType, OrderItemType } from "~/types";
 import SessionBlob from "~/model/SessionBlob";
 import { sessionBlobCookie, errorMessageCookie, messageCookie, getSessionBlob } from "~/.server/cookie";
 import appConfig from "~/appConfig";
@@ -19,6 +19,24 @@ async function removeProductFromCart(blob: SessionBlobType, productId: string): 
     throw new Response("Failed to fetch data", { status: response.status });
   }
   return response 
+}
+
+async function updateOrderItemQuantity(blob: SessionBlobType, productId: string | number, quantity: number): Promise<Response> {
+  const response = await createPutFetcher("auth", `cart/${productId}?quantity=${quantity}`, blob);
+  if (!response.ok) {
+    throw new Response("Failed to fetch data", { status: response.status });
+  }
+  return response 
+}
+
+async function updateCartQuantities(formData: FormData, blob: SessionBlobType, orderItems: OrderItemType[]): Promise<SessionBlobType> {
+  for (const orderItem of orderItems) {
+    if (formData.has(`orderitem_${orderItem.productId}`)) {
+      const res = await updateOrderItemQuantity(blob, orderItem.productId, parseInt(formData.get(`orderitem_${orderItem.productId}`)?.toString() || "1"));
+      blob = await res.json();
+    }
+  }
+  return blob;
 }
 
 export const action: ActionFunction = async ({ request, params }: ActionFunctionArgs) => {
@@ -53,6 +71,16 @@ export const action: ActionFunction = async ({ request, params }: ActionFunction
         ]
       }) 
     
+    } else if (data[`updateCartQuantities`]) {
+      let sessionBlob: SessionBlobType = await getSessionBlob(request) || new SessionBlob();
+      const orderItems = sessionBlob?.orderItems || [];
+      sessionBlob = await updateCartQuantities(formData, sessionBlob, orderItems); 
+      return redirect("/cart", {
+        headers: [
+          ["Set-Cookie", await messageCookie.serialize(appConfig.CARTUPDATED)],
+          ["Set-Cookie", await sessionBlobCookie.serialize(sessionBlob)]
+        ]
+      })
     }
   } catch (err) {
     console.error(err)

@@ -134,7 +134,7 @@ export default function CartPage() {
                   <td colSpan={7}>Total: ${orderItems.reduce((acc: number, item: OrderItemType) => {
                     return acc + item.unitPriceInCents * item.quantity / 100.0
                   }, 0).toFixed(2)} <input
-                    name="updateCartQuantities" className="btn" value="Update Cart" type="submit"></input></td>
+                    name="updateCartQuantities" className="btn" defaultValue="Update Cart" type="submit"></input></td>
                 </tr>
               </tbody>
             </table>
