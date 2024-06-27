@@ -86,7 +86,7 @@ public class CartServlet extends AbstractUIServlet {
     request.setAttribute("login", LoadBalancedStoreOperations.isLoggedIn(getSessionBlob(request)));
 
     List<Long> productIds = LoadBalancedRecommenderOperations
-        .getRecommendations(blob.getOrderItems(), blob.getUID());
+        .getRecommendations(blob.getOrderItems(), blob.getUid());
     List<Product> ads = new LinkedList<Product>();
     for (Long productId : productIds) {
       ads.add(LoadBalancedCRUDOperations.getEntity(Service.PERSISTENCE, "products", Product.class,

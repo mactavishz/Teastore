@@ -43,4 +43,3 @@ else
 	docker buildx build -t "${registry}teastore-auth" ../services/tools.descartes.teastore.auth/ --load
 	docker buildx build -t "${registry}teastore-recommender" ../services/tools.descartes.teastore.recommender/ --load
 fi
-

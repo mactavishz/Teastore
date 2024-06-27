@@ -61,7 +61,7 @@ public class LoginActionServlet extends AbstractUIServlet {
 		if (request.getParameter("username") != null && request.getParameter("password") != null) {
 			SessionBlob blob = LoadBalancedStoreOperations.login(getSessionBlob(request),
 					request.getParameter("username"), request.getParameter("password"));
-			login = (blob != null && blob.getSID() != null);
+			login = (blob != null && blob.getSid() != null);
 
 			if (login) {
 				saveSessionBlob(blob, response);

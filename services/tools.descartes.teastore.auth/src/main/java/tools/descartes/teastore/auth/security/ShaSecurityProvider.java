@@ -24,7 +24,7 @@ public class ShaSecurityProvider implements ISecurityProvider {
 
   @Override
   public SessionBlob secure(SessionBlob blob) {
-    if (blob.getUID() == null || blob.getSID() == null) {
+    if (blob.getUid() == null || blob.getSid() == null) {
       return blob;
     }
     blob.setToken(null);
