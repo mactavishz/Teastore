@@ -42,9 +42,9 @@ export default {
 	/**
 	 * Text for added product.
 	 */
-	ADDPRODUCT: "Product %s is added to cart!",
+	ADDPRODUCT: (id: string) => `Product ${id} is added to cart!`,
 	/**
 	 * Text for removed product.
 	 */
-	REMOVEPRODUCT: "Product %s is removed from cart!",
+	REMOVEPRODUCT: (id: string) => `Product ${id} is removed from cart!`,
 }
