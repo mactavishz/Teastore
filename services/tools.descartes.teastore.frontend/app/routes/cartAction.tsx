@@ -5,6 +5,24 @@ import SessionBlob from "~/model/SessionBlob";
 import { sessionBlobCookie, errorMessageCookie, messageCookie, getSessionBlob } from "~/.server/cookie";
 import { useLoginStatus  } from "~/.server/loginUtil"
 import appConfig from "~/appConfig";
+import { parse, setDate, format, isValid } from 'date-fns';
+
+function parseAndFormatCreditCardDate(date: string) {
+  const parseFormat = 'MM/yyyy';
+  const outputFormat = 'yyyy-MM-dd';
+  try {
+    const parsedDate = parse(date, parseFormat, new Date());
+    
+    if (!isValid(parsedDate)) {
+      throw new Error('Invalid date');
+    }
+    const firstDayOfMonth = setDate(parsedDate, 1);
+    return format(firstDayOfMonth, outputFormat);
+  } catch (error) {
+    console.error('Error parsing date:', error)
+    return null;
+  }
+}
 
 async function addProductToCart(blob: SessionBlobType, productId: string): Promise<Response> {
   const response = await createPOSTFetcher("auth", `cart/add/${productId}`, blob);
@@ -28,6 +46,44 @@ async function updateOrderItemQuantity(blob: SessionBlobType, productId: string 
     throw new Response("Failed to fetch data", { status: response.status });
   }
   return response 
+}
+
+async function confirmOrder(formData: FormData, blob: SessionBlobType): Promise<SessionBlobType> {
+  const params: string[] = ["firstname", "lastname", "address1", "address2", "cardtype", "cardnumber", "expirydate"]
+  let data: string[] = [];
+  for (const param of params) {
+    const val = formData.get(param);
+    if (!val) {
+      break;
+    }
+    data.push(val.toString());
+  }
+  if (data.length != params.length) {
+    throw new Error("Invalid form data");
+  }
+  let price = 0;
+  for (const orderItem of blob.orderItems) {
+    price += orderItem.quantity * orderItem.unitPriceInCents;
+  }
+  data.push(price.toString());
+  const res = await placeOrder(blob, data);
+  return res.json();
+}
+
+async function placeOrder(blob: SessionBlobType, data: string[]): Promise<Response> {
+  const addressName = `${data[0]} ${data[1]}`
+  const address1 = data[2];
+  const address2 = data[3];
+  const creditCardCompany = data[4];
+  const creditCardNumber = data[5];
+  const creditCardExpiryDate = parseAndFormatCreditCardDate(data[6]);
+  const totalPriceInCents = data[7];
+  const query = `addressName=${addressName}&address1=${address1}&address2=${address2}&creditCardCompany=${creditCardCompany}&creditCardNumber=${creditCardNumber}&creditCardExpiryDate=${creditCardExpiryDate}&totalPriceInCents=${totalPriceInCents}`
+  const response = await createPOSTFetcher("auth", `useractions/placeorder?${query}`, blob);
+  if (!response.ok) {
+    throw new Response("Failed to fetch data", { status: response.status });
+  }
+  return response
 }
 
 async function updateCartQuantities(formData: FormData, blob: SessionBlobType, orderItems: OrderItemType[]): Promise<SessionBlobType> {
@@ -101,7 +157,23 @@ export const action: ActionFunction = async ({ request, params }: ActionFunction
         })
       }
     } else if (data[`confirm`]) {
-      // TODO: implement confirm order
+      try {
+        let sessionBlob: SessionBlobType = await getSessionBlob(request);
+        sessionBlob = await confirmOrder(formData, sessionBlob);
+        return redirect("/", {
+          headers: [
+            ["Set-Cookie", await messageCookie.serialize(appConfig.ORDERCONFIRMED)],
+            ["Set-Cookie", await sessionBlobCookie.serialize(sessionBlob)]
+          ]
+        })
+      } catch (err) {
+        console.error(err)
+        return redirect("/order", {
+          headers: [
+            ["Set-Cookie", await errorMessageCookie.serialize(appConfig.ORDERFAILED)]
+          ]
+        })
+      }
     }
   } catch (err) {
     console.error(err)

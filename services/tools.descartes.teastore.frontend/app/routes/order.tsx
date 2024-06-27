@@ -101,7 +101,7 @@ export default function OrderPage() {
                 <div className="form-group row">
                   <label htmlFor="expirydate" className="col-sm-6 col-md-5 col-form-label col-form-label-lg">Expiry Date (MM/YYYY)</label>
                   <div className="col-sm-6 col-md-7">
-                    <input type="text" className="form-control form-control-lg" name="expirydate" id="expirydate" placeholder="12/2025" defaultValue="12/2025" pattern="(0[1-9]|1[012])[/](19|20)\d\d" required />
+                    <input type="text" className="form-control form-control-lg" name="expirydate" id="expirydate" placeholder="12/2025" defaultValue="12/2025" pattern="(0[1-9]|1[012])[\/](19|20)\d\d" required />
                   </div>
                 </div>
               </div>

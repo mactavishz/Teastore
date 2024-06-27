@@ -36,6 +36,10 @@ export default {
 	 */
 	ORDERCONFIRMED: "Your order is confirmed!",
 	/**
+	 * Text for confirmed order.
+	 */
+	ORDERFAILED: "Failed to confirm the order!",
+	/**
 	 * Text for updated cart.
 	 */
 	CARTUPDATED: "Your cart is updated!",
