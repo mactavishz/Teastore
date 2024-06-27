@@ -1,7 +1,7 @@
 import { redirect, ActionFunction, ActionFunctionArgs } from "@remix-run/node";
 import { createPOSTFetcher } from "~/.server/request";
 import SessionBlob from "~/model/SessionBlob";
-import { sessionBlobCookie, errorMessageCookie, messageCookie } from "~/.server/cookie";
+import { sessionBlobCookie, errorMessageCookie, messageCookie, getSessionBlob } from "~/.server/cookie";
 import appConfig from "~/appConfig";
 
 async function login(blob: SessionBlob, username: string | null = "", password: string | null = ""): Promise<Response> {
@@ -26,7 +26,7 @@ export const action: ActionFunction = async ({ request, params }: ActionFunction
   const username = formData.get("username");
   const password = formData.get("password");
   const logoutField = formData.get("logout")
-  const referer = request.headers.get("referer")
+  const referer = formData.get("referer")?.toString();
   let isloggedin = false;
   let sessionBlob = null;
  
@@ -34,13 +34,7 @@ export const action: ActionFunction = async ({ request, params }: ActionFunction
     return { error: "Invalid form submission" };
   }
   
-  try {
-    const cookieHeader = request.headers.get("Cookie");
-    sessionBlob = await sessionBlobCookie.parse(cookieHeader) || new SessionBlob();
-  } catch (err) {
-    console.error(err)
-    sessionBlob = new SessionBlob();
-  }
+  sessionBlob = await getSessionBlob(request) || new SessionBlob();
   
   if (logoutField) {
     try {
@@ -61,7 +55,7 @@ export const action: ActionFunction = async ({ request, params }: ActionFunction
   }
   
   try {
-    const loginRes = await login(new SessionBlob(), username, password);
+    const loginRes = await login(sessionBlob, username, password);
     const loginData: SessionBlob = await loginRes.json();
     isloggedin = loginData != null && loginData.sid != null;
     if (isloggedin) {
