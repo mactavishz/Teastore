@@ -27,15 +27,17 @@ services:
       DB_HOST: "db"
       DB_PORT: "3306"
   auth:
-    image: descartesresearch/teastore-auth
+    build:
+      context: ./services/tools.descartes.teastore.auth
+      dockerfile: Dockerfile
     depends_on:
       - registry
       - persistence
     expose:
       - "8080"
-    environment:
-      HOST_NAME: "auth"
-      REGISTRY_HOST: "registry"
+    env_file:
+      - ./services/tools.descartes.teastore.auth/env/dev.env
+      - ./env/dev.env
   image:
     image: descartesresearch/teastore-image
     depends_on:
@@ -59,10 +61,12 @@ services:
       - ./services/tools.descartes.teastore.recommender/env/dev.env
       - ./env/dev.env
   webui:
-    image: descartesresearch/teastore-webui
+    build:
+      context: ./services/tools.descartes.teastore.webui
+      dockerfile: Dockerfile
     depends_on:
       - registry
-      - auth
+#      - auth
       - image
       - persistence
       - recommender

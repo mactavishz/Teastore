@@ -77,7 +77,7 @@ public class ProductServlet extends AbstractUIServlet {
       items.add(oi);
       items.addAll(getSessionBlob(request).getOrderItems());
       List<Long> productIds = LoadBalancedRecommenderOperations.getRecommendations(items,
-          getSessionBlob(request).getUID());
+          getSessionBlob(request).getUid());
       List<Product> ads = new LinkedList<Product>();
       for (Long productId : productIds) {
         ads.add(LoadBalancedCRUDOperations.getEntity(Service.PERSISTENCE, "products", Product.class,
