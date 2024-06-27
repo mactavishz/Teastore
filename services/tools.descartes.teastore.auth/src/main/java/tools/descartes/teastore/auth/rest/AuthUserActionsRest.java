@@ -24,6 +24,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
 
+import tools.descartes.teastore.auth.restclient.PersistenceClient;
 import tools.descartes.teastore.auth.security.BCryptProvider;
 import tools.descartes.teastore.auth.security.RandomSessionIdGenerator;
 import tools.descartes.teastore.auth.security.ShaSecurityProvider;
@@ -31,11 +32,12 @@ import tools.descartes.teastore.entities.Order;
 import tools.descartes.teastore.entities.OrderItem;
 import tools.descartes.teastore.entities.User;
 import tools.descartes.teastore.entities.message.SessionBlob;
-import tools.descartes.teastore.registryclient.Service;
-import tools.descartes.teastore.registryclient.loadbalancers.LoadBalancerTimeoutException;
-import tools.descartes.teastore.registryclient.rest.LoadBalancedCRUDOperations;
-import tools.descartes.teastore.registryclient.util.NotFoundException;
-import tools.descartes.teastore.registryclient.util.TimeoutException;
+import tools.descartes.teastore.utils.NotFoundException;
+import tools.descartes.teastore.utils.TimeoutException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.eclipse.microprofile.metrics.annotation.Timed;
+import org.eclipse.microprofile.metrics.annotation.Counted;
 
 /**
  * Rest endpoint for the store user actions.
@@ -46,6 +48,8 @@ import tools.descartes.teastore.registryclient.util.TimeoutException;
 @Produces({ "application/json" })
 @Consumes({ "application/json" })
 public class AuthUserActionsRest {
+  private final PersistenceClient persistenceClient = new PersistenceClient();
+  private final Logger LOG = LoggerFactory.getLogger(AuthUserActionsRest.class);
 
   /**
    * Persists order in database.
@@ -70,6 +74,20 @@ public class AuthUserActionsRest {
    */
   @POST
   @Path("placeorder")
+  @Timed(
+
+          name = "placeOrderTimer",
+          tags = {"method=post"},
+          absolute = true,
+          description = "Time and Frequency of placeOrder"
+
+  )
+  @Counted(
+          name = "placeOrderCounter",
+          tags = {"method=post"},
+          absolute = true,
+          description = "Counts the number of invocations of placeOrder"
+  )
   public Response placeOrder(SessionBlob blob,
       @QueryParam("totalPriceInCents") long totalPriceInCents,
       @QueryParam("addressName") String addressName, @QueryParam("address1") String address1,
@@ -81,7 +99,7 @@ public class AuthUserActionsRest {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
 
-    blob.getOrder().setUserId(blob.getUID());
+    blob.getOrder().setUserId(blob.getUid());
     blob.getOrder().setTotalPriceInCents(totalPriceInCents);
     blob.getOrder().setAddressName(addressName);
     blob.getOrder().setAddress1(address1);
@@ -93,18 +111,14 @@ public class AuthUserActionsRest {
 
     long orderId;
     try {
-      orderId = LoadBalancedCRUDOperations.sendEntityForCreation(Service.PERSISTENCE, "orders",
-          Order.class, blob.getOrder());
-    } catch (LoadBalancerTimeoutException e) {
-      return Response.status(408).build();
+      orderId = persistenceClient.createOrder(blob.getOrder());
     } catch (NotFoundException e) {
       return Response.status(404).build();
     }
     for (OrderItem item : blob.getOrderItems()) {
       try {
         item.setOrderId(orderId);
-        LoadBalancedCRUDOperations.sendEntityForCreation(Service.PERSISTENCE, "orderitems",
-            OrderItem.class, item);
+        persistenceClient.createOrderItem(item);;
       } catch (TimeoutException e) {
         return Response.status(408).build();
       } catch (NotFoundException e) {
@@ -130,22 +144,37 @@ public class AuthUserActionsRest {
    */
   @POST
   @Path("login")
+  @Timed(
+
+          name = "loginTimer",
+          tags = {"method=post"},
+          absolute = true,
+          description = "Time and Frequency of login"
+
+  )
+  @Counted(
+          name = "loginCounter",
+          tags = {"method=post"},
+          absolute = true,
+          description = "Counts the number of invocations of login"
+  )
   public Response login(SessionBlob blob, @QueryParam("name") String name,
       @QueryParam("password") String password) {
     User user;
     try {
-      user = LoadBalancedCRUDOperations.getEntityWithProperties(Service.PERSISTENCE, "users",
-          User.class, "name", name);
-    } catch (TimeoutException e) {
+      user = persistenceClient.getUser("name", name);
+    } catch (TimeoutException e){
       return Response.status(408).build();
     } catch (NotFoundException e) {
       return Response.status(Response.Status.OK).entity(blob).build();
+    } catch (Exception e) {
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
 
     if (user != null && BCryptProvider.checkPassword(password, user.getPassword())
     ) {
-      blob.setUID(user.getId());
-      blob.setSID(new RandomSessionIdGenerator().getSessionId());
+      blob.setUid(user.getId());
+      blob.setSid(new RandomSessionIdGenerator().getSessionId());
       blob = new ShaSecurityProvider().secure(blob);
       return Response.status(Response.Status.OK).entity(blob).build();
     }
@@ -161,9 +190,23 @@ public class AuthUserActionsRest {
    */
   @POST
   @Path("logout")
+  @Timed(
+
+          name = "logoutTimer",
+          tags = {"method=post"},
+          absolute = true,
+          description = "Time and Frequency of logout"
+
+  )
+  @Counted(
+          name = "logoutCounter",
+          tags = {"method=post"},
+          absolute = true,
+          description = "Counts the number of invocations of logout"
+  )
   public Response logout(SessionBlob blob) {
-    blob.setUID(null);
-    blob.setSID(null);
+    blob.setUid(null);
+    blob.setSid(null);
     blob.setOrder(new Order());
     blob.getOrderItems().clear();
     return Response.status(Response.Status.OK).entity(blob).build();

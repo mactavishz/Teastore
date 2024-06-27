@@ -5,18 +5,24 @@ import java.util.List;
 
 import tools.descartes.teastore.entities.Order;
 import tools.descartes.teastore.entities.OrderItem;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Blob containing all information about the user session.
  * @author Simon
  */
 public class SessionBlob {
 
+	@JsonProperty("uid")
 	private Long uid;
+	@JsonProperty("sid")
 	private String sid;
+	@JsonProperty("token")
 	private String token;
+	@JsonProperty("order")
 	private Order order;
+	@JsonProperty("orderItems")
 	private List<OrderItem> orderItems = new LinkedList<OrderItem>();
+	@JsonProperty("message")
 	private String message;
 	
 	/**
@@ -30,7 +36,7 @@ public class SessionBlob {
 	 * Getter for the userid.
 	 * @return userid
 	 */
-	public Long getUID() {
+	public Long getUid() {
 		return uid;
 	}
 
@@ -38,7 +44,7 @@ public class SessionBlob {
 	 * Setter for the userid.
 	 * @param uID userid
 	 */
-	public void setUID(Long uID) {
+	public void setUid(Long uID) {
 		uid = uID;
 	}
 
@@ -46,7 +52,7 @@ public class SessionBlob {
 	 * Getter for session id.
 	 * @return session id
 	 */
-	public String getSID() {
+	public String getSid() {
 		return sid;
 	}
 
@@ -54,7 +60,7 @@ public class SessionBlob {
 	 * Setter for session id.
 	 * @param sID session id
 	 */
-	public void setSID(String sID) {
+	public void setSid(String sID) {
 		sid = sID;
 	}
 

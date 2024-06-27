@@ -1,76 +1,145 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>auth</artifactId>
-	<packaging>war</packaging>
-	<name>TeaStore Auth</name>
-	<url>http://descartes.tools</url>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>auth</artifactId>
+    <packaging>war</packaging>
+    <version>${revision}</version>
+    <name>TeaStore Auth</name>
+    <url>http://descartes.tools</url>
 
-	<properties>
-		<maven.compiler.source>11</maven.compiler.source>
-		<maven.compiler.target>11</maven.compiler.target>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
-	<dependencies>
-		<!-- Internal Dependencies -->
-		<dependency>
-			<groupId>tools.descartes.teastore</groupId>
-			<artifactId>registryclient</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>tools.descartes.teastore</groupId>
-			<artifactId>kieker.probes</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <properties>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- ADD THIS -->
+        <liberty.var.http.port>8080</liberty.var.http.port>
+        <!-- ADD THIS -->
+        <liberty.var.https.port>8443</liberty.var.https.port>
+        <!-- ADD THIS -->
+        <liberty.var.context.root>/tools.descartes.teastore.auth</liberty.var.context.root>
+        <!-- ADD THIS -->
+        <local.http.port>8888</local.http.port>
+        <!-- ADD THIS -->
+        <local.https.port>9999</local.https.port>
+    </properties>
+    <dependencies>
+
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.activation</groupId>
+            <artifactId>jakarta.activation-api</artifactId>
+            <version>2.0.1</version>
+            <scope>provided</scope>
+        </dependency>
 
 		<dependency>
-			<groupId>jakarta.activation</groupId>
-			<artifactId>jakarta.activation-api</artifactId>
-			<version>2.0.1</version>
-		</dependency>
-		
-		<!-- WebApp Dependencies -->
-		<dependency>
-			<groupId>org.mindrot</groupId>
-			<artifactId>jbcrypt</artifactId>
-			<version>0.4</version>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>2.17.1</version>
 		</dependency>
 		<dependency>
-			<groupId>jakarta.platform</groupId>
-			<artifactId>jakarta.jakartaee-api</artifactId>
-			<version>9.0.0</version>
-			<scope>provided</scope>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.17.1</version>
 		</dependency>
 
-		<!-- Test Dependencies -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.13.1</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
 
-	<build>
-		<finalName>tools.descartes.teastore.auth</finalName>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.22.2</version>
-				<configuration>
-					<reuseForks>false</reuseForks>
-					<forkCount>1</forkCount>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.1</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Internal Dependencies -->
+        <dependency>
+            <groupId>tools.descartes.teastore</groupId>
+            <artifactId>entities</artifactId>
+        </dependency>
+        <!-- ADD THIS, REMOVE THE OLD VERSION OF JAKARTA -->
+        <dependency>
+            <groupId>jakarta.platform</groupId>
+            <artifactId>jakarta.jakartaee-api</artifactId>
+            <version>10.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- ADD THIS -->
+        <dependency>
+            <groupId>org.eclipse.microprofile</groupId>
+            <artifactId>microprofile</artifactId>
+            <version>6.1</version>
+            <type>pom</type>
+            <scope>provided</scope>
+        </dependency>
 
-	<parent>
-		<groupId>tools.descartes.teastore</groupId>
-		<artifactId>parent</artifactId>
-		<version>${revision}</version>
-		<relativePath>../../pom.xml</relativePath>
-	</parent>
+        <dependency> <!-- Logging framework also used by ribbon -->
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.25</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.25</version>
+        </dependency>
+        <dependency>
+            <groupId>tools.descartes.teastore</groupId>
+            <artifactId>utils</artifactId>
+        </dependency>
+    </dependencies>
+    <build>
+        <finalName>tools.descartes.teastore.auth</finalName>
+        <plugins>
+            <!-- IMPORTANT: ADD THIS -->
+            <plugin>
+                <groupId>io.openliberty.tools</groupId>
+                <artifactId>liberty-maven-plugin</artifactId>
+                <version>3.10.2</version>
+                <configuration>
+                    <containerRunOpts>
+                        -p ${local.http.port}:${liberty.var.http.port}
+                        -p ${local.https.port}:${liberty.var.https.port}
+                        --env-file ${project.basedir}/env/dev.env
+                        --env-file ${project.parent.basedir}/env/dev.env
+                        --network ${docker.network} --name
+                        ${project.artifactId}
+                    </containerRunOpts>
+                </configuration>
+            </plugin>
+            <plugin>
+                <!-- Attach classes so that registryclient can import registry for testing. -->
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.3.1</version>
+                <configuration>
+                    <attachClasses>true</attachClasses>
+                    <classesClassifier>classes</classesClassifier>
+                </configuration>
+            </plugin>
+            <!-- ADD THIS, this is for testing purposes -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.2.5</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <http.port>${liberty.var.http.port}</http.port>
+                        <!-- tag::contextRoot[] -->
+                        <context.root>/tools.descartes.teastore.auth</context.root>
+                        <!-- end::contextRoot[] -->
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <parent>
+        <groupId>tools.descartes.teastore</groupId>
+        <artifactId>parent</artifactId>
+        <version>${revision}</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
 </project>

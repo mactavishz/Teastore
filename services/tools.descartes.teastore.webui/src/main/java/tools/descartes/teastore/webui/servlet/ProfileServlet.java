@@ -66,9 +66,9 @@ public class ProfileServlet extends AbstractUIServlet {
           .getEntities(Service.PERSISTENCE, "categories", Category.class, -1, -1));
       request.setAttribute("title", "TeaStore Home");
       request.setAttribute("User", LoadBalancedCRUDOperations.getEntity(Service.PERSISTENCE,
-          "users", User.class, getSessionBlob(request).getUID()));
+          "users", User.class, getSessionBlob(request).getUid()));
       request.setAttribute("Orders", LoadBalancedCRUDOperations.getEntities(Service.PERSISTENCE,
-          "orders", Order.class, "user", getSessionBlob(request).getUID(), -1, -1));
+          "orders", Order.class, "user", getSessionBlob(request).getUid(), -1, -1));
       request.setAttribute("login",
           LoadBalancedStoreOperations.isLoggedIn(getSessionBlob(request)));
       request.setAttribute("helper", ELHelperUtils.UTILS);
