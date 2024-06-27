@@ -23,6 +23,18 @@ export function createPOSTFetcher(serviceName: string, path: string, data: objec
   })
 }
 
+export function createPutFetcher(serviceName: string, path: string, data: object, fetchOptions: object = {}): Promise<Response> {
+  const url = buildURL(serviceName, path);
+  return fetch(url, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+    ...fetchOptions,
+  })
+}
+
 export function createGETFetcher(serviceName: string, path: string, data: { [x: string]: string | number; } = {}, fetchOptions: object = {}): Promise<Response> {
   const url = new URL(buildURL(serviceName, path)); 
   
