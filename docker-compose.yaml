@@ -87,12 +87,12 @@ services:
     env_file:
       - ./env/dev.env
       - ./services/tools.descartes.teastore.frontend/env/dev.env
-#    depends_on:
-#      - registry
-#      - auth
-#      - image
-#      - persistence
-#      - recommender
+    depends_on:
+      - registry
+      - auth
+      - image
+      - persistence
+      - recommender
     environment:
       HOST_NAME: "frontend"
     ports:
