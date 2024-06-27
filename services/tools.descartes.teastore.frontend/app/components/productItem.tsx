@@ -2,7 +2,7 @@ import { Product } from '../types';
 export default function ProductItem({ product }: { product: Product }) {
   return (
     <div className="thumbnail">
-      <form method="POST">
+      <form action="cartAction" method="POST">
         <table>
           <tbody>
             <tr>
@@ -16,14 +16,14 @@ export default function ProductItem({ product }: { product: Product }) {
               <td className="description">
                 <b>{product.name}</b>
                 <br />
-                <span> Price: ${product.listPriceInCents / 100}</span>
+                <span> Price: ${product.listPriceInCents / 100.0}</span>
                 <br />
                 <span> {product.description} </span>
               </td>
             </tr>
           </tbody>
         </table>
-        <input name="addToCart" className="btn" value="Add to Cart" type="submit" />
+        <input name="addToCart" className="btn" defaultValue="Add to Cart" type="submit" />
       </form>
     </div>
   );
