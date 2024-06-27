@@ -55,7 +55,7 @@ export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) =>
     const ordersData = await ordersRes.json();
     return json({ user: userData, orders: ordersData });
   } catch (err) {
-    console.log(err)
+    console.error(err)
     throw new Response("An error occurred", { status: 500 });
   }
 }
