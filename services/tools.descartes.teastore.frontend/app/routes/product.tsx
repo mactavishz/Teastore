@@ -98,7 +98,6 @@ export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) =>
     let [productImageRes, recommendedImageRes] = await Promise.all([getProductImage(productId), getRecommendedImages(recommendations.map(productId => productId.toString()))])
     const productImage = await productImageRes.json();
     const recommendedImages = await recommendedImageRes.json();
-    console.log(productImage)
     return json({
       product: {
         ...productData,
@@ -112,7 +111,7 @@ export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) =>
       })
     })
   } catch (err) {
-    console.log(err)
+    console.error(err)
     throw new Response("An error occurred", { status: 500 });
   }
 }
@@ -132,7 +131,7 @@ export default function ProductPage() {
                 <h2 className="minipage-title">{product.name}</h2>
                 <img className="productpicture" src={product.image} alt={product.name} />
                 <blockquote>{product.description}</blockquote>
-                <span>Price: ${product.listPriceInCents / 100.0}</span><br />
+                <span>Price: ${(product.listPriceInCents / 100.0).toFixed(2)}</span><br />
                 <input name="addToCart" className="btn" defaultValue="Add to Cart" type="submit" />
               </div>
               </div>
