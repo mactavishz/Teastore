@@ -1,10 +1,3 @@
-// export default function AboutPage() {
-//   return (
-//     <div>About Page</div>
-//   )
-// }
-
-
 
 export default function AboutPage() {
 
@@ -12,42 +5,42 @@ export default function AboutPage() {
     {
       name: "Jóakim v. Kistowski",
       role: "Team leader, Interfaces, Persistence Provider Service",
-      imageUrl: "/path/to/joakim-image.jpg",
+      imageUrl: "/images/joakimKistowski.png",
       profileUrl: "https://se.informatik.uni-wuerzburg.de/staff/joakim_kistowski/"
     },
     {
       name: "André Bauer",
       role: "Web design",
-      imageUrl: "/path/to/andre-image.jpg",
+      imageUrl: "/images/andreBauer.png",
       profileUrl: "https://se.informatik.uni-wuerzburg.de/staff/andre_bauer/"
     },
     {
       name: "Simon Eismann",
       role: "Auth Service, Docker, Kieker",
-      imageUrl: "/path/to/simon-image.jpg",
+      imageUrl: "/images/simonEismann.png",
       profileUrl: "https://se.informatik.uni-wuerzburg.de/staff/simon_eismann/"
     },
     {
       name: "Norbert Schmitt",
       role: "Image Provider Service, Docker, Kieker",
-      imageUrl: "/path/to/norbert-image.jpg",
+      imageUrl: "/images/norbertSchmitt.png",
       profileUrl: "https://se.informatik.uni-wuerzburg.de/staff/norbert_schmitt/"
     },
     {
       name: "Johannes Grohmann",
       role: "Recommender Service",
-      imageUrl: "/path/to/johannes-image.jpg",
+      imageUrl: "/images/johannesGrohmann.png",
       profileUrl: "https://se.informatik.uni-wuerzburg.de/staff/johannes_grohmann/"
     },
     {
       name: "Samuel Kounev",
       role: "Supervisor",
-      imageUrl: "/path/to/samuel-image.jpg",
+      imageUrl: "/images/samuelKounev.png",
       profileUrl: "https://se.informatik.uni-wuerzburg.de/staff/samuel_kounev/"
     }
   ];
 
-  const descartesLogoUrl = '/path/to/descartes-logo.png';
+  const descartesLogoUrl = '/images/descartesLogo.png';
 
   return (
     <div className="container" id="main">
