@@ -7,14 +7,65 @@
 
 
 export default function AboutPage() {
+
+  const developers = [
+    {
+      name: "Jóakim v. Kistowski",
+      role: "Team leader, Interfaces, Persistence Provider Service",
+      imageUrl: "/path/to/joakim-image.jpg",
+      profileUrl: "https://se.informatik.uni-wuerzburg.de/staff/joakim_kistowski/"
+    },
+    {
+      name: "André Bauer",
+      role: "Web design",
+      imageUrl: "/path/to/andre-image.jpg",
+      profileUrl: "https://se.informatik.uni-wuerzburg.de/staff/andre_bauer/"
+    },
+    {
+      name: "Simon Eismann",
+      role: "Auth Service, Docker, Kieker",
+      imageUrl: "/path/to/simon-image.jpg",
+      profileUrl: "https://se.informatik.uni-wuerzburg.de/staff/simon_eismann/"
+    },
+    {
+      name: "Norbert Schmitt",
+      role: "Image Provider Service, Docker, Kieker",
+      imageUrl: "/path/to/norbert-image.jpg",
+      profileUrl: "https://se.informatik.uni-wuerzburg.de/staff/norbert_schmitt/"
+    },
+    {
+      name: "Johannes Grohmann",
+      role: "Recommender Service",
+      imageUrl: "/path/to/johannes-image.jpg",
+      profileUrl: "https://se.informatik.uni-wuerzburg.de/staff/johannes_grohmann/"
+    },
+    {
+      name: "Samuel Kounev",
+      role: "Supervisor",
+      imageUrl: "/path/to/samuel-image.jpg",
+      profileUrl: "https://se.informatik.uni-wuerzburg.de/staff/samuel_kounev/"
+    }
+  ];
+
+
+
   return (
     <div className="container" id="main">
       <div className="row">
         <div className="col-sm-12 col-md-12">
           <h3>Developer Team</h3>
         </div>
-        {/* Developer profiles here */}
-        {/* to do */}
+
+        {/* Developer profiles */}
+        {developers.map((dev, index) => (
+          <DeveloperProfile
+            key={index}
+            name={dev.name}
+            role={dev.role}
+            imageUrl={dev.imageUrl}
+            profileUrl={dev.profileUrl}
+          />
+        ))}
 
         <div className="col-sm-12 col-md-12">
           {/* Descartes Research Group info */}
@@ -26,15 +77,12 @@ export default function AboutPage() {
 };
 
 
-interface DescartesGroupProps {
-  logoUrl: string;
-}
-
-// export default DescartesGroup;
+// interface DescartesGroupProps {
+//   logoUrl: string;
+// }
 
 
 
-// const DescartesGroup: React.FC<DescartesGroupProps> = ({ logoUrl }) => {
 export function DescartesGroup(){
   return (
     <div>
@@ -75,3 +123,50 @@ export function DescartesGroup(){
     </div>
   );
 };
+
+
+interface DeveloperProfileProps {
+  name: string;
+  role: string;
+  imageUrl: string;
+  profileUrl: string;
+}
+
+// // export function DeveloperProfile(){
+// const DeveloperProfile: React.FC<DeveloperProfileProps> = ({ name, role, imageUrl, profileUrl }) => {
+//   return (
+//     <div className="col-sm-4 col-md-4">
+//       {/* <img src={imageUrl} alt={name} className="img-rounded img-responsive" /> */}
+//       <blockquote>
+//         <p>
+//           {/* <a className="name" target="_blank" rel="noopener noreferrer" href={profileUrl}>
+//             {name}
+//           </a> */}
+//         </p>
+//         <small>
+//           <cite title="Source Title">{role}</cite>
+//         </small>
+//       </blockquote>
+//     </div>
+//   );
+// };
+
+// export function DeveloperProfile;
+
+export function DeveloperProfile({ name, role, imageUrl, profileUrl }: DeveloperProfileProps) {
+  return (
+    <div className="col-sm-4 col-md-4">
+      <img src={imageUrl} alt={name} className="img-rounded img-responsive" />
+      <blockquote>
+        <p>
+          <a className="name" target="_blank" rel="noopener noreferrer" href={profileUrl}>
+            {name}
+          </a>
+        </p>
+        <small>
+          <cite title="Source Title">{role}</cite>
+        </small>
+      </blockquote>
+    </div>
+  );
+}
