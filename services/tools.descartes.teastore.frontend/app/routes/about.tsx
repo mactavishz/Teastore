@@ -47,7 +47,7 @@ export default function AboutPage() {
     }
   ];
 
-
+  const descartesLogoUrl = '/path/to/descartes-logo.png';
 
   return (
     <div className="container" id="main">
@@ -69,7 +69,7 @@ export default function AboutPage() {
 
         <div className="col-sm-12 col-md-12">
           {/* Descartes Research Group info */}
-          <DescartesGroup />
+          <DescartesGroup logoUrl={descartesLogoUrl} />
         </div>
       </div>
     </div>
@@ -77,19 +77,18 @@ export default function AboutPage() {
 };
 
 
-// interface DescartesGroupProps {
-//   logoUrl: string;
-// }
+{/* Descartes Research Group info */}
+interface DescartesGroupProps {
+  logoUrl: string;
+}
 
-
-
-export function DescartesGroup(){
+export function DescartesGroup({ logoUrl }: DescartesGroupProps) {
   return (
     <div>
       <h3>We are part of the Descartes Research Group:</h3>
       <a href="http://www.descartes.tools" target="_blank" rel="noopener noreferrer">
         <img
-          // src={logoUrl}
+          src={logoUrl}
           alt="Descartes Research Group"
           className="img-rounded img-responsive"
         />
@@ -122,36 +121,18 @@ export function DescartesGroup(){
       </blockquote>
     </div>
   );
-};
+}
 
 
+
+
+{/* Developer profiles */}
 interface DeveloperProfileProps {
   name: string;
   role: string;
   imageUrl: string;
   profileUrl: string;
 }
-
-// // export function DeveloperProfile(){
-// const DeveloperProfile: React.FC<DeveloperProfileProps> = ({ name, role, imageUrl, profileUrl }) => {
-//   return (
-//     <div className="col-sm-4 col-md-4">
-//       {/* <img src={imageUrl} alt={name} className="img-rounded img-responsive" /> */}
-//       <blockquote>
-//         <p>
-//           {/* <a className="name" target="_blank" rel="noopener noreferrer" href={profileUrl}>
-//             {name}
-//           </a> */}
-//         </p>
-//         <small>
-//           <cite title="Source Title">{role}</cite>
-//         </small>
-//       </blockquote>
-//     </div>
-//   );
-// };
-
-// export function DeveloperProfile;
 
 export function DeveloperProfile({ name, role, imageUrl, profileUrl }: DeveloperProfileProps) {
   return (
