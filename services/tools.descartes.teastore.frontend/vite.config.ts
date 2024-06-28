@@ -4,9 +4,15 @@ import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 installGlobals();
+console.log(process.env)
 
 export default defineConfig({
-  plugins: [remix(), tsconfigPaths()],
+  plugins: [
+    remix({
+      basename: process.env.BASE_URL || "/tools.descartes.teastore.webui/"
+    }),
+    tsconfigPaths()
+  ],
   server: {
     hmr: {
       port: 3010
