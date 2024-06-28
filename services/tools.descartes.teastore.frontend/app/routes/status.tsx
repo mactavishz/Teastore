@@ -1,37 +1,111 @@
 
 import React from 'react';
+import { json, useLoaderData } from '@remix-run/react';
+import type { LoaderFunction } from '@remix-run/node';
 
+
+type Server = {
+  host: string;
+  port: number;
+};
+
+type LoaderData = {
+  webuiservers: Server[];
+  authenticationservers: Server[];
+  persistenceservers: Server[];
+  imageservers: Server[];
+  recommenderservers: Server[];
+  dbfinished: boolean;
+  imagefinished: boolean;
+  recommenderfinished: boolean;
+  noregistry: boolean;
+};
+
+
+const getServersForService = (service: string): Server[] => {
+  // todo: make an API call
+  return [{ host: 'localhost', port: 8080 }];
+};
+
+const checkServiceStatus = (service: string): boolean => {
+  // todo: make an API call
+  return Math.random() > 0.5; // dummy random status
+};
+
+export const loader: LoaderFunction = async () => {
+  try {
+    const data: LoaderData = {
+      webuiservers: getServersForService('WEBUI'),
+      authenticationservers: getServersForService('AUTH'),
+      persistenceservers: getServersForService('PERSISTENCE'),
+      imageservers: getServersForService('IMAGE'),
+      recommenderservers: getServersForService('RECOMMENDER'),
+      dbfinished: checkServiceStatus('PERSISTENCE'),
+      imagefinished: checkServiceStatus('IMAGE'),
+      recommenderfinished: checkServiceStatus('RECOMMENDER'),
+      noregistry: false
+    };
+
+    return json(data);
+  } catch (error) {
+    console.error('Error fetching service status:', error);
+    return json({ ...getEmptyData(), noregistry: true });
+  }
+};
+
+const getEmptyData = (): LoaderData => ({
+  webuiservers: [],
+  authenticationservers: [],
+  persistenceservers: [],
+  imageservers: [],
+  recommenderservers: [],
+  dbfinished: false,
+  imagefinished: false,
+  recommenderfinished: false,
+  noregistry: true
+});
 
 export default function StatusPage() {
-  // dummy data.
-  const services = [
-    {
-      name: 'WebUI',
-      servers: [{ host: 'localhost', port: 8080 }],
-      status: 'OK' as const,
+  const data = useLoaderData<LoaderData>();
+
+  const getServiceStatus = (
+    servers: Server[],
+    finished: boolean,
+    waitingFor?: 'PERSISTENCE'
+  ): Service['status'] => {
+    if (servers.length === 0) return 'Offline';
+    if (waitingFor === 'PERSISTENCE' && !data.dbfinished) return 'Waiting';
+    if (!finished) return 'Generating';
+    return 'OK';
+  };
+
+  const services: Service[] = [
+    { 
+      name: 'WebUI', 
+      servers: data.webuiservers, 
+      status: data.webuiservers.length > 0 ? 'OK' : 'Offline'
     },
-    {
-      name: 'Auth',
-      servers: [{ host: 'localhost', port: 8081 }],
-      status: 'OK' as const,
+    { 
+      name: 'Auth', 
+      servers: data.authenticationservers, 
+      status: data.authenticationservers.length > 0 ? 'OK' : 'Offline'
     },
-    {
-      name: 'Persistence',
-      servers: [{ host: 'localhost', port: 8082 }],
-      status: 'Generating' as const,
+    { 
+      name: 'Persistence', 
+      servers: data.persistenceservers, 
+      status: getServiceStatus(data.persistenceservers, data.dbfinished)
     },
-    {
-      name: 'Recommender',
-      servers: [{ host: 'localhost', port: 8083 }],
-      status: 'Waiting' as const,
+    { 
+      name: 'Recommender', 
+      servers: data.recommenderservers, 
+      status: getServiceStatus(data.recommenderservers, data.recommenderfinished, 'PERSISTENCE')
     },
-    {
-      name: 'Image',
-      servers: [{ host: 'localhost', port: 8084 }],
-      status: 'Generating' as const,
+    { 
+      name: 'Image', 
+      servers: data.imageservers, 
+      status: getServiceStatus(data.imageservers, data.imagefinished, 'PERSISTENCE')
     },
   ];
-
 
   return (
     <div className="container" id="main">
@@ -39,6 +113,7 @@ export default function StatusPage() {
         <div className="col-sm-12 col-lg-8 col-lg-offset-2">
           <h2 className="minipage-title">TeaStore Service Status</h2>
           <br/>
+          {data.noregistry && <h2>Load Balancer does not work. Is Registry offline?</h2>}
           <p><b>This page does not auto refresh!</b> Refresh manually or start an auto refresh for checking the current status (e.g. to see if database generation has finished).</p>
           <p>
             <b>Note:</b> Database and image generation may take a while.
@@ -47,7 +122,6 @@ export default function StatusPage() {
             Please wait for the image provider to finish as well before running any performance tests.
           </p>
           <br/>
-          {/* form and table */}
           <ServiceStatusTable services={services} />
           <button className="btn errorbtn" onClick={() => window.location.href = '/'}>
             Back to Shop
@@ -57,6 +131,8 @@ export default function StatusPage() {
     </div>
   );
 }
+
+
 
 
 
