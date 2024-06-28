@@ -1,111 +1,88 @@
-
 import React from 'react';
 import { json, useLoaderData } from '@remix-run/react';
 import type { LoaderFunction } from '@remix-run/node';
-
+// import { ServiceStatusTable } from './ServiceStatusTable';
 
 type Server = {
   host: string;
   port: number;
 };
 
+enum ServiceEnum {
+  WEBUI = 'webui',
+  AUTH = 'auth',
+  PERSISTENCE = 'persistence',
+  IMAGE = 'image',
+  RECOMMENDER = 'recommender'
+}
+
 type LoaderData = {
-  webuiservers: Server[];
-  authenticationservers: Server[];
-  persistenceservers: Server[];
-  imageservers: Server[];
-  recommenderservers: Server[];
-  dbfinished: boolean;
-  imagefinished: boolean;
-  recommenderfinished: boolean;
-  noregistry: boolean;
+  services: Service[];
+  error: string | null;
 };
 
-
-const getServersForService = (service: string): Server[] => {
-  // todo: make an API call
-  return [{ host: 'localhost', port: 8080 }];
+type HealthResponse = {
+  checks: any[];
+  status: 'UP' | 'DOWN';
 };
 
-const checkServiceStatus = (service: string): boolean => {
-  // todo: make an API call
-  return Math.random() > 0.5; // dummy random status
+const getServersForService = (service: ServiceEnum): Server[] => {
+  // Assuming all services are running on their own host with the service name
+  return [{ host: service, port: 8080 }];
+};
+
+const checkServiceStatus = async (service: ServiceEnum): Promise<boolean> => {
+  try {
+    const { host, port } = getServersForService(service)[0];
+    const response = await fetch(`http://${host}:${port}/health`);
+    if (!response.ok) {
+      return false;
+    }
+    const healthData: HealthResponse = await response.json();
+    return healthData.status === 'UP';
+  } catch (error) {
+    console.error(`Error checking status for ${service}:`, error);
+    return false;
+  }
 };
 
 export const loader: LoaderFunction = async () => {
   try {
-    const data: LoaderData = {
-      webuiservers: getServersForService('WEBUI'),
-      authenticationservers: getServersForService('AUTH'),
-      persistenceservers: getServersForService('PERSISTENCE'),
-      imageservers: getServersForService('IMAGE'),
-      recommenderservers: getServersForService('RECOMMENDER'),
-      dbfinished: checkServiceStatus('PERSISTENCE'),
-      imagefinished: checkServiceStatus('IMAGE'),
-      recommenderfinished: checkServiceStatus('RECOMMENDER'),
-      noregistry: false
-    };
+    const servicesData = await Promise.all(
+      Object.values(ServiceEnum).map(async (service) => {
+        const servers = getServersForService(service);
+        const isHealthy = await checkServiceStatus(service);
+        return { service, servers, isHealthy };
+      })
+    );
 
-    return json(data);
+    const services: Service[] = servicesData.map(({ service, servers, isHealthy }) => ({
+      name: service,
+      servers,
+      status: getServiceStatus(isHealthy, service)
+    }));
+
+    return json<LoaderData>({ services, error: null });
   } catch (error) {
     console.error('Error fetching service status:', error);
-    return json({ ...getEmptyData(), noregistry: true });
+    return json<LoaderData>({ services: [], error: 'Failed to fetch service status' });
   }
 };
 
-const getEmptyData = (): LoaderData => ({
-  webuiservers: [],
-  authenticationservers: [],
-  persistenceservers: [],
-  imageservers: [],
-  recommenderservers: [],
-  dbfinished: false,
-  imagefinished: false,
-  recommenderfinished: false,
-  noregistry: true
-});
+
+const getServiceStatus = (
+  isHealthy: boolean,
+  service: ServiceEnum
+): 'OK' | 'Offline' => {
+  if (service === ServiceEnum.WEBUI) {
+    return 'OK';
+  }
+  
+  return isHealthy ? 'OK' : 'Offline';
+};
 
 export default function StatusPage() {
-  const data = useLoaderData<LoaderData>();
-
-  const getServiceStatus = (
-    servers: Server[],
-    finished: boolean,
-    waitingFor?: 'PERSISTENCE'
-  ): Service['status'] => {
-    if (servers.length === 0) return 'Offline';
-    if (waitingFor === 'PERSISTENCE' && !data.dbfinished) return 'Waiting';
-    if (!finished) return 'Generating';
-    return 'OK';
-  };
-
-  const services: Service[] = [
-    { 
-      name: 'WebUI', 
-      servers: data.webuiservers, 
-      status: data.webuiservers.length > 0 ? 'OK' : 'Offline'
-    },
-    { 
-      name: 'Auth', 
-      servers: data.authenticationservers, 
-      status: data.authenticationservers.length > 0 ? 'OK' : 'Offline'
-    },
-    { 
-      name: 'Persistence', 
-      servers: data.persistenceservers, 
-      status: getServiceStatus(data.persistenceservers, data.dbfinished)
-    },
-    { 
-      name: 'Recommender', 
-      servers: data.recommenderservers, 
-      status: getServiceStatus(data.recommenderservers, data.recommenderfinished, 'PERSISTENCE')
-    },
-    { 
-      name: 'Image', 
-      servers: data.imageservers, 
-      status: getServiceStatus(data.imageservers, data.imagefinished, 'PERSISTENCE')
-    },
-  ];
+  const { services, error } = useLoaderData<LoaderData>();
 
   return (
     <div className="container" id="main">
@@ -113,7 +90,7 @@ export default function StatusPage() {
         <div className="col-sm-12 col-lg-8 col-lg-offset-2">
           <h2 className="minipage-title">TeaStore Service Status</h2>
           <br/>
-          {data.noregistry && <h2>Load Balancer does not work. Is Registry offline?</h2>}
+          {error && <h2>{error}</h2>}
           <p><b>This page does not auto refresh!</b> Refresh manually or start an auto refresh for checking the current status (e.g. to see if database generation has finished).</p>
           <p>
             <b>Note:</b> Database and image generation may take a while.
@@ -131,9 +108,6 @@ export default function StatusPage() {
     </div>
   );
 }
-
-
-
 
 
 {/* form and table */}
