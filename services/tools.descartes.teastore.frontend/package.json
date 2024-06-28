@@ -1,5 +1,5 @@
 {
-  "name": "tools.descartes.teastore.frontend",
+  "name": "tools.descartes.teastore.webui",
   "private": true,
   "sideEffects": false,
   "type": "module",
