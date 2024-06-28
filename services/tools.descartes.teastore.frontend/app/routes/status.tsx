@@ -1,7 +1,6 @@
 import React from 'react';
 import { json, useLoaderData } from '@remix-run/react';
 import type { LoaderFunction } from '@remix-run/node';
-// import { ServiceStatusTable } from './ServiceStatusTable';
 
 type Server = {
   host: string;
@@ -74,10 +73,11 @@ const getServiceStatus = (
   isHealthy: boolean,
   service: ServiceEnum
 ): 'OK' | 'Offline' => {
+  // WebUI is healthy if you can see it
   if (service === ServiceEnum.WEBUI) {
     return 'OK';
   }
-  
+  // check other services
   return isHealthy ? 'OK' : 'Offline';
 };
 
