@@ -5,7 +5,7 @@ import { getURL } from "~/utils/url";
 
 type Server = {
   host: string;
-  port: number;
+  port: string;
 };
 
 enum ServiceEnum {
@@ -28,8 +28,14 @@ type HealthResponse = {
 
 const getServersForService = (service: ServiceEnum): Server[] => {
   // Assuming all services are running on their own host with the service name
-  return [{ host: service, port: 8080 }];
+  return [getServerConfig(service)]
 };
+
+const getServerConfig = (service: ServiceEnum): Server => {
+  const host = process.env[`${service.toUpperCase()}_HOST`] || service;
+  const port = process.env[`${service.toUpperCase()}_PORT`] || "8080";
+  return { host, port };
+}
 
 const checkServiceStatus = async (service: ServiceEnum): Promise<boolean> => {
   try {
@@ -65,7 +71,7 @@ export const loader: LoaderFunction = async () => {
     return json<LoaderData>({ services, error: null });
   } catch (error) {
     console.error('Error fetching service status:', error);
-    return json<LoaderData>({ services: [], error: 'Failed to fetch service status' });
+    return new Response('Failed to fetch service status', { status: 500 });
   }
 };
 
@@ -114,7 +120,7 @@ export default function StatusPage() {
 {/* form and table */}
 type Service = {
   name: string;
-  servers: { host: string; port: number }[];
+  servers: { host: string; port: string }[];
   status: 'OK' | 'Offline' | 'Generating' | 'Waiting' | 'Training';
 };
 
