@@ -55,7 +55,6 @@
         <module>services/tools.descartes.teastore.recommender</module>
         <module>services/tools.descartes.teastore.registry</module>
         <module>services/tools.descartes.teastore.auth</module>
-        <module>services/tools.descartes.teastore.webui</module>
         <module>./utilities/tools.descartes.teastore.docker.all</module>
     </modules>
 

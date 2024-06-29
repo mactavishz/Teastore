@@ -62,23 +62,28 @@ services:
       - ./env/dev.env
   webui:
     build:
-      context: ./services/tools.descartes.teastore.webui
-      dockerfile: Dockerfile
+      context: services/tools.descartes.teastore.webui
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./services/tools.descartes.teastore.webui:/web:rw
+      - frontend_node_modules:/web/node_modules
+    env_file:
+      - ./env/dev.env
+      - services/tools.descartes.teastore.webui/env/dev.env
     depends_on:
       - registry
       - auth
       - image
       - persistence
       - recommender
-    expose:
-      - "8080"
     environment:
       HOST_NAME: "webui"
-      REGISTRY_HOST: "registry"
     ports:
       - "8080:8080"
-
+      - "3010:3010" # HMR port
 networks:
   default:
     external: true
     name: teastore-network
+volumes:
+    frontend_node_modules:
