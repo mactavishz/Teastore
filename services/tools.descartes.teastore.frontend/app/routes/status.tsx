@@ -1,6 +1,7 @@
 import React from 'react';
 import { json, useLoaderData } from '@remix-run/react';
 import type { LoaderFunction } from '@remix-run/node';
+import { getURL } from "~/utils/url";
 
 type Server = {
   host: string;
@@ -100,9 +101,9 @@ export default function StatusPage() {
           </p>
           <br/>
           <ServiceStatusTable services={services} />
-          <button className="btn errorbtn" onClick={() => window.location.href = '/'}>
+          <a className="btn btn-default" href={getURL("/")}>
             Back to Shop
-          </button>
+          </a>
         </div>
       </div>
     </div>

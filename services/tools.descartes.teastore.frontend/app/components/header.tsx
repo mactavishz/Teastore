@@ -1,3 +1,5 @@
+import { getURL } from "~/utils/url";
+
 interface HeaderProps {
   storeIcon: string;
   login: boolean;
@@ -18,7 +20,7 @@ export default function Header({ storeIcon, login, message, errorMessage, setMes
               className="icon-bar"></span> <span className="icon-bar"></span> <span
                 className="icon-bar"></span>
           </button>
-          <a className="navbar-brand" href="/">
+          <a className="navbar-brand" href={getURL("/")}>
             <img src={storeIcon} width="30" height="30" className="d-inline-block align-top" alt="" />
             &nbsp; TeaStore
           </a>
@@ -36,17 +38,17 @@ export default function Header({ storeIcon, login, message, errorMessage, setMes
                       </form>
                     </li>
                     <li>
-                      <a href="/profile"><span className="glyphicon glyphicon glyphicon-user" aria-hidden="true"></span></a>
+                      <a href={getURL("/profile")}><span className="glyphicon glyphicon glyphicon-user" aria-hidden="true"></span></a>
                     </li>
                   </>
                 ) :
                 (
                   <li>
-                    <a href="/login">Sign in</a>
+                    <a href={getURL("/login")}>Sign in</a>
                   </li>
                 )
             }
-            <li><a href="/cart"><span
+            <li><a href={getURL("/cart")}><span
               className="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span></a></li>
           </ul>
         </div>

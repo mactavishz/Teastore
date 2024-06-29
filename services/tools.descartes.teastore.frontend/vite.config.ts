@@ -4,7 +4,6 @@ import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 installGlobals();
-console.log(process.env)
 
 export default defineConfig({
   plugins: [

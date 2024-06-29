@@ -1,5 +1,6 @@
 import { useSubmit } from "@remix-run/react";
 import { useRef } from "react";
+import { getURL } from "~/utils/url";
 
 interface PaginationProps {
   pagination: string[];
@@ -30,7 +31,7 @@ export default function Pagination({ pagination, categoryId, pageNum, productDis
             }
             return (
               <li className={item == pageNum.toString() ? "active" : ""} key={`page-button-${item}`}>
-                <a href={`/category?category=${categoryId}&page=${displayPageNum}`}>
+                <a href={getURL(`/category?category=${categoryId}&page=${displayPageNum}`)}>
                   {item}
                 </a>
               </li>

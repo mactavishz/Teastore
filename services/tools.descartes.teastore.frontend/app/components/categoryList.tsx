@@ -1,4 +1,5 @@
 import type { Category } from "~/types";
+import { getURL } from "~/utils/url";
 
 export default function CategoryList({ list = [] }: { list: Category[] }) {
   return (
@@ -10,7 +11,7 @@ export default function CategoryList({ list = [] }: { list: Category[] }) {
             return (
               <li className="category-item" role="presentation" key={category.id}>
                 <a
-                  href={`/category?category=${category.id}&page=1`}
+                  href={getURL(`/category?category=${category.id}&page=1`)}
                   className="menulink"
                   id={`link_${category.name}`}
                 >

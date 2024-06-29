@@ -9,6 +9,7 @@ const defaultState: GlobalStateContextType = {
   setMessage: () => {},
   setErrorMessage: () => {},
   isLoggedIn: false,
+  baseURL: "/",
 };
 
 // Create the context with the correct type

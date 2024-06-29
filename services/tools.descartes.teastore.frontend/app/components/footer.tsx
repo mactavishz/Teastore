@@ -1,3 +1,5 @@
+import { getURL } from "~/utils/url";
+
 export default function Footer() {
   return (
     <nav id="footnav"
@@ -13,8 +15,8 @@ export default function Footer() {
           </ul>
           <ul className="nav navbar-nav navbar-right">
             {/* <li><a href="/database">Database</a></li> */}
-            <li><a href="/status">Status</a></li>
-            <li><a href="/about">About us</a></li>
+            <li><a href={getURL("/status")}>Status</a></li>
+            <li><a href={getURL("/about")}>About us</a></li>
             <li><a
               href="https://github.com/DescartesResearch/TeaStore/wiki"><span
                 className="glyphicon glyphicon-question-sign" aria-hidden="true"></span></a></li>

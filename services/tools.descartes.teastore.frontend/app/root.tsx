@@ -65,7 +65,7 @@ export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) =>
     const [iconRes, categoryListRes, loginStatus] = await Promise.all([getIcon(), getCategoryList(), useLoginStatus({ request })]);
     const iconData: IconData = await iconRes.json();
     categoryList = await categoryListRes.json() || [];
-    return json({ icon: iconData.icon, loginStatus, categoryList, message, errorMessage }, {
+    return json({ icon: iconData.icon, loginStatus, categoryList, message, errorMessage, baseURL: process.env.BASE_URL }, {
       headers: [
         ["Set-Cookie", await errorMessageCookie.serialize(errorMessage, { maxAge: 0})],
         ["Set-Cookie", await messageCookie.serialize(message, { maxAge: 0 })]
@@ -78,7 +78,7 @@ export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) =>
 }
 
 export default function App() {
-  const { icon, loginStatus, categoryList, errorMessage: defaultErrorMessage, message: defaultMessage } = useLoaderData<typeof loader>();
+  const { icon, loginStatus, categoryList, errorMessage: defaultErrorMessage, message: defaultMessage, baseURL } = useLoaderData<typeof loader>();
   const [message, setMessage] = useState(defaultMessage)
   const [errorMessage, setErrorMessage] = useState(defaultErrorMessage)
   useLayoutEffect();
@@ -96,7 +96,7 @@ export default function App() {
         <Links />
       </head>
       <body suppressHydrationWarning={true}>
-        <GlobalStateContext.Provider value={{ categoryList, message, errorMessage, setMessage, setErrorMessage, isLoggedIn: loginStatus }}>
+        <GlobalStateContext.Provider value={{ baseURL, categoryList, message, errorMessage, setMessage, setErrorMessage, isLoggedIn: loginStatus }}>
           <Header
             storeIcon={icon}
             login={loginStatus}
@@ -106,8 +106,8 @@ export default function App() {
             setErrorMessage={setErrorMessage}
           />
           <Outlet />
+          <Footer></Footer>
         </GlobalStateContext.Provider>
-        <Footer></Footer>
         <Scripts />
         <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js" />
         <script src="https://cdn.jsdelivr.net/npm/bootstrap3@3.3.5/dist/js/bootstrap.min.js" />

@@ -26,6 +26,7 @@ export interface GlobalStateContextType {
   setMessage: React.Dispatch<React.SetStateAction<string | null>>;
   setErrorMessage: React.Dispatch<React.SetStateAction<string | null>>;
   isLoggedIn: boolean;
+  baseURL: string;
 }
 
 export interface OrderType {
