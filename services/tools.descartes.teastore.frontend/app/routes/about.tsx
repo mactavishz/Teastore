@@ -1,3 +1,4 @@
+import ErrorMessage from "~/components/error";
 
 export default function AboutPage() {
 
@@ -143,4 +144,8 @@ export function DeveloperProfile({ name, role, imageUrl, profileUrl }: Developer
       </blockquote>
     </div>
   );
+}
+
+export function ErrorBoundary() {
+  return <ErrorMessage />;
 }

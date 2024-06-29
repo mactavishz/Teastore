@@ -18,6 +18,7 @@ import { createGETFetcher, createPOSTFetcher } from "~/.server/request"; // Adju
 import { paginationPageSizeCookie } from "~/.server/cookie";
 import { useContext } from "react";
 import { GlobalStateContext } from "~/context/GlobalStateContext";
+import ErrorMessage from "~/components/error";
 
 const INITIAL_PRODUCT_DISPLAY_COUNT = 20;
 const PRODUCT_DISPLAY_COUNT_OPTIONS = [5, 10, 20, 30];
@@ -25,8 +26,9 @@ const PRODUCT_DISPLAY_COUNT_OPTIONS = [5, 10, 20, 30];
 export const meta: MetaFunction<typeof loader> = ({
   data
 }) => {
+  const name = data && data.category ? data.category.name : "";
   return [
-    { title: `TeaStore Category ${data.category.name}` },
+    { title: `TeaStore Category ${name}` },
   ];
 };
 
@@ -205,4 +207,8 @@ export default function CategoryPage() {
       </div>
     </div>
   )
+}
+
+export function ErrorBoundary() {
+  return <ErrorMessage />;
 }

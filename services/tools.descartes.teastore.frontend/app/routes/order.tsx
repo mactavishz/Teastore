@@ -9,6 +9,7 @@ import { OrderItemType, SessionBlobType, Product } from "~/types";
 import { useLoginStatus } from "~/.server/loginUtil";
 import SessionBlob from "~/model/SessionBlob";
 import appConfig from "~/appConfig";
+import ErrorMessage from "~/components/error";
 
 export const meta: MetaFunction = () => {
   return [
@@ -112,4 +113,8 @@ export default function OrderPage() {
       </div>
     </div>
   )
+}
+
+export function ErrorBoundary() {
+  return <ErrorMessage />;
 }

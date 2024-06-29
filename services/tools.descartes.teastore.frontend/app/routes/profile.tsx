@@ -9,6 +9,7 @@ import { createGETFetcher } from "~/.server/request";
 import { SessionBlobType, OrderType } from "~/types";
 import appConfig from "~/appConfig";
 import { parseISO, format } from 'date-fns';
+import ErrorMessage from "~/components/error";
 
 export const meta: MetaFunction = () => {
   return [
@@ -121,4 +122,8 @@ export default function ProfilePage() {
       </div>
     </div>
   )
+}
+
+export function ErrorBoundary() {
+  return <ErrorMessage />;
 }

@@ -7,7 +7,7 @@ import {
 } from "@remix-run/react";
 import { useState } from "react";
 import type { Category, IconData } from "./types";
-import { LinksFunction, LoaderFunction, json, LoaderFunctionArgs } from "@remix-run/node";
+import { LinksFunction, LoaderFunction, json, LoaderFunctionArgs, redirect } from "@remix-run/node";
 import Header from "./components/header";
 import Footer from "./components/footer";
 import { useLayoutEffect } from "~/hooks/useLayoutEffect"; 

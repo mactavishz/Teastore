@@ -16,6 +16,7 @@ import { Product, SessionBlobType, OrderItemType } from "~/types";
 import { OrderItem } from "~/model/OrderItem";
 import { getSessionBlob } from "~/.server/cookie";
 import { GlobalStateContext } from "~/context/GlobalStateContext";
+import ErrorMessage from "~/components/error";
 
 export const meta: MetaFunction = () => {
   return [
@@ -142,4 +143,8 @@ export default function ProductPage() {
       </div>
     </div>
   )
+}
+
+export function ErrorBoundary() {
+  return <ErrorMessage />;
 }

@@ -8,6 +8,7 @@ import { createPOSTFetcher, createGETFetcher } from "~/.server/request";
 import { getSessionBlob } from "~/.server/cookie";
 import { OrderItemType, SessionBlobType, Product } from "~/types";
 import SessionBlob from "~/model/SessionBlob";
+import ErrorMessage from "~/components/error";
 
 export const meta: MetaFunction = () => {
   return [
@@ -151,4 +152,8 @@ export default function CartPage() {
       </div>
     </div>
   )
+}
+
+export function ErrorBoundary() {
+  return <ErrorMessage />;
 }

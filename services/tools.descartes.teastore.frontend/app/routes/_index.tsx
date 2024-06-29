@@ -1,5 +1,6 @@
 import type { MetaFunction } from "@remix-run/node";
 import CategoryList from "~/components/categoryList";
+import ErrorMessage from "~/components/error";
 import { useContext } from "react";
 import { GlobalStateContext } from "~/context/GlobalStateContext";
 
@@ -22,4 +23,8 @@ export default function Index() {
       </div>
     </div>
   );
+}
+
+export function ErrorBoundary() {
+  return <ErrorMessage />;
 }

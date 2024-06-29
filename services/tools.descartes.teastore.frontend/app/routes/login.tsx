@@ -3,6 +3,7 @@ import { useLoaderData } from "@remix-run/react";
 import CategoryList from "~/components/categoryList";
 import { useContext } from "react";
 import { GlobalStateContext } from "~/context/GlobalStateContext";
+import ErrorMessage from "~/components/error";
 
 export const meta: MetaFunction = () => {
   return [
@@ -55,4 +56,8 @@ export default function LoginPage() {
       </div>
     </div>
   )
+}
+
+export function ErrorBoundary() {
+  return <ErrorMessage />;
 }

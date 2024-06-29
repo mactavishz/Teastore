@@ -2,6 +2,7 @@ import React from 'react';
 import { json, useLoaderData } from '@remix-run/react';
 import type { LoaderFunction } from '@remix-run/node';
 import { getURL } from "~/utils/url";
+import ErrorMessage from '~/components/error';
 
 type Server = {
   host: string;
@@ -179,4 +180,8 @@ export function ServiceStatusTable({ services }: ServiceStatusTableProps) {
       </tbody>
     </table>
   );
+}
+
+export function ErrorBoundary() {
+  return <ErrorMessage />;
 }
