@@ -17,13 +17,12 @@ package tools.descartes.teastore.auth.startup;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import io.opentracing.util.GlobalTracer;
-import tools.descartes.teastore.registryclient.RegistryClient;
-import tools.descartes.teastore.registryclient.Service;
-import tools.descartes.teastore.registryclient.loadbalancers.ServiceLoadBalancer;
-import tools.descartes.teastore.registryclient.tracing.Tracing;
-import tools.descartes.teastore.registryclient.util.RESTClient;
+import tools.descartes.teastore.utils.RegistryClient;
+import tools.descartes.teastore.utils.Service;
+
 
 /**
  * Application Lifecycle Listener implementation class Registry Client Startup.
@@ -33,8 +32,9 @@ import tools.descartes.teastore.registryclient.util.RESTClient;
  */
 @WebListener
 public class AuthStartup implements ServletContextListener {
-
-  private static final int REST_READ_TIMOUT = 1750;
+  private final Logger LOG = LoggerFactory.getLogger(AuthStartup.class);
+  private final String serverName = Service.getServerName("SERVICE_HOST", "SERVICE_PORT");
+  private final RegistryClient client = new RegistryClient();
 
   /**
    * Also set this accordingly in RegistryClientStartup.
@@ -53,7 +53,7 @@ public class AuthStartup implements ServletContextListener {
    * @param event The servlet context event at destruction.
    */
   public void contextDestroyed(ServletContextEvent event) {
-    RegistryClient.getClient().unregister(event.getServletContext().getContextPath());
+    client.unregister(Service.AUTH.getServiceName(), serverName);
   }
 
   /**
@@ -62,10 +62,12 @@ public class AuthStartup implements ServletContextListener {
    * @param event The servlet context event at initialization.
    */
   public void contextInitialized(ServletContextEvent event) {
-    GlobalTracer.register(Tracing.init(Service.AUTH.getServiceName()));
-    RESTClient.setGlobalReadTimeout(REST_READ_TIMOUT);
-    ServiceLoadBalancer.preInitializeServiceLoadBalancers(Service.PERSISTENCE);
-    RegistryClient.getClient().register(event.getServletContext().getContextPath());
+    LOG.info("Waiting for dependent services to become available.");
+    client.runAfterServiceIsAvailable(Service.PERSISTENCE.getServiceName(), () -> {
+      LOG.info("Persistence service is available");
+      client.register(Service.AUTH.getServiceName(), serverName);
+    }, Service.AUTH.getServiceName());
+
   }
 
 }
