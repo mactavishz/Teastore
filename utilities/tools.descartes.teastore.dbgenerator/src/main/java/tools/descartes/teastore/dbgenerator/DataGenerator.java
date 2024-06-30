@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
 
-import jakarta.persistence.EntityManager;
 import org.eclipse.persistence.sessions.server.ServerSession;
 import org.eclipse.persistence.tools.schemaframework.SchemaManager;
 import org.mindrot.jbcrypt.BCrypt;
@@ -33,7 +32,6 @@ import tools.descartes.teastore.model.domain.PersistenceOrder;
 import tools.descartes.teastore.model.domain.ProductRepository;
 import tools.descartes.teastore.model.domain.UserRepository;
 import tools.descartes.teastore.model.repository.CacheManager;
-import tools.descartes.teastore.model.repository.DatabaseManagementEntity;
 import tools.descartes.teastore.model.restclient.PersistenceClient;
 import tools.descartes.teastore.model.repository.DataGeneratorUtil;
 import tools.descartes.teastore.entities.Category;
@@ -42,6 +40,8 @@ import tools.descartes.teastore.entities.OrderItem;
 import tools.descartes.teastore.entities.Product;
 import tools.descartes.teastore.entities.User;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /**
  * Class for generating data in the database.
  *
@@ -49,7 +49,7 @@ import tools.descartes.teastore.entities.User;
  *
  */
 public final class DataGenerator {
-
+	private static final Logger LOG = LoggerFactory.getLogger(DataGenerator.class);
 	/**
 	 * Status code for maintenance mode.
 	 */
@@ -70,24 +70,40 @@ public final class DataGenerator {
 	/**
 	 * Default max order per user for small database.
 	 */
-	public static final int SMALL_DB_MAX_ORDERS_PER_USER = 5;
+	public static final int SMALL_DB_MAX_ORDERS_PER_USER = 2;
+	/**
+	 * Default category count for midsize database.
+	 */
+	public static final int MIDSIZE_DB_CATEGORIES = 10;
+	/**
+	 * Default product count per category for midsize database.
+	 */
+	public static final int MIDSIZE_DB_PRODUCTS_PER_CATEGORY = 500;
+	/**
+	 * Default user count for midsize database.
+	 */
+	public static final int MIDSIZE_DB_USERS = 500;
+	/**
+	 * Default max order per user for midsize database.
+	 */
+	public static final int MIDSIZE_DB_MAX_ORDERS_PER_USER = 5;
 
 	/**
-	 * Default category count for tiny database.
+	 * Default category count for large database.
 	 */
-	public static final int TINY_DB_CATEGORIES = 2;
+	public static final int LARGE_DB_CATEGORIES = 10;
 	/**
-	 * Default product count per category for tiny database.
+	 * Default product count per category for midsize database.
 	 */
-	public static final int TINY_DB_PRODUCTS_PER_CATEGORY = 20;
+	public static final int LARGE_DB_PRODUCTS_PER_CATEGORY = 4000;
 	/**
-	 * Default user count for tiny database.
+	 * Default user count for midsize database.
 	 */
-	public static final int TINY_DB_USERS = 5;
+	public static final int LARGE_DB_USERS = 2000;
 	/**
-	 * Default max order per user for tiny database.
+	 * Default max order per user for midsize database.
 	 */
-	public static final int TINY_DB_MAX_ORDERS_PER_USER = 2;
+	public static final int LARGE_DB_MAX_ORDERS_PER_USER = 10;
 
 	private Random random = new Random(5);
 
@@ -175,6 +191,36 @@ public final class DataGenerator {
 	 */
 	public boolean isDatabaseEmpty() {
 		return DataGeneratorUtil.isDatabaseEmpty();
+	}
+
+	public void generateDB(String size) {
+        switch (size) {
+            case "small" -> {
+				LOG.info("Generating small database");
+				LOG.info("Categories: " + SMALL_DB_CATEGORIES);
+				LOG.info("Products per category: " + SMALL_DB_PRODUCTS_PER_CATEGORY);
+				LOG.info("Users: " + SMALL_DB_USERS);
+				LOG.info("Max orders per user: " + SMALL_DB_MAX_ORDERS_PER_USER);
+				generateDatabaseContent(SMALL_DB_CATEGORIES, SMALL_DB_PRODUCTS_PER_CATEGORY, SMALL_DB_USERS, SMALL_DB_MAX_ORDERS_PER_USER);
+			}
+            case "mid" -> {
+				LOG.info("Generating midsize database");
+				LOG.info("Categories: " + MIDSIZE_DB_CATEGORIES);
+				LOG.info("Products per category: " + MIDSIZE_DB_PRODUCTS_PER_CATEGORY);
+				LOG.info("Users: " + MIDSIZE_DB_USERS);
+				LOG.info("Max orders per user: " + MIDSIZE_DB_MAX_ORDERS_PER_USER);
+				generateDatabaseContent(MIDSIZE_DB_CATEGORIES, MIDSIZE_DB_PRODUCTS_PER_CATEGORY, MIDSIZE_DB_USERS, MIDSIZE_DB_MAX_ORDERS_PER_USER);
+			}
+            case "large" -> {
+				LOG.info("Generating large database");
+				LOG.info("Categories: " + LARGE_DB_CATEGORIES);
+				LOG.info("Products per category: " + LARGE_DB_PRODUCTS_PER_CATEGORY);
+				LOG.info("Users: " + LARGE_DB_USERS);
+				LOG.info("Max orders per user: " + LARGE_DB_MAX_ORDERS_PER_USER);
+				generateDatabaseContent(LARGE_DB_CATEGORIES, LARGE_DB_PRODUCTS_PER_CATEGORY, LARGE_DB_USERS, LARGE_DB_MAX_ORDERS_PER_USER);
+			}
+            default -> throw new IllegalArgumentException("Invalid size: " + size);
+        }
 	}
 
 	/**

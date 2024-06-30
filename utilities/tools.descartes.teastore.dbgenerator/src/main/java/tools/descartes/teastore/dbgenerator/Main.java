@@ -9,14 +9,38 @@ public class Main {
     private static final long DATABASE_OFFLINE_WAIT_MS = 2000;
 
     public static void main(String[] args) {
-      waitForDatabase();
-      if (DataGenerator.GENERATOR.isDatabaseEmpty()) {
-          LOG.info("Database is empty. Generating new database content");
-          DataGenerator.GENERATOR.generateDatabaseContent(DataGenerator.SMALL_DB_CATEGORIES,
-              DataGenerator.SMALL_DB_PRODUCTS_PER_CATEGORY, DataGenerator.SMALL_DB_USERS,
-              DataGenerator.SMALL_DB_MAX_ORDERS_PER_USER);
+        String size = null;
+        // print all the arguments
+        LOG.info("Arguments: " + args.length);
+
+        for (String arg : args) {
+            LOG.info("Argument: " + arg);
+        }
+
+        if (args.length > 2) {
+            LOG.error("Too many arguments. Only one argument is allowed.");
+            System.exit(-1);
+        }
+
+        if (args.length == 1) {
+            size = args[0];
+        }
+
+        if (args.length == 2) {
+            size = args[1];
+        }
+
+        if (!size.equals("small") && !size.equals("large") && !size.equals("mid")) {
+            LOG.error("Invalid argument. Only 'small', 'mid' and 'large' are allowed.");
+            System.exit(-1);
+        }
+
+        waitForDatabase();
+        if (DataGenerator.GENERATOR.isDatabaseEmpty()) {
+            LOG.info("Database is empty. Generating new database content");
+            DataGenerator.GENERATOR.generateDB(size);
         } else {
-          LOG.info("Populated database found. Skipping data generation");
+            LOG.info("Populated database found. Skipping data generation");
         }
         LOG.info("Persistence finished initializing database");
     }
