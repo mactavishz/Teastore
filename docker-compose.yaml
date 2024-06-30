@@ -1,5 +1,6 @@
 services:
   registry:
+    container_name: teastore-registry
     build:
       context: ./services/tools.descartes.teastore.registry
       dockerfile: Dockerfile
@@ -9,6 +10,7 @@ services:
       - ./services/tools.descartes.teastore.registry/env/dev.env
       - ./env/dev.env
   db:
+    container_name: teastore-db
     build:
         context: ./utilities/tools.descartes.teastore.database
         dockerfile: Dockerfile
@@ -17,6 +19,7 @@ services:
     ports:
       - "3306:3306"
   persistence:
+    container_name: teastore-persistence
     build:
       context: ./services/tools.descartes.teastore.persistence
       dockerfile: Dockerfile
@@ -29,6 +32,7 @@ services:
       - ./services/tools.descartes.teastore.persistence/env/dev.env
       - ./env/dev.env
   auth:
+    container_name: teastore-auth
     build:
       context: ./services/tools.descartes.teastore.auth
       dockerfile: Dockerfile
@@ -41,6 +45,7 @@ services:
       - ./services/tools.descartes.teastore.auth/env/dev.env
       - ./env/dev.env
   image:
+    container_name: teastore-image
     image: descartesresearch/teastore-image
     depends_on:
       - registry
@@ -51,6 +56,7 @@ services:
       HOST_NAME: "image"
       REGISTRY_HOST: "registry"
   recommender:
+    container_name: teastore-recommender
     build:
       context: ./services/tools.descartes.teastore.recommender
       dockerfile: Dockerfile
@@ -63,6 +69,7 @@ services:
       - ./services/tools.descartes.teastore.recommender/env/dev.env
       - ./env/dev.env
   webui:
+    container_name: teastore-webui
     build:
       context: services/tools.descartes.teastore.webui
       dockerfile: Dockerfile.dev
