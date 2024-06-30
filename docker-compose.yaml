@@ -9,23 +9,30 @@ services:
       - ./services/tools.descartes.teastore.registry/env/dev.env
       - ./env/dev.env
   db:
-    image: descartesresearch/teastore-db
+    build:
+        context: ./utilities/tools.descartes.teastore.database
+        dockerfile: Dockerfile
     expose:
       - "3306"
     ports:
       - "3306:3306"
   persistence:
-    image: descartesresearch/teastore-persistence
+    build:
+      context: ./services/tools.descartes.teastore.persistence
+      dockerfile: Dockerfile
     depends_on:
       - registry
       - db
     expose:
       - "8080"
-    environment:
-      HOST_NAME: "persistence"
-      REGISTRY_HOST: "registry"
-      DB_HOST: "db"
-      DB_PORT: "3306"
+    env_file:
+      - ./services/tools.descartes.teastore.persistence/env/dev.env
+      - ./env/dev.env
+#    environment:
+#      HOST_NAME: "persistence"
+#      REGISTRY_HOST: "registry"
+#      DB_HOST: "db"
+#      DB_PORT: "3306"
   auth:
     build:
       context: ./services/tools.descartes.teastore.auth
