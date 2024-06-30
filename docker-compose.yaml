@@ -28,11 +28,6 @@ services:
     env_file:
       - ./services/tools.descartes.teastore.persistence/env/dev.env
       - ./env/dev.env
-#    environment:
-#      HOST_NAME: "persistence"
-#      REGISTRY_HOST: "registry"
-#      DB_HOST: "db"
-#      DB_PORT: "3306"
   auth:
     build:
       context: ./services/tools.descartes.teastore.auth

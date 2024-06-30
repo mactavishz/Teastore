@@ -10,6 +10,6 @@ COPY --chown=1001:0 target/*.war /config/apps
 RUN mkdir -p /config/jdbc
 
 # Copy the MySQL Connector JAR
-COPY --chown=1001:0 target/liberty/wlp/usr/servers/defaultServer/jdbc/*.jar /config/jdbc/
+COPY --chown=1001:0 mysql-connector-j-8.4.0.jar /config/jdbc/
 
 RUN configure.sh

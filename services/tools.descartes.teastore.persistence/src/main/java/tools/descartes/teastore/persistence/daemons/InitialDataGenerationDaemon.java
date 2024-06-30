@@ -46,7 +46,7 @@ public class InitialDataGenerationDaemon implements ServletContextListener {
    *          The servlet context event at destruction.
    */
   public void contextDestroyed(ServletContextEvent event) {
-    // client.unregister(Service.PERSISTENCE.getServiceName(), serverName);
+    client.unregister(Service.PERSISTENCE.getServiceName(), serverName);
   }
 
   /**
@@ -55,8 +55,8 @@ public class InitialDataGenerationDaemon implements ServletContextListener {
    *          The servlet context event at initialization.
    */
   public void contextInitialized(ServletContextEvent event) {
-    // LOG.info("Persistence finished initializing database");
-    // client.register(Service.AUTH.getServiceName(), serverName);
-    // LOG.info("Persistence started registration daemon");
+    LOG.info("Persistence started registration");
+    client.register(Service.PERSISTENCE.getServiceName(), serverName);
+    LOG.info("Persistence finshed registration");
   }
 }
