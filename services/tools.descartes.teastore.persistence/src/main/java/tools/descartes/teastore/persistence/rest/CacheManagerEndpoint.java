@@ -19,7 +19,7 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
-import tools.descartes.teastore.persistence.repository.CacheManager;
+import tools.descartes.teastore.model.repository.CacheManager;
 
 /**
  * REST endpoint for cache clearing.

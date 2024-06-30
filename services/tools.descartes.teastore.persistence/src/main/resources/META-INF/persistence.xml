@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- PRODUCTION CONFIGURATION ONLY! Uses Mysql/MariaDB and is packaged into the final WAR file. -->
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd"
+             version="3.0">
+	<persistence-unit name="tools.descartes.teastore.persistence" transaction-type="RESOURCE_LOCAL">
+		<class>tools.descartes.teastore.model.domain.PersistenceProduct</class>
+		<class>tools.descartes.teastore.model.domain.PersistenceCategory</class>
+		<class>tools.descartes.teastore.model.domain.PersistenceOrderItem</class>
+		<class>tools.descartes.teastore.model.domain.PersistenceOrder</class>
+		<class>tools.descartes.teastore.model.domain.PersistenceUser</class>
+		<class>tools.descartes.teastore.model.repository.DatabaseManagementEntity</class>
+		<!-- Converters -->
+        <class>tools.descartes.teastore.model.domain.converters.LocalDateAttributeConverter</class>
+        <class>tools.descartes.teastore.model.domain.converters.LocalDateTimeAttributeConverter</class>
+		<exclude-unlisted-classes>false</exclude-unlisted-classes>
+		<properties>
+      		<property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
+        	<property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/teadb"/>
+        	<property name="jakarta.persistence.jdbc.user" value="teauser"/>
+        	<property name="jakarta.persistence.jdbc.password" value="teapassword"/>
+		    <property name="eclipselink.logging.level" value="INFO"/>
+		    <property name="eclipselink.ddl-generation" value="create-tables"/>
+      		<property name="eclipselink.ddl-generation.output-mode" value="database" />
+     	</properties>
+	</persistence-unit>
+</persistence>

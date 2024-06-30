@@ -22,9 +22,8 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
 
-import tools.descartes.teastore.persistence.domain.ProductRepository;
-import tools.descartes.teastore.persistence.repository.DataGenerator;
-import tools.descartes.teastore.registryclient.util.AbstractCRUDEndpoint;
+import tools.descartes.teastore.model.domain.ProductRepository;
+import tools.descartes.teastore.utils.AbstractCRUDEndpoint;
 import tools.descartes.teastore.entities.Product;
 
 /**
@@ -40,9 +39,6 @@ public class ProductEndpoint extends AbstractCRUDEndpoint<Product> {
 	 */
 	@Override
 	protected long createEntity(final Product product) {
-		if (DataGenerator.GENERATOR.isMaintenanceMode()) {
-			return -1L;
-		}
 		return ProductRepository.REPOSITORY.createEntity(product);
 	}
 
@@ -83,9 +79,6 @@ public class ProductEndpoint extends AbstractCRUDEndpoint<Product> {
 	 */
 	@Override
 	protected boolean deleteEntity(long id) {
-		if (DataGenerator.GENERATOR.isMaintenanceMode()) {
-			return false;
-		}
 		return ProductRepository.REPOSITORY.removeEntity(id);
 	}
 	
