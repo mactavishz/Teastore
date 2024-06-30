@@ -13,19 +13,15 @@
  */
 package tools.descartes.teastore.persistence.rest;
 
-import java.util.concurrent.Executors;
+import java.util.List;
 
+import jakarta.persistence.EntityManager;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
-import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import tools.descartes.teastore.utils.Service;
+import tools.descartes.teastore.model.repository.DataGeneratorUtil;
 
 /**
  * Persistence endpoint for generating new database content.
@@ -102,11 +98,14 @@ public class DatabaseGenerationEndpoint {
 	@GET
 	@Path("finished")
 	public Response isFinshed() {
-		// if (DataGenerator.GENERATOR.getGenerationFinishedFlag()) {
-		// 	return Response.ok(true).build();
-		// } else {
-		return Response.serverError().entity(true).build();
-		// }
+		boolean finishedGenerating = false;
+		boolean isDatebaseEmpty = DataGeneratorUtil.isDatabaseEmpty();
+		if (isDatebaseEmpty) {
+			finishedGenerating = true;
+		} else {
+			finishedGenerating = DataGeneratorUtil.getGenerationFinishedFlag();
+		}
+		return Response.serverError().entity(finishedGenerating).build();
 	}
 
 	/**

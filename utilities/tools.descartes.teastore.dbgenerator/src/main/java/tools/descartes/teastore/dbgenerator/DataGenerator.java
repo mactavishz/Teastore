@@ -35,6 +35,7 @@ import tools.descartes.teastore.model.domain.UserRepository;
 import tools.descartes.teastore.model.repository.CacheManager;
 import tools.descartes.teastore.model.repository.DatabaseManagementEntity;
 import tools.descartes.teastore.model.restclient.PersistenceClient;
+import tools.descartes.teastore.model.repository.DataGeneratorUtil;
 import tools.descartes.teastore.entities.Category;
 import tools.descartes.teastore.entities.Order;
 import tools.descartes.teastore.entities.OrderItem;
@@ -173,9 +174,7 @@ public final class DataGenerator {
 	 * @return True if the database is empty.
 	 */
 	public boolean isDatabaseEmpty() {
-		// every other entity requires a valid category or user
-		return (CategoryRepository.REPOSITORY.getAllEntities(-1, 1).size() == 0
-				&& UserRepository.REPOSITORY.getAllEntities(-1, 1).size() == 0);
+		return DataGeneratorUtil.isDatabaseEmpty();
 	}
 
 	/**
@@ -192,14 +191,14 @@ public final class DataGenerator {
 	 */
 	public void generateDatabaseContent(int categories, int productsPerCategory,
 			int users, int maxOrdersPerUser) {
-		setGenerationFinishedFlag(false);
+		DataGeneratorUtil.setGenerationFinishedFlag(false);
 		CacheManager.MANAGER.clearAllCaches();
 		random = new Random(5);
 		generateCategories(categories);
 		generateProducts(productsPerCategory);
 		generateUsers(users);
 		generateOrders(maxOrdersPerUser, productsPerCategory);
-		setGenerationFinishedFlag(true);
+		DataGeneratorUtil.setGenerationFinishedFlag(true);
 		CacheManager.MANAGER.clearAllCaches();
 	}
 
@@ -332,58 +331,10 @@ public final class DataGenerator {
 		schemaManager.replaceDefaultTables(true, true);
 		CacheManager.MANAGER.clearLocalCacheOnly();
 		CacheManager.MANAGER.resetLocalEMF();
-		setGenerationFinishedFlag(false);
+		DataGeneratorUtil.setGenerationFinishedFlag(false);
 		CacheManager.MANAGER.clearAllCaches();
 	}
 
-	private void setGenerationFinishedFlag(boolean flag) {
-		EntityManager em = CategoryRepository.REPOSITORY.getEM();
-		try {
-			em.getTransaction().begin();
-			List<DatabaseManagementEntity> entities =
-					em.createQuery("SELECT u FROM "
-							+ DatabaseManagementEntity.class.getName()
-							+ " u", DatabaseManagementEntity.class)
-					.getResultList();
-			if (entities == null || entities.isEmpty()) {
-				DatabaseManagementEntity entity = new DatabaseManagementEntity();
-				entity.setFinishedGenerating(flag);
-				em.persist(entity);
-			} else {
-				DatabaseManagementEntity entity = entities.get(0);
-				entity.setFinishedGenerating(flag);
-			}
-			em.getTransaction().commit();
-		} finally {
-			em.close();
-		}
-	}
-
-	/**
-	 * Returns true if the database has finished generating.
-	 * False if it is currently generating.
-	 * @return False if the database is generating.
-	 */
-	public boolean getGenerationFinishedFlag() {
-		if (isMaintenanceMode()) {
-			return false;
-		}
-		boolean finishedGenerating = false;
-		EntityManager em = CategoryRepository.REPOSITORY.getEM();
-		try {
-			List<DatabaseManagementEntity> entities =
-					em.createQuery("SELECT u FROM "
-							+ DatabaseManagementEntity.class.getName()
-							+ " u", DatabaseManagementEntity.class)
-					.getResultList();
-			if (entities != null && !entities.isEmpty()) {
-				finishedGenerating = entities.get(0).isFinishedGenerating();
-			}
-		} finally {
-			em.close();
-		}
-		return finishedGenerating;
-	}
 
 	/**
 	 * Returns if the current persistence is in maintenance mode.
