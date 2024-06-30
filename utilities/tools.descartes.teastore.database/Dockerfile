@@ -6,7 +6,7 @@ COPY setup.sql /docker-entrypoint-initdb.d/setup_0.sql
 # COPY setupData.sql /docker-entrypoint-initdb.d/setup_1.sql
 
 # Modify MySQL configuration
-RUN echo "max_connections = 2048" >> /etc/mysql/conf.d/mysql.cnf
+#RUN echo "max_connections = 2048" >> /etc/mysql/conf.d/mysql.cnf
 
 ENV MYSQL_ROOT_PASSWORD rootpassword
 
