@@ -102,6 +102,16 @@ final class EMFManager {
 			LOG.info("Database port not set. Falling back to default port at " + MYSQL_DEFAULT_PORT + ".");
 			dbport = MYSQL_DEFAULT_PORT;
 		}
+		String dbuser = System.getenv("DB_USER");
+		if (dbuser != null) {
+			LOG.info("Database user set to \"" + dbuser + "\".");
+			persistenceProperties.put("jakarta.persistence.jdbc.user", dbuser);
+		}
+		String dbpassword = System.getenv("DB_PASSWORD");
+		if (dbpassword != null) {
+			LOG.info("Database password set from DB_PASSWORD environment variable.");
+			persistenceProperties.put("jakarta.persistence.jdbc.password", dbpassword);
+		}
 		url += dbhost;
 		url += ":";
 		url += dbport;
