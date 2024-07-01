@@ -21,3 +21,4 @@ codetopdf.py
 .venv
 .env
 __pycache__
+images_static
