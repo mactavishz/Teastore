@@ -37,7 +37,9 @@ services:
       HOST_NAME: "auth"
       REGISTRY_HOST: "registry"
   image:
-    image: descartesresearch/teastore-image
+    build:
+      context: ./services/tools.descartes.teastore.image
+      dockerfile: Dockerfile
     depends_on:
       - registry
       - persistence
@@ -46,6 +48,8 @@ services:
     environment:
       HOST_NAME: "image"
       REGISTRY_HOST: "registry"
+    ports:
+      - "8081:8080"
   recommender:
     build:
       context: ./services/tools.descartes.teastore.recommender

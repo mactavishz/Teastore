@@ -1,4 +1,8 @@
-FROM descartesresearch/teastore-base:latest
-MAINTAINER Chair of Software Engineering <se2-it@informatik.uni-wuerzburg.de>
+FROM nginx:latest
 
-COPY target/*.war /usr/local/tomcat/webapps/
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+
+
+COPY images_static /usr/share/nginx/tools.descartes.teastore.image

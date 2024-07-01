@@ -1,5 +1,6 @@
 package tools.descartes.teastore.image.setup;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -13,6 +14,8 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.imageio.ImageIO;
+
+import jakarta.validation.constraints.Size;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +23,7 @@ import tools.descartes.teastore.entities.ImageSize;
 import tools.descartes.teastore.entities.ImageSizePreset;
 import tools.descartes.teastore.image.ImageDB;
 import tools.descartes.teastore.image.StoreImage;
+import tools.descartes.teastore.image.ImageScaler;
 
 /**
  * Image generation runnable to generate a single image. 
@@ -71,49 +75,51 @@ public class CreatorRunner implements Runnable {
     // All products must be added to the database
     imgDB.setImageMapping(productID, imgID, size);
 
-    // Resolve path and create a new image
-    Path imgFile = workingDir.resolve(String.valueOf(imgID));
 
-    Path newWorkingDir=  Paths.get("images_temp");
-    Path newImgFile = newWorkingDir.resolve(productID + ".png");
-    if (Files.notExists(newWorkingDir)) {
+    BufferedImage img = ImageCreator.createImage(shapesPerImage, categoryImage, size, rand);
+
+    if (Files.notExists(workingDir)) {
         try {
-            Files.createDirectories(newWorkingDir);
+            Files.createDirectories(workingDir);
         } catch (IOException e) {
-          log.warn("Failed to create directories for path: " + newWorkingDir.toAbsolutePath(), e);
+          log.warn("Failed to create directories for path: " + workingDir.toAbsolutePath(), e);
           return;
         }
     }
 
-    BufferedImage img = ImageCreator.createImage(shapesPerImage, categoryImage, size, rand);
-    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+    for (ImageSizePreset imageSizePreset: ImageSizePreset.values()){
 
-    try {
-      ImageIO.write(img, StoreImage.STORE_IMAGE_FORMAT, stream);
-      Files.write(imgFile, Base64.getEncoder().encode(stream.toByteArray()),
-          StandardOpenOption.CREATE, StandardOpenOption.WRITE,
-          StandardOpenOption.TRUNCATE_EXISTING);
-    } catch (IOException ioException) {
-      if (!(ioException instanceof ClosedByInterruptException)) {
-        log.warn("An IOException occured while writing image with ID " + String.valueOf(imgID)
-            + " to file " + imgFile.toAbsolutePath() + ".", ioException);
-      } else {
-        log.warn("An exception was thrown during image creation with ID " + String.valueOf(imgID)
-            + " to file " + imgFile.toAbsolutePath() + ".", ioException);
+          if(imageSizePreset != ImageSizePreset.PREVIEW && imageSizePreset != ImageSizePreset.RECOMMENDATION  && imageSizePreset != ImageSizePreset.FULL){
+            continue;
+
+          }
+          Path newSizeDir=  workingDir.resolve(imageSizePreset.name().toLowerCase());
+          if (Files.notExists(newSizeDir)) {
+            try {
+              Files.createDirectories(newSizeDir);
+            } catch (IOException e) {
+              log.warn("Failed to create directories for path: " + newSizeDir.toAbsolutePath(), e);
+              return;
+            }
+          }
+        Path newImgFile = newSizeDir.resolve(productID + ".png");
+        BufferedImage imgScaled = ImageScaler.scale(img,imageSizePreset.getSize());
+
+      try {
+        ImageIO.write(imgScaled, "png", newImgFile.toFile());
+      } catch (IOException ioException) {
+        if (!(ioException instanceof ClosedByInterruptException)) {
+          log.warn("An IOException occurred while writing image with ID " + imgID
+                  + " to file " + newImgFile.toAbsolutePath() + ".", ioException);
+        } else {
+          log.warn("An exception was thrown during image creation with ID " + imgID
+                  + " to file " + newImgFile.toAbsolutePath() + ".", ioException);
+        }
       }
     }
 
-    try {
-      ImageIO.write(img, "png", newImgFile.toFile());
-    } catch (IOException ioException) {
-      if (!(ioException instanceof ClosedByInterruptException)) {
-        log.warn("An IOException occurred while writing image with ID " + imgID
-                + " to file " + newImgFile.toAbsolutePath() + ".", ioException);
-      } else {
-        log.warn("An exception was thrown during image creation with ID " + imgID
-                + " to file " + newImgFile.toAbsolutePath() + ".", ioException);
-      }
-    }
+
+//
 
     nrOfImagesGenerated.incrementAndGet();
   }
