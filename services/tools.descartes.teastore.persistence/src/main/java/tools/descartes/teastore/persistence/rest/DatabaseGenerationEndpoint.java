@@ -13,21 +13,15 @@
  */
 package tools.descartes.teastore.persistence.rest;
 
-import java.util.concurrent.Executors;
+import java.util.List;
 
+import jakarta.persistence.EntityManager;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
-import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import tools.descartes.teastore.persistence.repository.CacheManager;
-import tools.descartes.teastore.persistence.repository.DataGenerator;
-import tools.descartes.teastore.registryclient.RegistryClient;
+import tools.descartes.teastore.model.repository.DataGeneratorUtil;
 
 /**
  * Persistence endpoint for generating new database content.
@@ -36,8 +30,8 @@ import tools.descartes.teastore.registryclient.RegistryClient;
  */
 @Path("generatedb")
 public class DatabaseGenerationEndpoint {
-
-	private static final Logger LOG = LoggerFactory.getLogger(DatabaseGenerationEndpoint.class);
+	// private final String serverName = Service.getServerName("SERVICE_HOST", "SERVICE_PORT");
+	// private static final Logger LOG = LoggerFactory.getLogger(DatabaseGenerationEndpoint.class);
 
 	/**
 	 * Drop database and create a new one.
@@ -48,14 +42,14 @@ public class DatabaseGenerationEndpoint {
 	 * @return Status OK. Returns {@value DataGenerator.MAINTENANCE_STATUS_CODE}
 	 * if in maintenance mode.
 	 */
-	@GET
+	/*@GET
 	public Response generateDataBase(
 			@QueryParam("categories") final Integer categories,
 			@QueryParam("products") final Integer products,
 			@QueryParam("users") final Integer users,
 			@QueryParam("orders") final Integer orders) {
 		LOG.info("Received database generation command for Persistence at "
-			+ RegistryClient.getClient().getMyServiceInstanceServer() + ".");
+			+ serverName + ".");
 		if (DataGenerator.GENERATOR.isMaintenanceMode()) {
 			return Response.status(DataGenerator.MAINTENANCE_STATUS_CODE).build();
 		}
@@ -87,14 +81,14 @@ public class DatabaseGenerationEndpoint {
 				+ userCount + " users, "
 				+ maxOrderCount + " max orders per user.";
 		return Response.ok(message).build();
-	}
+	}*/
 
-	private int parseQuery(Integer param, int defaultValue) {
-		if (param == null) {
-			return defaultValue;
-		}
-		return param;
-	}
+	// private int parseQuery(Integer param, int defaultValue) {
+	// 	if (param == null) {
+	// 		return defaultValue;
+	// 	}
+	// 	return param;
+	// }
 
 	/**
 	 * Returns the is finished flag for database generation.
@@ -104,11 +98,14 @@ public class DatabaseGenerationEndpoint {
 	@GET
 	@Path("finished")
 	public Response isFinshed() {
-		if (DataGenerator.GENERATOR.getGenerationFinishedFlag()) {
-			return Response.ok(true).build();
+		boolean finishedGenerating = false;
+		boolean isDatebaseEmpty = DataGeneratorUtil.isDatabaseEmpty();
+		if (isDatebaseEmpty) {
+			finishedGenerating = true;
 		} else {
-			return Response.serverError().entity(false).build();
+			finishedGenerating = DataGeneratorUtil.getGenerationFinishedFlag();
 		}
+		return Response.serverError().entity(finishedGenerating).build();
 	}
 
 	/**
@@ -117,23 +114,23 @@ public class DatabaseGenerationEndpoint {
 	 * @param maintenanceMode Send true to enable, false to disable.
 	 * @return 404 if message body was missing. 200, otherwise.
 	 */
-	@POST
-	@Path("maintenance")
-	public Response setMaintenanceMode(final Boolean maintenanceMode) {
-		if (maintenanceMode == null) {
-			return Response.status(Status.NOT_FOUND).build();
-		}
-		DataGenerator.GENERATOR.setMaintenanceModeInternal(maintenanceMode);
-		return Response.ok().build();
-	}
+	// @POST
+	// @Path("maintenance")
+	// public Response setMaintenanceMode(final Boolean maintenanceMode) {
+	// 	if (maintenanceMode == null) {
+	// 		return Response.status(Status.NOT_FOUND).build();
+	// 	}
+	// 	DataGenerator.GENERATOR.setMaintenanceModeInternal(maintenanceMode);
+	// 	return Response.ok().build();
+	// }
 
 	/**
 	 * Returns the is maintenance flag. Only to be used by other persistence providers.
 	 * @return True, if in maintenance; false, otherwise.
 	 */
-	@GET
-	@Path("maintenance")
-	public Response isMaintenance() {
-		return Response.ok(DataGenerator.GENERATOR.isMaintenanceMode()).build();
-	}
+	// @GET
+	// @Path("maintenance")
+	// public Response isMaintenance() {
+	// 	return Response.ok(DataGenerator.GENERATOR.isMaintenanceMode()).build();
+	// }
 }
