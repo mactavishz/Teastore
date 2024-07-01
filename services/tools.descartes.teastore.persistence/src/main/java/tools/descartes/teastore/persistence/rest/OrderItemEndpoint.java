@@ -21,9 +21,8 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.QueryParam;
 
-import tools.descartes.teastore.persistence.domain.OrderItemRepository;
-import tools.descartes.teastore.persistence.repository.DataGenerator;
-import tools.descartes.teastore.registryclient.util.AbstractCRUDEndpoint;
+import tools.descartes.teastore.model.domain.OrderItemRepository;
+import tools.descartes.teastore.utils.AbstractCRUDEndpoint;
 import tools.descartes.teastore.entities.OrderItem;
 
 /**
@@ -39,9 +38,6 @@ public class OrderItemEndpoint extends AbstractCRUDEndpoint<OrderItem> {
 	 */
 	@Override
 	protected long createEntity(final OrderItem orderItem) {
-		if (DataGenerator.GENERATOR.isMaintenanceMode()) {
-			return -1L;
-		}
 		return OrderItemRepository.REPOSITORY.createEntity(orderItem);
 	}
 
@@ -82,9 +78,6 @@ public class OrderItemEndpoint extends AbstractCRUDEndpoint<OrderItem> {
 	 */
 	@Override
 	protected boolean deleteEntity(long id) {
-		if (DataGenerator.GENERATOR.isMaintenanceMode()) {
-			return false;
-		}
 		return OrderItemRepository.REPOSITORY.removeEntity(id);
 	}
 	

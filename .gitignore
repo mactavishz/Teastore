@@ -6,6 +6,8 @@ RemoteSystemsTempFiles/
 Servers/
 /.recommenders
 services/tools.descartes.petstore.image/test/
+services/tools.descartes.teastore.image/src/main/resources/db-dumps
+utilities/tools.descartes.teastore.database/db-dumps/
 limbo_checkstyle.out.xml
 interfaces/tools.descartes.teastore.entities/.classpath
 *.iml
@@ -22,3 +24,4 @@ codetopdf.py
 .env
 __pycache__
 images_static
+.vite

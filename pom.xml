@@ -31,6 +31,11 @@
             </dependency>
             <dependency>
                 <groupId>tools.descartes.teastore</groupId>
+                <artifactId>model</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>tools.descartes.teastore</groupId>
                 <artifactId>utils</artifactId>
                 <version>${revision}</version>
             </dependency>
@@ -44,10 +49,12 @@
 
     <modules>
         <module>interfaces/tools.descartes.teastore.entities</module>
+        <module>interfaces/tools.descartes.teastore.model</module>
         <module>./utilities/tools.descartes.teastore.kieker.probes</module>
         <module>./utilities/tools.descartes.teastore.kieker.rabbitmq</module>
         <module>utilities/tools.descartes.teastore.utils</module>
         <module>utilities/tools.descartes.teastore.registryclient</module>
+        <module>utilities/tools.descartes.teastore.dbgenerator</module>
         <module>utilities/tools.descartes.teastore.dockermemoryconfigurator</module>
         <module>./utilities/tools.descartes.teastore.dockerbase</module>
         <module>services/tools.descartes.teastore.image</module>
@@ -55,7 +62,6 @@
         <module>services/tools.descartes.teastore.recommender</module>
         <module>services/tools.descartes.teastore.registry</module>
         <module>services/tools.descartes.teastore.auth</module>
-        <module>services/tools.descartes.teastore.webui</module>
         <module>./utilities/tools.descartes.teastore.docker.all</module>
     </modules>
 

@@ -1,0 +1,34 @@
+<!-- YOU NEED TO CHANGE THIS -->
+<server description="TeaStore persistence">
+    <!-- tag::features[] -->
+    <featureManager>
+        <feature>jakartaee-10.0</feature>
+        <feature>microProfile-6.1</feature>
+        <feature>persistence-3.1</feature>
+        <feature>xmlBinding-4.0</feature>
+    </featureManager>
+    <!-- end::features[] -->
+    <variable name="http.port" defaultValue="8080"/>
+    <variable name="https.port" defaultValue="8443"/>
+    <!-- YOU NEED TO CHANGE THIS -->
+    <variable name="context.root" defaultValue="/tools.descartes.teastore.persistence"/>
+
+    <library id="global">
+        <fileset dir="jdbc" includes="*.jar"/>
+    </library>
+
+    <jdbcDriver id="MySQLJDBCDriver" libraryRef="global"/>
+
+    <!-- tag::webApplication[] -->
+    <!-- YOU NEED TO CHANGE THIS -->
+    <webApplication location="tools.descartes.teastore.persistence.war" contextRoot="${context.root}" />
+    <!-- end::webApplication[] -->
+    <mpMetrics authentication="false"/>
+
+    <!-- tag::logging[] -->
+    <logging consoleLogLevel="INFO"/>
+    <!-- end::logging[] -->
+
+    <httpEndpoint host="*" httpPort="${http.port}" httpsPort="${https.port}"
+                  id="defaultHttpEndpoint"/>
+</server>

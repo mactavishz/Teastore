@@ -22,9 +22,8 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
-import tools.descartes.teastore.persistence.domain.UserRepository;
-import tools.descartes.teastore.persistence.repository.DataGenerator;
-import tools.descartes.teastore.registryclient.util.AbstractCRUDEndpoint;
+import tools.descartes.teastore.model.domain.UserRepository;
+import tools.descartes.teastore.utils.AbstractCRUDEndpoint;
 import tools.descartes.teastore.entities.User;
 
 /**
@@ -41,9 +40,6 @@ public class UserEndpoint extends AbstractCRUDEndpoint<User> {
 	 */
 	@Override
 	protected long createEntity(final User category) {
-		if (DataGenerator.GENERATOR.isMaintenanceMode()) {
-			return -1L;
-		}
 		try {
 			return UserRepository.REPOSITORY.createEntity(category);
 		} catch (Exception e) {
@@ -90,9 +86,6 @@ public class UserEndpoint extends AbstractCRUDEndpoint<User> {
 	 */
 	@Override
 	protected boolean deleteEntity(long id) {
-		if (DataGenerator.GENERATOR.isMaintenanceMode()) {
-			return false;
-		}
 		return UserRepository.REPOSITORY.removeEntity(id);
 	}
 

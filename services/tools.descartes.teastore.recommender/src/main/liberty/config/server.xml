@@ -3,6 +3,7 @@
     <featureManager>
         <feature>jakartaee-10.0</feature>
         <feature>microProfile-6.1</feature>
+        <feature>concurrent-3.0</feature>
     </featureManager>
     <!-- end::features[] -->
     <variable name="http.port" defaultValue="8080"/>
@@ -10,6 +11,7 @@
     <!-- YOU NEED TO CHANGE THIS -->
     <variable name="context.root" defaultValue="/tools.descartes.teastore.recommender"/>
 
+    <applicationManager autoExpand="true"/>
     <!-- tag::webApplication[] -->
     <!-- YOU NEED TO CHANGE THIS -->
     <webApplication location="tools.descartes.teastore.recommender.war" contextRoot="${context.root}"/>
@@ -17,7 +19,7 @@
     <mpMetrics authentication="false"/>
 
     <!-- tag::logging[] -->
-    <logging traceSpecification="com.ibm.ws.microprofile.health.*=all"/>
+    <logging consoleLogLevel="INFO"/>
     <!-- end::logging[] -->
 
     <httpEndpoint host="*" httpPort="${http.port}" httpsPort="${https.port}"

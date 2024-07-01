@@ -15,58 +15,60 @@ package tools.descartes.teastore.recommender.servlet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tools.descartes.teastore.recommender.restclient.PersistenceClient;
 import tools.descartes.teastore.utils.RegistryClient;
-import tools.descartes.teastore.utils.Service;
+
+import jakarta.enterprise.concurrent.ManagedScheduledExecutorService;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import java.util.concurrent.TimeUnit;
 
 /**
- * DaemonThread for periodic retraining if required.
- * 
+ * ManagedDaemon for periodic retraining if required.
+ *
  * @author Johannes Grohmann
+ * @author Chao Zhan
  */
-public class RetrainDaemon extends Thread {
-	private final Logger LOG = LoggerFactory.getLogger(RetrainDaemon.class);
-	/**
-	 * The time between retraining in milliseconds.
-	 */
-	private RegistryClient client = new RegistryClient();
-	private long looptime;
+public class RetrainDaemon {
+    private static final Logger LOG = LoggerFactory.getLogger(RetrainDaemon.class);
+    private final RegistryClient client = new RegistryClient();
+    private final long looptime;
+    private ManagedScheduledExecutorService executor;
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param looptime
-	 *            The time between retraining in milliseconds
-	 */
-	public RetrainDaemon(long looptime) {
-		super();
-		// set as daemon thread
-		setDaemon(true);
-		this.looptime = looptime;
-	}
+    /**
+     * Constructor.
+     *
+     * @param looptime The time between retraining in milliseconds
+     */
+    public RetrainDaemon(long looptime) {
+        this.looptime = looptime;
+        try {
+            InitialContext ctx = new InitialContext();
+            executor = (ManagedScheduledExecutorService) ctx.lookup("java:comp/DefaultManagedScheduledExecutorService");
+        } catch (NamingException e) {
+            LOG.error("Failed to lookup managed executor", e);
+            throw new RuntimeException("Failed to initialize RetrainDaemon", e);
+        }
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run() {
-		super.run();
-		// repeat until stopped
-		while (true) {
-			try {
-				Thread.sleep(looptime);
-			} catch (InterruptedException e) {
-				// e.printStackTrace();
-				LOG.error("RetrainDaemon interrupted", e);
-			}
-			// wait for the persistance service and then retrain
-			client.runAfterServiceIsAvailable(Service.PERSISTENCE.getServiceName(), () -> {
-				TrainingSynchronizer.getInstance().retrieveDataAndRetrain();
-			}, Service.RECOMMENDER.getServiceName());
+    /**
+     * Starts the periodic retraining task.
+     */
+    public void start() {
+        executor.scheduleAtFixedRate(this::runTask, 0, looptime, TimeUnit.MILLISECONDS);
+    }
+
+    public void stop() {
+        if (executor != null) {
+			executor.shutdown();
 		}
+    }
 
-	}
-
+    private void runTask() {
+        try {
+            // wait for the persistence service and then retrain
+            TrainingSynchronizer.getInstance().retrieveDataAndRetrain();
+        } catch (Exception e) {
+            LOG.error("Error during retraining task", e);
+        }
+    }
 }
