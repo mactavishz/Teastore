@@ -14,7 +14,7 @@ import type { Category, Product } from "~/types";
 import ProductItem from "~/components/productItem";
 import CategoryList from "~/components/categoryList";
 import Pagination from "~/components/pagination";
-import { createGETFetcher, createPOSTFetcher } from "~/.server/request"; // Adjust the import path as needed
+import { createGETFetcher, buildStaticURL } from "~/.server/request"; // Adjust the import path as needed
 import { paginationPageSizeCookie } from "~/.server/cookie";
 import { useContext } from "react";
 import { GlobalStateContext } from "~/context/GlobalStateContext";
@@ -101,18 +101,6 @@ async function getProductListByCategory(id: string, page: number, numProducts: n
   return response;
 }
 
-async function getProductImages(productIds: string[]): Promise<Response> {
-  let imageMap = {};
-  for (const productId of productIds) {
-    Object.assign(imageMap, { [productId]: "64x64" })
-  }
-  const response = await createPOSTFetcher("image", "image/getProductImages", imageMap);
-  if (!response.ok) {
-    throw new Response("Failed to fetch data", { status: response.status });
-  }
-  return response;
-}
-
 export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) => {
   try {
     const url = new URL(request.url);
@@ -148,11 +136,8 @@ export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) =>
     const pagination = createNavigation(productCount, pageNum, pageSize);
     const productListRes = await getProductListByCategory(categoryId, pageNum, pageSize);
     const productList = await productListRes.json();
-    const productIds = productList.map((product: Product) => product.id.toString());
-    const imageRes = await getProductImages(productIds);
-    const images = await imageRes.json();
     for (const product of productList) {
-      product.image = images[product.id];
+      product.image = buildStaticURL("image", `preview/${product.id}.png`)
     }
     return json({ category: categoryData, productList, pagination, productCount, pageNum, pageSize }, {
       headers: {

@@ -4,7 +4,7 @@ import CategoryList from "~/components/categoryList";
 import Recommendation from "~/components/recommendation";
 import { useContext } from "react";
 import { GlobalStateContext } from "~/context/GlobalStateContext";
-import { createPOSTFetcher, createGETFetcher } from "~/.server/request";
+import { createPOSTFetcher, createGETFetcher, buildStaticURL } from "~/.server/request";
 import { getSessionBlob } from "~/.server/cookie";
 import { OrderItemType, SessionBlobType, Product } from "~/types";
 import SessionBlob from "~/model/SessionBlob";
@@ -32,18 +32,6 @@ async function getRecommendations(orderItems: OrderItemType[], uid: number): Pro
   return response;
 }
 
-async function getRecommendedImages(productIds: string[]): Promise<Response> {
-  let imageMap = {};
-  for (const productId of productIds) {
-    Object.assign(imageMap, { [productId]: "125x125" })
-  }
-  const response = await createPOSTFetcher("image", "image/getProductImages", imageMap);
-  if (!response.ok) {
-    throw new Response("Failed to fetch data", { status: response.status });
-  }
-  return response;
-}
-
 export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) => {
   try {
     const orderItems: OrderItemType[] = [];
@@ -65,15 +53,13 @@ export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) =>
     if (recommendedProducts.length > 3) {
       recommendedProducts = recommendedProducts.slice(0, 3)
     }
-    let [recommendedImageRes] = await Promise.all([getRecommendedImages(recommendations.map(productId => productId.toString()))])
-    const recommendedImages = await recommendedImageRes.json();
     return json({
       orderItems,
       productsMap,
       recommendedProducts: recommendedProducts.map((product) => {
         return {
           ...product,
-          image: recommendedImages[product.id]
+          image: buildStaticURL("image", `recommendation/${product.id}.png`)
         }
       })
     })
