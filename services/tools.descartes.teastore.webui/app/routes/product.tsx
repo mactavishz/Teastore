@@ -3,12 +3,10 @@ import {
   LoaderFunction,
   json,
   redirect,
-  ActionFunctionArgs,
-  ActionFunction,
   MetaFunction
 } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react"
-import { createGETFetcher, createPOSTFetcher } from "~/.server/request";
+import { createGETFetcher, createPOSTFetcher, buildStaticImageURL } from "~/.server/request";
 import CategoryList from "~/components/categoryList";
 import Recommendation from "~/components/recommendation";
 import { useContext } from "react";
@@ -23,30 +21,6 @@ export const meta: MetaFunction = () => {
     { title: "TeaStore Product" },
   ];
 };
-
-
-async function getRecommendedImages(productIds: string[]): Promise<Response> {
-  let imageMap = {};
-  for (const productId of productIds) {
-    Object.assign(imageMap, { [productId]: "125x125" })
-  }
-  const response = await createPOSTFetcher("image", "image/getProductImages", imageMap);
-  if (!response.ok) {
-    throw new Response("Failed to fetch data", { status: response.status });
-  }
-  return response;
-}
-
-async function getProductImage(productId: string): Promise<Response> {
-  let imageMap = {
-    [productId]: "300x300"
-  };
-  const response = await createPOSTFetcher("image", "image/getProductImages", imageMap);
-  if (!response.ok) {
-    throw new Response("Failed to fetch data", { status: response.status });
-  }
-  return response;
-}
 
 async function getProduct(productId: string | number): Promise<Response> {
   const response = await createGETFetcher("persistence", `products/${productId}`);
@@ -63,8 +37,6 @@ async function getRecommendations(orderItems: OrderItemType[], uid: number): Pro
   }
   return response;
 }
-
-
 
 export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
@@ -96,18 +68,15 @@ export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) =>
     if (recommendedProducts.length > 3) {
       recommendedProducts = recommendedProducts.slice(0, 3)
     }
-    let [productImageRes, recommendedImageRes] = await Promise.all([getProductImage(productId), getRecommendedImages(recommendations.map(productId => productId.toString()))])
-    const productImage = await productImageRes.json();
-    const recommendedImages = await recommendedImageRes.json();
     return json({
       product: {
         ...productData,
-        image: productImage[productId]
+        image: buildStaticImageURL(`full/${productData.id}.png`)
       },
       recommendedProducts: recommendedProducts.map((product) => {
         return {
           ...product,
-          image: recommendedImages[product.id]
+          image: buildStaticImageURL(`recommendation/${product.id}.png`)
         }
       })
     })

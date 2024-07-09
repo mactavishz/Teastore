@@ -26,12 +26,6 @@
 		</dependency>
 		<dependency>
 			<groupId>tools.descartes.teastore</groupId>
-			<artifactId>image</artifactId>
-			<version>${project.version}</version>
-			<type>war</type>
-		</dependency>
-		<dependency>
-			<groupId>tools.descartes.teastore</groupId>
 			<artifactId>recommender</artifactId>
 			<version>${project.version}</version>
 			<type>war</type>
@@ -74,14 +68,6 @@
 		                  <overWrite>true</overWrite>
 		                  <outputDirectory>${project.build.directory}/</outputDirectory>
 		                  <destFileName>tools.descartes.teastore.persistence.war</destFileName>
-		                </artifactItem>
-		                <artifactItem>
-		                  <groupId>tools.descartes.teastore</groupId>
-						  <artifactId>image</artifactId>
-						  <type>war</type>
-		                  <overWrite>true</overWrite>
-		                  <outputDirectory>${project.build.directory}/</outputDirectory>
-		                  <destFileName>tools.descartes.teastore.image.war</destFileName>
 		                </artifactItem>
 		                <artifactItem>
 		                  <groupId>tools.descartes.teastore</groupId>

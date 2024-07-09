@@ -1,9 +1,5 @@
 import React from "react";
 
-export interface IconData {
-  icon: string
-}
-
 export interface Category {
   id: number;
   name: string;

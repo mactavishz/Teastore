@@ -70,17 +70,17 @@ echo "MySQL dumps: ./dumps/mysql"
 echo "SQLite dumps: ./dumps/sqlite"
 
 mkdir -p ../utilities/tools.descartes.teastore.database/db-dumps
-mkdir -p ../services/tools.descartes.teastore.image/src/main/resources/db-dumps
+mkdir -p ../utilities/tools.descartes.teastore.imagegenerator/src/main/resources/db-dumps
 for size in "${DB_SIZES[@]}"
 do
   # move the mysql dump to the db-dumps folder in side the database module
   mv ./dumps/mysql/teadb_$size.sql ../utilities/tools.descartes.teastore.database/db-dumps/teadb_$size.sql
   # move the sqlite dump to the db-dumps folder in side the image module
-  mv ./dumps/sqlite/teadb_$size.db ../services/tools.descartes.teastore.image/src/main/resources/db-dumps/teadb_$size.db
+  mv ./dumps/sqlite/teadb_$size.db ../utilities/tools.descartes.teastore.imagegenerator/src/main/resources/db-dumps/teadb_$size.db
 done
 
 echo "Database dumps are copied to the following directories:"
 echo "MySQL dumps: ../utilities/tools.descartes.teastore.database/db-dumps"
-echo "SQLite dumps: ../services/tools.descartes.teastore.image/src/main/resources/db-dumps"
+echo "SQLite dumps: ../utilities/tools.descartes.teastore.imagegenerator/src/main/resources/db-dumps"
 echo "Cleaning up..."
 rm -rf ./dumps

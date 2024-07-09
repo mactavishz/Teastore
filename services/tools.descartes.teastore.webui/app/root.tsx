@@ -6,12 +6,12 @@ import {
   useLoaderData,
 } from "@remix-run/react";
 import { useState } from "react";
-import type { Category, IconData } from "./types";
+import type { Category } from "./types";
 import { LinksFunction, LoaderFunction, json, LoaderFunctionArgs, redirect } from "@remix-run/node";
 import Header from "./components/header";
 import Footer from "./components/footer";
 import { useLayoutEffect } from "~/hooks/useLayoutEffect"; 
-import { createGETFetcher, createPOSTFetcher } from "~/.server/request";
+import { createGETFetcher } from "~/.server/request";
 import { useLoginStatus } from "./.server/loginUtil";
 import { GlobalStateContext } from '~/context/GlobalStateContext';
 import { sessionBlobCookie, errorMessageCookie, messageCookie } from "~/.server/cookie";
@@ -30,16 +30,6 @@ export const links: LinksFunction = () => [
     media: "screen",
   },
 ];
-
-async function getIcon(): Promise<Response> {
-  const response = await createPOSTFetcher("image", "image/getWebImages", {
-    icon: "64x64"
-  });
-  if (!response.ok) {
-    throw new Response("Failed to fetch data", { status: response.status });
-  }
-  return response;
-}
 
 async function getCategoryList(): Promise<Response> {
   const response = await createGETFetcher("persistence", "categories", {
@@ -62,10 +52,9 @@ export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) =>
     sessionBlob = await sessionBlobCookie.parse(cookieHeader) || new SessionBlob();
     errorMessage = await errorMessageCookie.parse(cookieHeader);
     message = await messageCookie.parse(cookieHeader);
-    const [iconRes, categoryListRes, loginStatus] = await Promise.all([getIcon(), getCategoryList(), useLoginStatus({ request })]);
-    const iconData: IconData = await iconRes.json();
+    const [categoryListRes, loginStatus] = await Promise.all([getCategoryList(), useLoginStatus({ request })]);
     categoryList = await categoryListRes.json() || [];
-    return json({ icon: iconData.icon, loginStatus, categoryList, message, errorMessage, baseURL: process.env.BASE_URL }, {
+    return json({ loginStatus, categoryList, message, errorMessage, baseURL: process.env.BASE_URL }, {
       headers: [
         ["Set-Cookie", await errorMessageCookie.serialize(errorMessage, { maxAge: 0})],
         ["Set-Cookie", await messageCookie.serialize(message, { maxAge: 0 })]
@@ -78,7 +67,7 @@ export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) =>
 }
 
 export default function App() {
-  const { icon, loginStatus, categoryList, errorMessage: defaultErrorMessage, message: defaultMessage, baseURL } = useLoaderData<typeof loader>();
+  const { loginStatus, categoryList, errorMessage: defaultErrorMessage, message: defaultMessage, baseURL } = useLoaderData<typeof loader>();
   const [message, setMessage] = useState(defaultMessage)
   const [errorMessage, setErrorMessage] = useState(defaultErrorMessage)
   useLayoutEffect();
@@ -98,7 +87,6 @@ export default function App() {
       <body suppressHydrationWarning={true}>
         <GlobalStateContext.Provider value={{ baseURL, categoryList, message, errorMessage, setMessage, setErrorMessage, isLoggedIn: loginStatus }}>
           <Header
-            storeIcon={icon}
             login={loginStatus}
             message={message}
             errorMessage={errorMessage}

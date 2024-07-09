@@ -1,7 +1,6 @@
 import { getURL } from "~/utils/url";
 
 interface HeaderProps {
-  storeIcon: string;
   login: boolean;
   message: string | null;
   errorMessage: string | null;
@@ -9,7 +8,7 @@ interface HeaderProps {
   setErrorMessage: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-export default function Header({ storeIcon, login, message, errorMessage, setMessage, setErrorMessage }: HeaderProps) {
+export default function Header({ login, message, errorMessage, setMessage, setErrorMessage }: HeaderProps) {
   return (
     <nav id="headnav" className="navbar navbar-default container">
       <div className="container-fluid">
@@ -21,7 +20,7 @@ export default function Header({ storeIcon, login, message, errorMessage, setMes
                 className="icon-bar"></span>
           </button>
           <a className="navbar-brand" href={getURL("/")}>
-            <img src={storeIcon} width="30" height="30" className="d-inline-block align-top" alt="" />
+            <img src="/images/icon.png" width="30" height="30" className="d-inline-block align-top" alt="" />
             &nbsp; TeaStore
           </a>
         </div>
