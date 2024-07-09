@@ -71,14 +71,6 @@
 		                </artifactItem>
 		                <artifactItem>
 		                  <groupId>tools.descartes.teastore</groupId>
-						  <artifactId>image</artifactId>
-						  <type>war</type>
-		                  <overWrite>true</overWrite>
-		                  <outputDirectory>${project.build.directory}/</outputDirectory>
-		                  <destFileName>tools.descartes.teastore.image.war</destFileName>
-		                </artifactItem>
-		                <artifactItem>
-		                  <groupId>tools.descartes.teastore</groupId>
 						  <artifactId>recommender</artifactId>
 						  <type>war</type>
 		                  <overWrite>true</overWrite>
