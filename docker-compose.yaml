@@ -47,17 +47,17 @@ services:
       - ./services/tools.descartes.teastore.auth/env/dev.env
       - ./env/dev.env
   image:
+    container_name: teastore-image
     build:
       context: ./services/tools.descartes.teastore.image
       dockerfile: Dockerfile
+      args:
+        - DB_SIZE=${DB_SIZE:-small}
     depends_on:
       - registry
       - persistence
     expose:
       - "8080"
-    environment:
-      HOST_NAME: "image"
-      REGISTRY_HOST: "registry"
     ports:
       - "8081:8080"
   recommender:
@@ -100,3 +100,4 @@ networks:
     external: true
     name: teastore-network
 volumes:
+  frontend_node_modules:
