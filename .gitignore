@@ -8,6 +8,7 @@ Servers/
 services/tools.descartes.petstore.image/test/
 services/tools.descartes.teastore.image/src/main/resources/db-dumps
 services/tools.descartes.teastore.image/images_static
+images_static
 utilities/tools.descartes.teastore.database/db-dumps/
 limbo_checkstyle.out.xml
 interfaces/tools.descartes.teastore.entities/.classpath
