@@ -18,6 +18,7 @@ do
     openjdk:17 java -jar /app.jar "$size"
   echo "Static images for the $size database are generated successfully."
   echo "Moving static images to the image service..."
+  rm -rf ../services/tools.descartes.teastore.image/generated_images/db-"$size"
   mv ./generated_images/db-"$size" ../services/tools.descartes.teastore.image/generated_images/
 done
 
