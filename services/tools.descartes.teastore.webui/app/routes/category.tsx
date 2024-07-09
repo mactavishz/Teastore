@@ -14,7 +14,7 @@ import type { Category, Product } from "~/types";
 import ProductItem from "~/components/productItem";
 import CategoryList from "~/components/categoryList";
 import Pagination from "~/components/pagination";
-import { createGETFetcher, buildStaticURL } from "~/.server/request"; // Adjust the import path as needed
+import { createGETFetcher, buildStaticImageURL } from "~/.server/request"; // Adjust the import path as needed
 import { paginationPageSizeCookie } from "~/.server/cookie";
 import { useContext } from "react";
 import { GlobalStateContext } from "~/context/GlobalStateContext";
@@ -137,7 +137,7 @@ export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) =>
     const productListRes = await getProductListByCategory(categoryId, pageNum, pageSize);
     const productList = await productListRes.json();
     for (const product of productList) {
-      product.image = buildStaticURL("image", `preview/${product.id}.png`)
+      product.image = buildStaticImageURL(`preview/${product.id}.png`)
     }
     return json({ category: categoryData, productList, pagination, productCount, pageNum, pageSize }, {
       headers: {

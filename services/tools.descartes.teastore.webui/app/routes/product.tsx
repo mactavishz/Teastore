@@ -6,7 +6,7 @@ import {
   MetaFunction
 } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react"
-import { createGETFetcher, createPOSTFetcher, buildStaticURL } from "~/.server/request";
+import { createGETFetcher, createPOSTFetcher, buildStaticImageURL } from "~/.server/request";
 import CategoryList from "~/components/categoryList";
 import Recommendation from "~/components/recommendation";
 import { useContext } from "react";
@@ -71,12 +71,12 @@ export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) =>
     return json({
       product: {
         ...productData,
-        image: buildStaticURL("image", `full/${productData.id}.png`)
+        image: buildStaticImageURL(`full/${productData.id}.png`)
       },
       recommendedProducts: recommendedProducts.map((product) => {
         return {
           ...product,
-          image: buildStaticURL("image", `recommendation/${product.id}.png`)
+          image: buildStaticImageURL(`recommendation/${product.id}.png`)
         }
       })
     })

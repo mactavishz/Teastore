@@ -4,7 +4,7 @@ import CategoryList from "~/components/categoryList";
 import Recommendation from "~/components/recommendation";
 import { useContext } from "react";
 import { GlobalStateContext } from "~/context/GlobalStateContext";
-import { createPOSTFetcher, createGETFetcher, buildStaticURL } from "~/.server/request";
+import { createPOSTFetcher, createGETFetcher, buildStaticImageURL } from "~/.server/request";
 import { getSessionBlob } from "~/.server/cookie";
 import { OrderItemType, SessionBlobType, Product } from "~/types";
 import SessionBlob from "~/model/SessionBlob";
@@ -59,7 +59,7 @@ export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) =>
       recommendedProducts: recommendedProducts.map((product) => {
         return {
           ...product,
-          image: buildStaticURL("image", `recommendation/${product.id}.png`)
+          image: buildStaticImageURL(`recommendation/${product.id}.png`)
         }
       })
     })
