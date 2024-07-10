@@ -96,7 +96,7 @@ services:
     container_name: teastore-webui
     build:
       context: services/tools.descartes.teastore.webui
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     volumes:
       - ./services/tools.descartes.teastore.webui:/web:rw
       - frontend_node_modules:/web/node_modules

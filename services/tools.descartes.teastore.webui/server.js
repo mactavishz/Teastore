@@ -3,6 +3,7 @@ import express from "express";
 
 const port = process.env.SERVICE_PORT || 8080;
 const baseURL = process.env.BASE_URL || '/tools.descartes.teastore.webui/'
+const host = process.env.SERVICE_HOST || "localhost"
 
 const viteDevServer =
   process.env.NODE_ENV === "production"
@@ -36,5 +37,5 @@ app.all("*", createRequestHandler({ build }));
 
 
 app.listen(port, () => {
-  console.log(`App listening on http://localhost:${port}`);
+  console.log(`App listening on http://${host}:${port}`);
 });
