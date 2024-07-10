@@ -45,7 +45,6 @@
         <module>utilities/tools.descartes.teastore.imagegenerator</module>
         <module>services/tools.descartes.teastore.persistence</module>
         <module>services/tools.descartes.teastore.recommender</module>
-        <module>services/tools.descartes.teastore.registry</module>
         <module>services/tools.descartes.teastore.auth</module>
     </modules>
 
