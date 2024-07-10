@@ -1,13 +1,9 @@
 FROM nginx:latest
 
 ARG DB_SIZE
-ARG SERVICE_PORT
-ARG SERVICE_PORT_SSL
 
 RUN mkdir -p /data/images/tools.descartes.teastore.image
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/default.template
 COPY generated_images/db-${DB_SIZE} /data/images/tools.descartes.teastore.image
 
-EXPOSE ${SERVICE_PORT} ${SERVICE_PORT_SSL}
-
-CMD ["nginx", "-g", "daemon off;"]
+CMD sh -c "envsubst \"`env | awk -F = '{printf \" \\\\$%s\", $1}'`\" < /etc/nginx/conf.d/default.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
