@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import tools.descartes.teastore.recommender.servlet.RetrainDaemon;
 import tools.descartes.teastore.recommender.servlet.TrainingSynchronizer;
 import tools.descartes.teastore.utils.EnvVarNotFoundException;
+import tools.descartes.teastore.utils.RegistryClient;
 import tools.descartes.teastore.utils.Service;
 
 /**
@@ -34,6 +35,8 @@ import tools.descartes.teastore.utils.Service;
 public class RecommenderStartup implements ServletContextListener {
     private final Logger LOG = LoggerFactory.getLogger(RecommenderStartup.class);
     private final String serverName = Service.getServerName("SERVICE_HOST", "SERVICE_PORT");
+    private final String persistenceBaseURL = Service.getServiceBaseURL("PERSISTENCE_HOST", "PERSISTENCE_PORT");
+    private final RegistryClient client = new RegistryClient();
     private RetrainDaemon retrainDaemon = null;
     /**
      * Also set this accordingly in RegistryClientStartup.
@@ -53,6 +56,7 @@ public class RecommenderStartup implements ServletContextListener {
      */
     public void contextDestroyed(ServletContextEvent event) {
         LOG.info(String.format("Recommender service on %s destroyed\n", serverName));
+        client.destroy();
         if (retrainDaemon != null) {
             retrainDaemon.stop();
         }
@@ -65,23 +69,26 @@ public class RecommenderStartup implements ServletContextListener {
      */
     public void contextInitialized(ServletContextEvent event) {
         LOG.info(String.format("Recommender service initialized on %s\n", serverName));
-        TrainingSynchronizer.getInstance().retrieveDataAndRetrain();
-        try {
-            String looptimeStr = System.getenv("RECOMMENDER_RETRAIN_LOOP_TIME");
-            if (looptimeStr == null) {
-                throw new EnvVarNotFoundException("RECOMMENDER_RETRAIN_LOOP_TIME");
-            }
-            long looptime = Long.parseLong(looptimeStr);
-            // if a looptime is specified, a retraining daemon is started
-            if (looptime > 0) {
-                retrainDaemon = new RetrainDaemon(looptime);
-                retrainDaemon.start();
-                LOG.info("Periodic retraining every " + looptime + " milliseconds");
-            } else {
+        LOG.info(persistenceBaseURL);
+        client.runAfterServiceIsAvailable(persistenceBaseURL, () -> {
+            TrainingSynchronizer.getInstance().retrieveDataAndRetrain();
+            try {
+                String looptimeStr = System.getenv("RECOMMENDER_RETRAIN_LOOP_TIME");
+                if (looptimeStr == null) {
+                    throw new EnvVarNotFoundException("RECOMMENDER_RETRAIN_LOOP_TIME");
+                }
+                long looptime = Long.parseLong(looptimeStr);
+                // if a looptime is specified, a retraining daemon is started
+                if (looptime > 0) {
+                    retrainDaemon = new RetrainDaemon(looptime);
+                    retrainDaemon.start();
+                    LOG.info("Periodic retraining every " + looptime + " milliseconds");
+                } else {
+                    LOG.info("Recommender loop time not set. Disabling periodic retraining.");
+                }
+            } catch (EnvVarNotFoundException | NumberFormatException e) {
                 LOG.info("Recommender loop time not set. Disabling periodic retraining.");
             }
-        } catch (EnvVarNotFoundException | NumberFormatException e) {
-            LOG.info("Recommender loop time not set. Disabling periodic retraining.");
-        }
+        });
     }
 }
