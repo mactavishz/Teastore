@@ -14,48 +14,38 @@ public class StartupCallbackTask implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(StartupCallbackTask.class);
 
     private RegistryClient client = new RegistryClient();
-    private String requestedService;
+    private String serviceBaseURL;
     private Runnable callback;
-    private String myService;
 
     /**
      * Constructor.
      *
-     * @param requestedService service
+     * @param serviceBaseURL service
      * @param callback         callback object
-     * @param myService        service
      */
-    public StartupCallbackTask(String requestedService, Runnable callback, String myService) {
-        this.requestedService = requestedService;
+    public StartupCallbackTask(String serviceBaseURL, Runnable callback) {
+        this.serviceBaseURL = serviceBaseURL;
         this.callback = callback;
-        this.myService = myService;
     }
 
     @Override
     public void run() {
         try {
-            List<String> servers;
+            boolean up = false;
             do {
-                servers = client.getServersForService(requestedService);
-                if (servers == null || servers.isEmpty()) {
+                up = client.isServiceUp(serviceBaseURL);
+                if (!up) {
                     try {
-                        if (servers == null) {
-                            LOG.info("Registry not online. " + myService + " is waiting for it to come online");
-                        } else {
-                            LOG.info(requestedService + " not online. "
-                                    + myService + " is waiting for it to come online");
-                        }
+                        LOG.info("Service is not online yet. Waiting for service to come online.");
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 } else {
-                    System.out.println("Servers for " + requestedService + " are online: " + servers);
+                    LOG.info("Service is online.");
                 }
-            } while (servers == null || servers.isEmpty());
-
+            } while (!up);
             callback.run();
-
         } catch (Exception e) {
             e.printStackTrace();
             throw (e);

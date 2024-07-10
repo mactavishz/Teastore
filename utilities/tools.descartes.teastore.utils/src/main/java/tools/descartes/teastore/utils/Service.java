@@ -92,4 +92,8 @@ public enum Service {
 		return String.format("%s://%s/%s/rest/", getServiceProtocol(), getServerName(HOST_ENV, PORT_ENV),
 				service.getServiceName());
 	}
+
+	public static String getServiceBaseURL(String HOST_ENV, String PORT_ENV) {
+		return String.format("%s://%s", getServiceProtocol(), getServerName(HOST_ENV, PORT_ENV));
+	}
 }
