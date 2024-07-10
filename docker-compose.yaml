@@ -10,31 +10,51 @@ services:
       - "3306"
     ports:
       - "3306:3306"
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   persistence:
     container_name: teastore-persistence
     build:
       context: ./services/tools.descartes.teastore.persistence
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
+      args:
+        - SERVICE_PORT=${SERVICE_PORT:-8080}
+        - SERVICE_PORT_SSL=${SERVICE_PORT_SSL:-8443}
     depends_on:
-      - db
-    expose:
-      - "8080"
+      db:
+        condition: service_healthy
     env_file:
       - ./services/tools.descartes.teastore.persistence/env/dev.env
       - ./env/dev.env
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   auth:
     container_name: teastore-auth
     build:
       context: ./services/tools.descartes.teastore.auth
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
+      args:
+        - SERVICE_PORT=${SERVICE_PORT:-8080}
+        - SERVICE_PORT_SSL=${SERVICE_PORT_SSL:-8443}
     depends_on:
-      - db
-      - persistence
-    expose:
-      - "8080"
+      db:
+        condition: service_healthy
+      persistence:
+        condition: service_healthy
     env_file:
       - ./services/tools.descartes.teastore.auth/env/dev.env
       - ./env/dev.env
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   image:
     container_name: teastore-image
     build:
@@ -42,23 +62,29 @@ services:
       dockerfile: Dockerfile
       args:
         - DB_SIZE=${DB_SIZE:-small}
-    expose:
-      - "8080"
     ports:
       - "8081:8080"
   recommender:
     container_name: teastore-recommender
     build:
       context: ./services/tools.descartes.teastore.recommender
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
+      args:
+        - SERVICE_PORT=${SERVICE_PORT:-8080}
+        - SERVICE_PORT_SSL=${SERVICE_PORT_SSL:-8443}
     depends_on:
-      - db
-      - persistence
-    expose:
-      - "8080"
+      db:
+        condition: service_healthy
+      persistence:
+        condition: service_healthy
     env_file:
       - ./services/tools.descartes.teastore.recommender/env/dev.env
       - ./env/dev.env
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   webui:
     container_name: teastore-webui
     build:
@@ -71,11 +97,16 @@ services:
       - ./env/dev.env
       - services/tools.descartes.teastore.webui/env/dev.env
     depends_on:
-      - db
-      - persistence
-      - auth
-      - recommender
-      - image
+      db:
+        condition: service_healthy
+      persistence:
+        condition: service_healthy
+      auth:
+        condition: service_healthy
+      recommender:
+        condition: service_healthy
+      image:
+        condition: service_started
     environment:
       HOST_NAME: "webui"
     ports:
