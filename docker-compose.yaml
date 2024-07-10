@@ -62,6 +62,13 @@ services:
       dockerfile: Dockerfile
       args:
         - DB_SIZE=${DB_SIZE:-small}
+        - SERVICE_PORT=${SERVICE_PORT:-8080}
+        - SERVICE_PORT_SSL=${SERVICE_PORT_SSL:-8443}
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     ports:
       - "8081:8080"
   recommender:
