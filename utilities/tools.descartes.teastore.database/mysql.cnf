@@ -1,0 +1,3 @@
+[mysqld]
+performance_schema=off
+mysqlx=0
