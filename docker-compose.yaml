@@ -122,6 +122,7 @@ services:
     ports:
       - "8080:8080"
       - "3010:3010" # HMR port
+      - "9464:9464" # Metrics port
 networks:
   default:
     external: true
