@@ -67,5 +67,5 @@ app.all("*", createRequestHandler({ build }));
 
 
 app.listen(port, () => {
-  console.log(`App listening on http://${host}:${port}`);
+  console.log(`App listening on http://${host}:${port} in ${process.env.NODE_ENV || "development"} mode`);
 });
