@@ -6,5 +6,6 @@ RUN npm install --verbose
 
 EXPOSE 8080
 EXPOSE 3010
+EXPOSE 9464
 
 CMD npm run dev
