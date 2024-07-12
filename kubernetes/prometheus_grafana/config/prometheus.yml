@@ -18,9 +18,9 @@ scrape_configs:
       labels:
         instance: prometheus
 
-  # - job_name: 'kube-state-metrics'
-  #   static_configs:
-  #   - targets: ['kube-state-metrics.monitoring.svc.cluster.local:8080']
+  - job_name: 'kube-state-metrics'
+    static_configs:
+    - targets: ['kube-state-metrics.monitoring-tea.svc.cluster.local:8080']
 
   - job_name: 'endpoint'
     static_configs:
