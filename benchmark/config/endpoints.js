@@ -71,7 +71,7 @@ export default {
     base: getBaseURL("webui"),
     userpasswd: "password",
     home: {
-      url: "/tools.descartes.teastore.webui",
+      url: "/tools.descartes.teastore.webui/",
       method: "GET",
     },
     login: {
