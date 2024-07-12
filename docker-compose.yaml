@@ -34,7 +34,7 @@ services:
     expose:
       - "8080"
     ports:
-      - "8083:8080"
+      - "8084:8080"
   auth:
     container_name: teastore-auth
     build:
@@ -56,7 +56,7 @@ services:
     expose:
       - "8080"
     ports:
-      - "8082:8080"
+      - "8083:8080"
   image:
     container_name: teastore-image
     build:
@@ -75,7 +75,7 @@ services:
     expose:
       - "8080"
     ports:
-      - "8081:8080"
+      - "8082:8080"
   recommender:
     container_name: teastore-recommender
     build:
@@ -97,7 +97,7 @@ services:
     expose:
       - "8080"
     ports:
-      - "8084:8080"
+      - "8081:8080"
   webui:
     container_name: teastore-webui
     build:
