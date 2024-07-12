@@ -38,13 +38,20 @@ spec:
         volumeMounts:
         - mountPath: "/var/lib/grafana"
           name: grafana-storage
+          readOnly: false
+        - mountPath: /etc/grafana/provisioning/datasources
+          name: grafana-datasources
+          readOnly: false
       volumes:
+      - name: grafana-datasources
+        secret:
+          secretName: grafana-datasources
       - name: grafana-storage
+        emptyDir: {}
         # persistentVolumeClaim:
         #   claimName: pvc-grafana
         # hostPath:
         #   path: /mnt/data/grafana  
         #   type: DirectoryOrCreate
-        emptyDir: {}
 
 ---
