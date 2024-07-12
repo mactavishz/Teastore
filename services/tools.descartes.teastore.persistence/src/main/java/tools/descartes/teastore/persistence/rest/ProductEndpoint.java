@@ -25,6 +25,7 @@ import jakarta.ws.rs.core.Response;
 import tools.descartes.teastore.model.domain.ProductRepository;
 import tools.descartes.teastore.utils.AbstractCRUDEndpoint;
 import tools.descartes.teastore.entities.Product;
+import org.eclipse.microprofile.metrics.annotation.Timed;
 
 /**
  * Persistence endpoint for for CRUD operations on products.
@@ -91,6 +92,12 @@ public class ProductEndpoint extends AbstractCRUDEndpoint<Product> {
 	 */
 	@GET
 	@Path("category/{category:[0-9][0-9]*}")
+	@Timed(
+			name = "getProductsForCategory",
+			absolute = true,
+			tags = {"method=get", "url=/products/category/{category}"},
+			description = "A measure of how long it takes to get all products for a category."
+	)
 	public List<Product> listAllForCategory(@PathParam("category") final Long categoryId,
 			@QueryParam("start") final Integer startPosition,
 			@QueryParam("max") final Integer maxResult) {
@@ -112,6 +119,12 @@ public class ProductEndpoint extends AbstractCRUDEndpoint<Product> {
 	 */
 	@GET
 	@Path("count/{category:[0-9][0-9]*}")
+	@Timed(
+			name = "getProductCountForCategory",
+			absolute = true,
+			tags = {"method=get", "url=/products/count/{category}"},
+			description = "A measure of how long it takes to get the count of products for a category."
+	)
 	public Response countForCategory(@PathParam("category") final Long categoryId) {
 		if (categoryId == null) {
 			return Response.status(404).build();

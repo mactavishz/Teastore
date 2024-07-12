@@ -24,7 +24,7 @@ import jakarta.ws.rs.QueryParam;
 import tools.descartes.teastore.model.domain.OrderRepository;
 import tools.descartes.teastore.utils.AbstractCRUDEndpoint;
 import tools.descartes.teastore.entities.Order;
-
+import org.eclipse.microprofile.metrics.annotation.Timed;
 /**
  * Persistence endpoint for for CRUD operations on orders.
  * @author Joakim von Kistowski
@@ -90,6 +90,7 @@ public class OrderEndpoint extends AbstractCRUDEndpoint<Order> {
 	 */
 	@GET
 	@Path("user/{user:[0-9][0-9]*}")
+	@Timed(name = "listAllOrdersForUser", tags = {"method=get", "url=/orders/user/{user}"}, absolute = true, description = "Time and frequency to list all orders for a user.")
 	public List<Order> listAllForUser(@PathParam("user") final Long userId,
 			@QueryParam("start") final Integer startPosition,
 			@QueryParam("max") final Integer maxResult) {

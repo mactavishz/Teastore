@@ -17,6 +17,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.UriBuilder;
+import org.eclipse.microprofile.metrics.annotation.Timed;
 
 import java.util.List;
 
@@ -38,6 +39,12 @@ public abstract class AbstractCRUDEndpoint<T> {
 	 * @return A new entity with the initial values of the passed template.
 	 */
 	@POST
+	@Timed(
+			name = "createEntity",
+			tags = {"method=post"},
+			absolute = true,
+			description = "Time and frequency of creating a new entity."
+	)
 	public Response create(final T entity) {
 		long id = createEntity(entity);
 		return Response.created(UriBuilder.fromResource(AbstractCRUDEndpoint.class).
@@ -60,6 +67,13 @@ public abstract class AbstractCRUDEndpoint<T> {
 	 */
 	@GET
 	@Path("/{id:[0-9][0-9]*}")
+	@Timed(
+			name = "findEntityById",
+			tags = {"method=get"},
+			absolute = true,
+			description = "Time and frequency of finding an entity by ID."
+
+	)
 	public Response findById(@PathParam("id") final Long id) {
 		if (id == null) {
 			return Response.status(Status.NOT_FOUND).build();
@@ -87,6 +101,12 @@ public abstract class AbstractCRUDEndpoint<T> {
 	 * @return List of all entities within the provided range. Returns an empty list for no matches
 	 */
 	@GET
+	@Timed(
+			name = "listAllEntities",
+			tags = {"method=get"},
+			absolute = true,
+			description = "Time and frequency of listing all entities."
+	)
 	public List<T> listAll(@QueryParam("start") final Integer startPosition,
 			@QueryParam("max") final Integer maxResult) {
 		final List<T> entities = listAllEntities(parseIntQueryParam(startPosition), parseIntQueryParam(maxResult));
@@ -114,6 +134,12 @@ public abstract class AbstractCRUDEndpoint<T> {
 	 */
 	@PUT
 	@Path("/{id:[0-9][0-9]*}")
+	@Timed(
+			name = "updateEntity",
+			tags = {"method=put"},
+			absolute = true,
+			description = "Time and frequency of updating an entity."
+	)
 	public Response update(@PathParam("id") Long id, final T entity) {
 		boolean updated = false;
 		if (id != null && entity != null) {
@@ -143,6 +169,12 @@ public abstract class AbstractCRUDEndpoint<T> {
 	 */
 	@DELETE
 	@Path("/{id:[0-9][0-9]*}")
+	@Timed(
+			name = "deleteEntity",
+			tags = {"method=delete"},
+			absolute = true,
+			description = "Time and frequency of deleting an entity."
+	)
 	public Response deleteById(@PathParam("id") final Long id) {
 		boolean deleted = deleteEntity(id);
 		if (deleted) {
