@@ -2,6 +2,7 @@
 
 BASE_URL=""
 WORKLOAD="test"
+PROTOCOL="http"
 WEBUI_PORT=${WEBUI_PORT:-"30080"}
 RECOMMENDER_PORT=${RECOMMENDER_PORT:-"30082"}
 PERSISTENCE_PORT=${PERSISTENCE_PORT:-"30083"}
@@ -23,16 +24,26 @@ while [[ $# -gt 0 ]]; do
 	-h | --help)
 		echo "Usage: $0 [options]"
 		echo "Options:"
-		echo "  -H, --host <url>        The base URL of the system under test. Default: http://localhost:8080"
-		echo "  -w, --workload <name>   The workload name to run, available workloads: test, average, stress, breakpoint. Default: test"
-		echo "  -t, --targets <list>    The list of comma seperated target services to test. Default: recommender,persistence,image,auth,webui"
-		echo "  -c --compress           Compress the reports folder after the test"
+		echo "  -H, --host <hostname>        The base URL of the system under test. Default: localhost"
+		echo "  -p, --protocol <http|https>  The protocol to use for the test. Default: http"
+		echo "  -w, --workload <name>        The workload name to run, available workloads: test, average, stress, breakpoint. Default: test"
+		echo "  -t, --targets <list>         The list of comma seperated target services to test. Default: recommender,persistence,image,auth,webui"
+		echo "  -c --compress                Compress the reports folder after the test"
 		exit 0
 		;;
 	-H | --host)
 		HOST=$(echo $2 | sed 's:/*$::')
 		# if the host is not specified, use the default host
-		BASE_URL=${HOST:-"http://localhost:8080"}
+		BASE_URL=${HOST:-"localhost"}
+		shift
+		shift
+		;;
+	-p | --protocol)
+		PROTOCOL="$2"
+		if [ $PROTOCOL != "http" ] && [ $PROTOCOL != "https" ]; then
+      echo "Invalid protocol, only http or https is allowed"
+      exit 1
+    fi
 		shift
 		shift
 		;;
@@ -67,7 +78,7 @@ done
 
 echo "Running benchmark on $BASE_URL"
 echo "Selected workload: $WORKLOAD"
-echo "Test target services: ${TEST_TARGETS[@]}"
+echo "Test target services:" "${TEST_TARGETS[@]}"
 
 # loop through the test targets
 for target in "${TEST_TARGETS[@]}"; do
@@ -81,11 +92,11 @@ for target in "${TEST_TARGETS[@]}"; do
 		mkdir -p reports/$target/$WORKLOAD
 		echo "Running test $file"
 		k6 run \
-			-e AUTH_BASE_URL="$BASE_URL:$AUTH_PORT" \
-			-e RECOMMENDER_BASE_URL="$BASE_URL:$RECOMMENDER_PORT" \
-			-e PERSISTENCE_BASE_URL="$BASE_URL:$PERSISTENCE_PORT" \
-			-e IMAGE_BASE_URL="$BASE_URL:$IMAGE_PORT" \
-			-e WEBUI_BASE_URL="$BASE_URL:$WEBUI_PORT" \
+			-e AUTH_BASE_URL="$PROTOCOL://$BASE_URL:$AUTH_PORT" \
+			-e RECOMMENDER_BASE_URL="$PROTOCOL://$BASE_URL:$RECOMMENDER_PORT" \
+			-e PERSISTENCE_BASE_URL="$PROTOCOL://$BASE_URL:$PERSISTENCE_PORT" \
+			-e IMAGE_BASE_URL="$PROTOCOL://$BASE_URL:$IMAGE_PORT" \
+			-e WEBUI_BASE_URL="$PROTOCOL://$BASE_URL:$WEBUI_PORT" \
 			-e USER="$USER" \
 			-e K6_WEB_DASHBOARD="true" \
 			-e K6_WEB_DASHBOARD_EXPORT=reports/$target/$WORKLOAD/$(basename ${file%.*}).html \
