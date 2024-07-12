@@ -61,7 +61,7 @@ services:
     container_name: teastore-image
     build:
       context: ./services/tools.descartes.teastore.image
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
       args:
         - DB_SIZE=${DB_SIZE:-mid}
     env_file:
