@@ -17,7 +17,7 @@ export function setup() {
 
 export default function (allProducts) {
   const pid = allProducts[Math.floor(Math.random() * allProducts.length)].id;
-  http[imageConfig.getProductImage.method.toLowerCase()](`${imageConfig.base}${imageConfig.getProductImage.url}/${pid}.png`);
+  http[imageConfig.getRecommendationImage.method.toLowerCase()](`${imageConfig.base}${imageConfig.getRecommendationImage.url}/${pid}.png`);
   sleep(1);
 }
 

@@ -47,14 +47,18 @@ export default {
   },
   image: {
     base: getBaseURL("image"),
-    getWebImages: {
-      url: "/tools.descartes.teastore.image/rest/image/getWebImages",
-      method: "POST",
+    getProductImage: {
+      url: "/tools.descartes.teastore.image/full",
+      method: "GET",
     },
-    getProductImages: {
-      url: "/tools.descartes.teastore.image/rest/image/getProductImages",
-      method: "POST",
+    getPreviewImage: {
+      url: "/tools.descartes.teastore.image/preview",
+      method: "GET",
     },
+    getRecommendationImage: {
+      url: "/tools.descartes.teastore.image/recommendation",
+      method: "GET",
+    }
   },
   recommender: {
     base: getBaseURL("recommender"),

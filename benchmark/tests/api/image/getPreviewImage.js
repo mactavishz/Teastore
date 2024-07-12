@@ -1,7 +1,6 @@
 import http from 'k6/http';
 import config from "../../../config/endpoints.js"
 import { options as workLoadOpts } from "../../../config/workload.js" 
-import { getRandomItems } from "../../../utils.js"
 import { sleep } from 'k6';
 
 const imageConfig = config.image;
@@ -10,24 +9,16 @@ export const options = {
   stages: workLoadOpts.stages
 };
 
-const ProductImagePreviewSize = "64x64";
-const maxProducts = 20
-
 export function setup() {
   // setup code
+  console.log(persistenceConfig.base + persistenceConfig.getProducts.url)
   const allProducts = http[persistenceConfig.getProducts.method.toLowerCase()](persistenceConfig.base + persistenceConfig.getProducts.url).json();
   return allProducts;
 }
 
 export default function (allProducts) {
-  const pids = getRandomItems(allProducts, maxProducts).map(p => p.id)
-  let data = {};
-  for (let pid of pids) {
-    data[pid] = ProductImagePreviewSize;
-  }
-  http[imageConfig.getWebImages.method.toLowerCase()](imageConfig.base + imageConfig.getWebImages.url, JSON.stringify(data), {
-    headers: { 'Content-Type': 'application/json' }
-  });
+  const pid = allProducts[Math.floor(Math.random() * allProducts.length)].id;
+  http[imageConfig.getPreviewImage.method.toLowerCase()](`${imageConfig.base}${imageConfig.getPreviewImage.url}/${pid}.png`);
   sleep(1);
 }
 
