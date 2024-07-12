@@ -5,7 +5,7 @@ services:
         context: ./utilities/tools.descartes.teastore.database
         dockerfile: Dockerfile
         args:
-          - DB_SIZE=${DB_SIZE:-small}
+          - DB_SIZE=${DB_SIZE:-mid}
     expose:
       - "3306"
     ports:
@@ -63,7 +63,7 @@ services:
       context: ./services/tools.descartes.teastore.image
       dockerfile: Dockerfile
       args:
-        - DB_SIZE=${DB_SIZE:-small}
+        - DB_SIZE=${DB_SIZE:-mid}
     env_file:
       - ./services/tools.descartes.teastore.image/env/dev.env
       - ./env/dev.env
