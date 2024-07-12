@@ -31,7 +31,6 @@ import tools.descartes.teastore.entities.message.SessionBlob;
 import tools.descartes.teastore.utils.NotFoundException;
 import tools.descartes.teastore.utils.TimeoutException;
 import org.eclipse.microprofile.metrics.annotation.Timed;
-import org.eclipse.microprofile.metrics.annotation.Counted;
 
 
 /**
@@ -58,18 +57,10 @@ public class AuthCartRest {
   @POST
   @Path("add/{pid}")
   @Timed(
-
-          name = "addProductToCartTimer",
-          tags = {"method=post"},
+          name = "addProductToCart",
+          tags = {"method=post", "url=/cart/add/{pid}"},
           absolute = true,
           description = "Time and Frequency of addProductToCart"
-
-  )
-  @Counted(
-          name = "addProductToCartCounter",
-          tags = {"method=post"},
-          absolute = true,
-          description = "Counts the number of invocations of addProductToCart"
   )
   public Response addProductToCart(SessionBlob blob, @PathParam("pid") final Long pid) {
 
@@ -110,18 +101,10 @@ public class AuthCartRest {
   @POST
   @Path("remove/{pid}")
   @Timed(
-
-          name = "removeProductFromCartTimer",
-          tags = {"method=post"},
+          name = "removeProductFromCart",
+          tags = {"method=post", "url=/cart/remove/{pid}"},
           absolute = true,
           description = "Time and Frequency of removeProductFromCart"
-
-  )
-  @Counted(
-          name = "removeProductFromCartCounter",
-          tags = {"method=post"},
-          absolute = true,
-          description = "Counts the number of invocations of removeProductFromCart"
   )
   public Response removeProductFromCart(SessionBlob blob, @PathParam("pid") final Long pid) {
     OrderItem toRemove = null;
@@ -153,18 +136,10 @@ public class AuthCartRest {
   @PUT
   @Path("{pid}")
   @Timed(
-
-          name = "updateQuantityTimer",
-          tags = {"method=post"},
+          name = "updateQuantity",
+          tags = {"method=put", "url=/cart/{pid}"},
           absolute = true,
           description = "Time and Frequency of updateQuantity"
-
-  )
-  @Counted(
-          name = "updateQuantityCounter",
-          tags = {"method=post"},
-          absolute = true,
-          description = "Counts the number of invocations of updateQuantity"
   )
   public Response updateQuantity(SessionBlob blob, @PathParam("pid") final Long pid,
       @QueryParam("quantity") int quantity) {
