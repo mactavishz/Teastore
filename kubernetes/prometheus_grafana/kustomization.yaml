@@ -1,0 +1,18 @@
+
+resources:
+  - namespace.yaml
+  - prometheus-server.yaml
+  - grafana.yaml
+  - prometheus-serviceAccount.yaml
+  - prometheus-clusterRole.yaml
+  - prometheus-clusterRoleBinding.yaml
+
+configMapGenerator:
+  - name: prometheus-server-conf
+    namespace: monitoring
+    # namespace: teastore
+    files:
+      - config/prometheus.yml
+
+namespace: monitoring
+# namespace: teastore

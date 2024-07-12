@@ -7,5 +7,6 @@ resources:
   - image.yaml
   - recommender.yaml
   - webui.yaml
+  - hpa.yaml
 
 namespace: teastore

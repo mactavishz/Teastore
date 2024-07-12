@@ -8,8 +8,15 @@ metadata:
     app: teastore
     run: teastore-auth
 spec:
+  type: NodePort
   ports:
-    - port: 8080
+    - name: http
+      port: 8080
+      nodePort: 30085   # expose to the outside
+      protocol: TCP
+    - name: metrics
+      port: 9464
+      targetPort: 9464
       protocol: TCP
   selector:
     run: teastore-auth
@@ -36,13 +43,25 @@ spec:
     spec:
       containers:
         - name: teastore-auth
-          image: descartesresearch/teastore-auth
+          image: macsalvation/teastore-auth:v0.1.0
+          # image: johnzr/cnae-g8-teastore-auth-origin:v1.0
+          imagePullPolicy: "Always"
           ports:
             - containerPort: 8080
+              name: http
+            - containerPort: 9464
+              name: metrics
           env:
             - name: HOST_NAME
               value: "teastore-auth"
             - name: REGISTRY_HOST
               value: "teastore-registry"
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 500m
+              memory: 512Mi
 
 ---

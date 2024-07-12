@@ -8,34 +8,40 @@ metadata:
     app: teastore
     run: teastore-webui
 spec:
-  # type: NodePort
-  type: ClusterIP
-  ports:
-    - port: 8080
-      # nodePort: 30080
-      protocol: TCP
+  type: NodePort
+  # type: ClusterIP
   selector:
     run: teastore-webui
+  ports:
+    - name: http
+      port: 8080
+      nodePort: 30080   # expose to the outside
+      protocol: TCP
+    - name: metrics
+      port: 9464
+      targetPort: 9464
+      protocol: TCP
+  
 
 ---
 
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: teastore-webui-ingress
-  annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: web # only http for now
-spec:
-  rules:
-  - http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: teastore-webui
-            port:
-              number: 8080
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: teastore-webui-ingress
+#   annotations:
+#     traefik.ingress.kubernetes.io/router.entrypoints: web # only http for now
+# spec:
+#   rules:
+#   - http:
+#       paths:
+#       - path: /
+#         pathType: Prefix
+#         backend:
+#           service:
+#             name: teastore-webui
+#             port:
+#               number: 8080
 
 ---
 
@@ -59,13 +65,25 @@ spec:
     spec:
       containers:
         - name: teastore-webui
-          image: descartesresearch/teastore-webui
+          image: macsalvation/teastore-webui:v0.1.0
+          imagePullPolicy: "Always"
+          # image: johnzr/cnae-g8-teastore-webui-origin:v1.0
           ports:
             - containerPort: 8080
+              name: http
+            - containerPort: 9464
+              name: metrics
           env:
             - name: HOST_NAME
               value: "teastore-webui"
             - name: REGISTRY_HOST
               value: "teastore-registry"
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: "1"
+              memory: 1Gi
 
 ---

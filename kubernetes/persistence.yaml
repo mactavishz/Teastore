@@ -8,8 +8,15 @@ metadata:
     app: teastore
     run: teastore-persistence
 spec:
+  type: NodePort
   ports:
-    - port: 8080
+    - name: http
+      port: 8080
+      nodePort: 30083   # expose to the outside
+      protocol: TCP
+    - name: metrics
+      port: 9464
+      targetPort: 9464
       protocol: TCP
   selector:
     run: teastore-persistence
@@ -36,9 +43,14 @@ spec:
     spec:
       containers:
         - name: teastore-persistence
-          image: descartesresearch/teastore-persistence
+          image: macsalvation/teastore-persistence:v0.1.0
+          imagePullPolicy: "Always"
+          # image: johnzr/cnae-g8-teastore-persistence-origin:v1.0
           ports:
             - containerPort: 8080
+              name: http
+            - containerPort: 9464
+              name: metrics
           env:
             - name: HOST_NAME
               value: "teastore-persistence"
@@ -48,4 +60,11 @@ spec:
               value: "teastore-db"
             - name: DB_PORT
               value: "3306"
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: "1"
+              memory: 1Gi
 ---

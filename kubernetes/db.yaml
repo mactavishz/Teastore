@@ -9,7 +9,12 @@ metadata:
     run: teastore-db
 spec:
   ports:
-    - port: 3306
+    - name: mysql
+      port: 3306
+      protocol: TCP
+    - name: metrics
+      port: 9464
+      targetPort: 9464
       protocol: TCP
   selector:
     run: teastore-db
@@ -36,10 +41,19 @@ spec:
     spec:
       containers:
         - name: teastore-db
-          image: descartesresearch/teastore-db
+          image: macsalvation/teastore-db:v0.1.0
+          imagePullPolicy: "Always"
+          # image: johnzr/cnae-g8-teastore-db-origin:v1.0
           ports:
-            - containerPort: 3306
-            
----
+            - containerPort: 8080
+              name: http
+            - containerPort: 9464
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 500m
+              memory: 512Mi
 
 
