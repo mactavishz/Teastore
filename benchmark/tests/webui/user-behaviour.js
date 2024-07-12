@@ -121,7 +121,7 @@ function browse(data) {
           res = http[webuiConfig.cartAction.method.toLowerCase()](
             webuiConfig.base + webuiConfig.cartAction.url,
             {
-              addToCart: "",
+              addToCart: "addToCart",
               productid: randProductId,
             }
           );
@@ -150,8 +150,8 @@ function placeOrder(data) {
   const user_data = {
     firstname: "User",
     lastname: "User",
-    adress1: "Road",
-    adress2: "City",
+    address1: "Road",
+    address2: "City",
     cardtype: "volvo",
     cardnumber: "314159265359",
     expirydate: "12/2050",
@@ -176,12 +176,10 @@ function placeOrder(data) {
   let removeProductChoice = choice();
   // 50% chance to remove one product from cart
   if (removeProductChoice) {
-    const rmPid = randomInt(0, data.cartProductIds.length - 1)
+    const rmPid = data.cartProductIds[randomInt(0, data.cartProductIds.length - 1)]
     data.cartProductIds = data.cartProductIds.filter((pid) => pid !== rmPid);
     if (rmPid) {
-      let formData = {
-        productid: rmPid,
-      };
+      let formData = {};
       formData[`removeProduct_${rmPid}`] = "whatever";
       res = http[webuiConfig.cartAction.method.toLowerCase()](
         webuiConfig.base + webuiConfig.cartAction.url,
