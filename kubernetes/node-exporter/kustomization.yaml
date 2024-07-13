@@ -1,0 +1,10 @@
+
+resources:
+  - nodeExporter-clusterRole.yaml
+  - nodeExporter-clusterRoleBinding.yaml
+  - nodeExporter-daemonSet.yaml
+  - nodeExporter-networkPolicy.yaml
+  - nodeExporter-service.yaml
+  - nodeExporter-serviceAccount.yaml
+
+namespace: monitoring-tea
