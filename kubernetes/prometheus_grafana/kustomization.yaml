@@ -10,7 +10,7 @@ resources:
 
 configMapGenerator:
   - name: prometheus-server-conf
-    namespace: monitoring
+    namespace: monitoring-tea
     # namespace: teastore
     files:
       - config/prometheus.yml
