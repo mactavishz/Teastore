@@ -12,17 +12,17 @@ global:
     monitor: 'teastore'
 
 scrape_configs:
-  - job_name: 'prometheus'
+  - job_name: 'Prometheus'
     static_configs:
     - targets: ['localhost:9090']
       labels:
         instance: prometheus
 
-  - job_name: 'kube-state-metrics'
+  - job_name: 'Kube-state-metrics'
     static_configs:
     - targets: ['kube-state-metrics.monitoring-tea.svc.cluster.local:8080']
 
-  - job_name: 'endpoint'
+  - job_name: 'TeaStore'
     static_configs:
           - targets: ['teastore-persistence.teastore.svc.cluster.local:9464']
             labels:
@@ -42,3 +42,11 @@ scrape_configs:
           - targets: ['teastore-registry.teastore.svc.cluster.local:9464']
             labels:
                 instance: teastore-registry
+
+  # - job_name: 'Node-exporter'
+  #   static_configs:
+  #   # - targets: ['node-exporter.monitoring-tea.svc.cluster.local:9100']
+  #   - targets: 
+  #       ['100.82.238.10:30091']
+    #   labels:
+    #     instance: xxxxx
