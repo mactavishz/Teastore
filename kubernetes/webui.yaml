@@ -73,6 +73,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: teastore-webui-config
+            - configMapRef:
+                name: teastore-share-config
           # readinessProbe:
           #   httpGet:
           #     path: /health

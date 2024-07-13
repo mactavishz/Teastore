@@ -12,7 +12,7 @@ resources:
   # - hpa.yaml
 
 configMapGenerator:
-  - name: teastore-webui-config
+  - name: teastore-share-config
     literals:
       - PERSISTENCE_HOST=teastore-persistence
       - PERSISTENCE_PORT=8080
@@ -31,6 +31,8 @@ configMapGenerator:
       - WEBUI_PORT_SSL=8443
       - DB_HOST=teastore-db
       - DB_PORT=3306
+  - name: teastore-webui-config
+    literals:      
       - BASE_URL=/tools.descartes.teastore.webui/
       - SERVICE_HOST=teastore-webui
       - SERVICE_PORT=8080
