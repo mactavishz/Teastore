@@ -45,7 +45,7 @@ if [[ $DEPLOY = 1 ]]; then
   done
 	docker buildx build --platform ${DOCKER_PLATFORMS} -t "${registry}teastore-persistence${tag}" ${PERSISTENCE_PATH} -f "${PERSISTENCE_PATH}Dockerfile.prod" ${push_flag:+--push}
 	docker buildx build --platform ${DOCKER_PLATFORMS} -t "${registry}teastore-webui${tag}" ${WEBUI_PATH} -f "${WEBUI_PATH}Dockerfile.prod" ${push_flag:+--push}
-	docker buildx build --platform ${DOCKER_PLATFORMS} -t "${registry}teastore-auth${tag}" ${AUTH_PATH} -f "${AUTH_PATH}Dokcerfile.prod" ${push_flag:+--push}
+	docker buildx build --platform ${DOCKER_PLATFORMS} -t "${registry}teastore-auth${tag}" ${AUTH_PATH} -f "${AUTH_PATH}Dockerfile.prod" ${push_flag:+--push}
 	docker buildx build --platform ${DOCKER_PLATFORMS} -t "${registry}teastore-recommender${tag}" ${RECOMMENDER_PATH} -f "${RECOMMENDER_PATH}Dockerfile.prod" ${push_flag:+--push}
 	docker buildx rm mybuilder
 else
