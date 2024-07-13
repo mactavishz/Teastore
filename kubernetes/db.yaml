@@ -5,19 +5,18 @@ kind: Service
 metadata:
   name: teastore-db
   labels:
-    app: teastore
-    run: teastore-db
+    app: teastore-db
 spec:
   ports:
     - name: mysql
       port: 3306
       protocol: TCP
-    - name: metrics
-      port: 9464
-      targetPort: 9464
-      protocol: TCP
+    # - name: metrics
+    #   port: 9464
+    #   targetPort: 9464
+    #   protocol: TCP
   selector:
-    run: teastore-db
+    app: teastore-db
 
 ---
 
@@ -26,18 +25,15 @@ kind: Deployment
 metadata:
   name: teastore-db
   labels:
-    app: teastore
-    run: teastore-db
+    app: teastore-db
 spec:
   selector:
     matchLabels:
-      app: teastore
-      run: teastore-db
+      app: teastore-db
   template:
     metadata:
       labels:
-        app: teastore
-        run: teastore-db
+        app: teastore-db
     spec:
       containers:
         - name: teastore-db
@@ -45,15 +41,15 @@ spec:
           imagePullPolicy: "Always"
           # image: johnzr/cnae-g8-teastore-db-origin:v1.0
           ports:
-            - containerPort: 8080
+            - containerPort: 3306
               name: http
-            - containerPort: 9464
-          resources:
-            limits:
-              cpu: 500m
-              memory: 512Mi
-            requests:
-              cpu: 500m
-              memory: 512Mi
+            # - containerPort: 9464
+          # resources:
+          #   limits:
+          #     cpu: 500m
+          #     memory: 512Mi
+          #   requests:
+          #     cpu: 500m
+          #     memory: 512Mi
 
 
