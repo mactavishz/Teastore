@@ -109,6 +109,11 @@ services:
     env_file:
       - ./env/dev.env
       - services/tools.descartes.teastore.webui/env/dev.env
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     depends_on:
       db:
         condition: service_healthy
