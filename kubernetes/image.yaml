@@ -6,8 +6,7 @@ kind: Service
 metadata:
   name: teastore-image
   labels:
-    app: teastore
-    run: teastore-image
+    app: teastore-image
 spec:
   type: NodePort
   ports:
@@ -20,7 +19,7 @@ spec:
       targetPort: 9464
       protocol: TCP
   selector:
-    run: teastore-image
+    app: teastore-image
 
 ---
 
@@ -29,18 +28,15 @@ kind: Deployment
 metadata:
   name: teastore-image
   labels:
-    app: teastore
-    run: teastore-image
+    app: teastore-image
 spec:
   selector:
     matchLabels:
-      app: teastore
-      run: teastore-image
+      app: teastore-image
   template:
     metadata:
       labels:
-        app: teastore
-        run: teastore-image
+        app: teastore-image
     spec:
       containers:
         - name: teastore-image
@@ -50,18 +46,18 @@ spec:
           ports:
             - containerPort: 8080
               name: http
-            - containerPort: 9464
-              name: metrics
-          env:
-            - name: HOST_NAME
-              value: "teastore-image"
-            - name: REGISTRY_HOST
-              value: "teastore-registry"
-          resources:
-            limits:
-              cpu: "1"
-              memory: 1Gi
-            requests:
-              cpu: "1"
-              memory: 1Gi
+            # - containerPort: 9464
+            #   name: metrics
+          envFrom:
+            - configMapRef:
+                name: teastore-share-config
+            - configMapRef:
+                name: teastore-image-config
+          # resources:
+          #   limits:
+          #     cpu: "1"
+          #     memory: 1Gi
+          #   requests:
+          #     cpu: "1"
+          #     memory: 1Gi
 ---

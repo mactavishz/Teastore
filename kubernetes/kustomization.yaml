@@ -50,6 +50,13 @@ configMapGenerator:
       # - USE_HTTPS=false
       - RECOMMENDER_RETRAIN_LOOP_TIME=10000
       - RECOMMENDER_ALGORITHM=SlopeOne
+  - name: teastore-image-config
+    literals:
+      - SERVICE_HOST=teastore-image
+      - SERVICE_PORT=8080
+      - SERVICE_PORT_SSL=8443
+      # - USE_POD_IP=false
+      # - USE_HTTPS=false
 
 vars:
   - name: IMAGE_CDN_HOST
