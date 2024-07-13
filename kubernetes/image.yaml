@@ -14,10 +14,10 @@ spec:
       port: 8080
       nodePort: 30084   # expose to the outside
       protocol: TCP
-    - name: metrics
-      port: 9464
-      targetPort: 9464
-      protocol: TCP
+    # - name: metrics
+    #   port: 9464
+    #   targetPort: 9464
+    #   protocol: TCP
   selector:
     app: teastore-image
 
