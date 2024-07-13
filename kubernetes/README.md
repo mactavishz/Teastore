@@ -74,6 +74,9 @@ Run TeaStore with kustomize:
 # start
 kubectl apply -k ./
 
+# refactored
+kubectl apply -k . --set-string IMAGE_CDN_HOST=image-cdn.domain.com
+
 # update
 kubectl apply -k ./
 

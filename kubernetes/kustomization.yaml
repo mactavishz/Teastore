@@ -1,3 +1,5 @@
+kind: Kustomization
+
 resources:
   - namespace.yaml
   - db.yaml
@@ -12,30 +14,39 @@ resources:
 configMapGenerator:
   - name: teastore-webui-config
     literals:
-      - PERSISTENCE_HOST=persistence
+      - PERSISTENCE_HOST=teastore-persistence
       - PERSISTENCE_PORT=8080
       - PERSISTENCE_PORT_SSL=8443
-      - RECOMMENDER_HOST=recommender
+      - RECOMMENDER_HOST=teastore-recommender
       - RECOMMENDER_PORT=8080
       - RECOMMENDER_PORT_SSL=8443
-      - AUTH_HOST=auth
+      - AUTH_HOST=teastore-auth
       - AUTH_PORT=8080
       - AUTH_PORT_SSL=8443
-      - IMAGE_HOST=image
+      - IMAGE_HOST=teastore-image
       - IMAGE_PORT=8080
       - IMAGE_PORT_SSL=8443
-      - WEBUI_HOST=webui
+      - WEBUI_HOST=teastore-webui
       - WEBUI_PORT=8080
       - WEBUI_PORT_SSL=8443
-      - DB_HOST=db
+      - DB_HOST=teastore-db
       - DB_PORT=3306
       - BASE_URL=/tools.descartes.teastore.webui/
-      - SERVICE_HOST=webui
+      - SERVICE_HOST=teastore-webui
       - SERVICE_PORT=8080
-      - IMAGE_CDN_HOST=localhost
+      - IMAGE_CDN_HOST=$(IMAGE_CDN_HOST)
       - IMAGE_CDN_PORT=8082
       - WEBUI_HMR_PORT=3010
       # - USE_POD_IP=false
       # - USE_HTTPS=false
+
+vars:
+  - name: IMAGE_CDN_HOST
+    objref:
+      kind: ConfigMap
+      name: teastore-webui-config
+      apiVersion: v1
+    fieldref:
+      fieldpath: data.IMAGE_CDN_HOST
 
 namespace: teastore
