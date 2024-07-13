@@ -1,12 +1,12 @@
 resources:
   - namespace.yaml
   - db.yaml
-  - registry.yaml
+  # - registry.yaml
   - persistence.yaml
   - auth.yaml
   - image.yaml
   - recommender.yaml
   - webui.yaml
-  - hpa.yaml
+  # - hpa.yaml
 
 namespace: teastore

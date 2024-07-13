@@ -65,7 +65,7 @@ spec:
     spec:
       containers:
         - name: teastore-webui
-          image: macsalvation/teastore-webui:v0.1.0
+          image: macsalvation/teastore-webui:v0.2.0
           imagePullPolicy: "Always"
           # image: johnzr/cnae-g8-teastore-webui-origin:v1.0
           ports:

@@ -44,7 +44,7 @@ spec:
     spec:
       containers:
         - name: teastore-image
-          image: macsalvation/teastore-image:v0.1.0
+          image: macsalvation/teastore-image:v0.2.0-dbmid
           imagePullPolicy: "Always"
           # image: johnzr/cnae-g8-teastore-image-origin:v1.0
           ports:

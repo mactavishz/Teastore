@@ -44,7 +44,7 @@ spec:
     spec:
       containers:
         - name: teastore-recommender
-          image: macsalvation/teastore-recommender:v0.1.0
+          image: macsalvation/teastore-recommender:v0.2.0
           imagePullPolicy: "Always"
           # image: johnzr/cnae-g8-teastore-recommender-origin:v1.0
           ports:

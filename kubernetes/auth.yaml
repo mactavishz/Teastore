@@ -43,7 +43,7 @@ spec:
     spec:
       containers:
         - name: teastore-auth
-          image: macsalvation/teastore-auth:v0.1.0
+          image: macsalvation/teastore-auth:v0.2.0
           # image: johnzr/cnae-g8-teastore-auth-origin:v1.0
           imagePullPolicy: "Always"
           ports:
