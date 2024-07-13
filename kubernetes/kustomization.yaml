@@ -32,15 +32,13 @@ configMapGenerator:
       - DB_HOST=teastore-db
       - DB_PORT=3306
   - name: teastore-webui-config
-    literals:      
-      - BASE_URL=/tools.descartes.teastore.webui/
-      - SERVICE_HOST=teastore-webui
-      - SERVICE_PORT=8080
-      - IMAGE_CDN_HOST=$(IMAGE_CDN_HOST)
-      - IMAGE_CDN_PORT=8082
-      # - WEBUI_HMR_PORT=3010
-      # - USE_POD_IP=false
-      # - USE_HTTPS=false
+    env: env/webui-env.txt
+    # literals:      
+    #   - BASE_URL=/tools.descartes.teastore.webui/
+    #   - SERVICE_HOST=teastore-webui
+    #   - SERVICE_PORT=8080
+    #   - IMAGE_CDN_HOST=$(IMAGE_CDN_HOST)
+    #   - IMAGE_CDN_PORT=8082
   - name: teastore-recommender-config
     literals:
       - SERVICE_HOST=teastore-recommender
@@ -72,13 +70,13 @@ configMapGenerator:
       # - USE_POD_IP=false
       # - USE_HTTPS=false
 
-vars:
-  - name: IMAGE_CDN_HOST
-    objref:
-      kind: ConfigMap
-      name: teastore-webui-config
-      apiVersion: v1
-    fieldref:
-      fieldpath: data.IMAGE_CDN_HOST
+# vars:
+#   - name: IMAGE_CDN_HOST
+#     objref:
+#       kind: ConfigMap
+#       name: teastore-webui-config
+#       apiVersion: v1
+#     fieldref:
+#       fieldpath: data.IMAGE_CDN_HOST
 
 namespace: teastore
