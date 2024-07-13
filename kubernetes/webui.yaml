@@ -68,11 +68,18 @@ spec:
               name: http
             - containerPort: 9464
               name: metrics
-            - containerPort: 3010
-              name: hmr
+            # - containerPort: 3010
+            #   name: hmr
           envFrom:
             - configMapRef:
                 name: teastore-webui-config
+          # readinessProbe:
+          #   httpGet:
+          #     path: /health
+          #     port: 8080
+          #   periodSeconds: 10
+          #   timeoutSeconds: 5
+          #   failureThreshold: 5
           # resources:
           #   limits:
           #     cpu: "1"
