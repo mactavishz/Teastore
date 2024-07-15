@@ -5,12 +5,16 @@
   "type": "module",
   "scripts": {
     "build": "remix vite:build",
-    "dev": "node ./server.js",
+    "dev": "node ./start.mjs",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
-    "start": "remix-serve ./build/server/index.js",
+    "start": "node ./start.mjs",
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.48.0",
+    "@opentelemetry/exporter-prometheus": "^0.52.1",
+    "@opentelemetry/sdk-node": "^0.52.1",
     "@remix-run/express": "^2.9.2",
     "@remix-run/node": "^2.9.2",
     "@remix-run/react": "^2.9.2",

@@ -24,6 +24,7 @@ import jakarta.ws.rs.QueryParam;
 import tools.descartes.teastore.model.domain.OrderItemRepository;
 import tools.descartes.teastore.utils.AbstractCRUDEndpoint;
 import tools.descartes.teastore.entities.OrderItem;
+import org.eclipse.microprofile.metrics.annotation.Timed;
 
 /**
  * Persistence endpoint for for CRUD operations on orders.
@@ -90,6 +91,12 @@ public class OrderItemEndpoint extends AbstractCRUDEndpoint<OrderItem> {
 	 */
 	@GET
 	@Path("product/{product:[0-9][0-9]*}")
+	@Timed(
+			name = "getOrderItemsForProduct",
+			absolute = true,
+			tags = {"method=get", "url=/orderitems/product/{product}"},
+			description = "A measure of how long it takes to get all order items for a product."
+	)
 	public List<OrderItem> listAllForProduct(@PathParam("product") final Long productId,
 			@QueryParam("start") final Integer startPosition,
 			@QueryParam("max") final Integer maxResult) {
@@ -113,6 +120,12 @@ public class OrderItemEndpoint extends AbstractCRUDEndpoint<OrderItem> {
 	 */
 	@GET
 	@Path("order/{order:[0-9][0-9]*}")
+	@Timed(
+			name = "getOrderItemsForOrder",
+			absolute = true,
+			tags = {"method=get", "url=/orderitems/order/{order}"},
+			description = "A measure of how long it takes to get all order items for an order."
+	)
 	public List<OrderItem> listAllForOrder(@PathParam("order") final Long orderId,
 			@QueryParam("start") final Integer startPosition,
 			@QueryParam("max") final Integer maxResult) {

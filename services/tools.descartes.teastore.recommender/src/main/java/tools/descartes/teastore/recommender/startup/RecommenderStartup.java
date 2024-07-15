@@ -19,10 +19,10 @@ import jakarta.servlet.annotation.WebListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import tools.descartes.teastore.utils.RegistryClient;
 import tools.descartes.teastore.recommender.servlet.RetrainDaemon;
 import tools.descartes.teastore.recommender.servlet.TrainingSynchronizer;
 import tools.descartes.teastore.utils.EnvVarNotFoundException;
+import tools.descartes.teastore.utils.RegistryClient;
 import tools.descartes.teastore.utils.Service;
 
 /**
@@ -33,11 +33,9 @@ import tools.descartes.teastore.utils.Service;
  */
 @WebListener
 public class RecommenderStartup implements ServletContextListener {
-
-    // private static final int REST_READ_TIMOUT = 1750;
-
     private final Logger LOG = LoggerFactory.getLogger(RecommenderStartup.class);
     private final String serverName = Service.getServerName("SERVICE_HOST", "SERVICE_PORT");
+    private final String persistenceBaseURL = Service.getServiceBaseURL("PERSISTENCE_HOST", "PERSISTENCE_PORT");
     private final RegistryClient client = new RegistryClient();
     private RetrainDaemon retrainDaemon = null;
     /**
@@ -57,7 +55,8 @@ public class RecommenderStartup implements ServletContextListener {
      *            The servlet context event at destruction.
      */
     public void contextDestroyed(ServletContextEvent event) {
-        client.unregister(Service.RECOMMENDER.getServiceName(), serverName);
+        LOG.info(String.format("Recommender service on %s destroyed\n", serverName));
+        client.destroy();
         if (retrainDaemon != null) {
             retrainDaemon.stop();
         }
@@ -69,11 +68,10 @@ public class RecommenderStartup implements ServletContextListener {
      *            The servlet context event at initialization.
      */
     public void contextInitialized(ServletContextEvent event) {
-        LOG.info("Waiting for dependent services to become available.");
-        client.runAfterServiceIsAvailable(Service.PERSISTENCE.getServiceName(), () -> {
-            LOG.info("Persistence service is available");
+        LOG.info(String.format("Recommender service initialized on %s\n", serverName));
+        LOG.info(persistenceBaseURL);
+        client.runAfterServiceIsAvailable(persistenceBaseURL, () -> {
             TrainingSynchronizer.getInstance().retrieveDataAndRetrain();
-            client.register(Service.RECOMMENDER.getServiceName(), serverName);
             try {
                 String looptimeStr = System.getenv("RECOMMENDER_RETRAIN_LOOP_TIME");
                 if (looptimeStr == null) {
@@ -91,7 +89,6 @@ public class RecommenderStartup implements ServletContextListener {
             } catch (EnvVarNotFoundException | NumberFormatException e) {
                 LOG.info("Recommender loop time not set. Disabling periodic retraining.");
             }
-        }, Service.RECOMMENDER.getServiceName());
+        });
     }
-
 }

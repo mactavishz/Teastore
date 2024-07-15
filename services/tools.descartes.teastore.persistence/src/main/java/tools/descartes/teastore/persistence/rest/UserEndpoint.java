@@ -25,6 +25,7 @@ import jakarta.ws.rs.core.Response.Status;
 import tools.descartes.teastore.model.domain.UserRepository;
 import tools.descartes.teastore.utils.AbstractCRUDEndpoint;
 import tools.descartes.teastore.entities.User;
+import org.eclipse.microprofile.metrics.annotation.Timed;
 
 /**
  * Persistence endpoint for CRUD operations on Categories.
@@ -98,6 +99,12 @@ public class UserEndpoint extends AbstractCRUDEndpoint<User> {
 	 */
 	@GET
 	@Path("name/{name}")
+	@Timed(
+			name = "getUserByName",
+			absolute = true,
+			tags = {"method=get", "url=/users/name/{name}"},
+			description = "A measure of how long it takes to retrieve a user by name."
+	)
 	public Response findById(@PathParam("name") final String name) {
 		if (name == null || name.isEmpty()) {
 			return Response.status(Status.NOT_FOUND).build();

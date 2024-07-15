@@ -24,22 +24,29 @@ public class PersistenceClient {
     private final String recommenderRESTEndpoint = Service.getSelfServiceRESTEndpoint(Service.RECOMMENDER);
 
     public boolean isPersistenceAvailable() {
+        Client client = null;
+        Response response = null;
+        boolean result = false;
         try {
-            Client client = ClientBuilder.newClient();
-            Response response = client.target(persistenceRESTEndpoint)
+            client = ClientBuilder.newClient();
+            response = client.target(persistenceRESTEndpoint)
                     .path("generatedb")
                     .path("finished")
                     .request()
                     .get();
 
-            boolean result = Boolean.parseBoolean(response.readEntity(String.class));
-            client.close();
-            response.close();
-            return result;
+            result = Boolean.parseBoolean(response.readEntity(String.class));
         } catch (ProcessingException e) {
             e.printStackTrace();
-            return false;
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+            if (client != null) {
+                client.close();
+            }
         }
+        return result;
     }
 
     public List<OrderItem> getOrderItems(int startIndex, int limit) {

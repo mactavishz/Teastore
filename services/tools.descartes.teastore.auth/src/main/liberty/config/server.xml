@@ -7,9 +7,6 @@
         <feature>concurrent-3.0</feature>
     </featureManager>
 
-    <!-- end::features[] -->
-    <variable name="http.port" defaultValue="8080"/>
-    <variable name="https.port" defaultValue="8443"/>
     <!-- YOU NEED TO CHANGE THIS -->
     <variable name="context.root" defaultValue="/tools.descartes.teastore.auth"/>
 
@@ -24,6 +21,6 @@
     <logging consoleLogLevel="INFO"/>
     <!-- end::logging[] -->
 
-    <httpEndpoint host="*" httpPort="${http.port}" httpsPort="${https.port}"
+    <httpEndpoint host="*" httpPort="${service.port}" httpsPort="${service.port.ssl}"
                   id="defaultHttpEndpoint"/>
 </server>

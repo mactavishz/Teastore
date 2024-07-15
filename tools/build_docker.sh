@@ -1,45 +1,54 @@
 #!/bin/bash
 DOCKER_PLATFORMS='linux/amd64,linux/arm64'
-registry=''     # e.g. 'descartesresearch/'
+registry='' # e.g. 'descartesresearch/'
+tag=''
+DEPLOY=0
 
 print_usage() {
-  printf "Usage: docker_build.sh [-p] [-r REGISTRY_NAME]\n"
+	printf "Usage: docker_build.sh [-p] [-d] [-r REGISTRY_NAME] [-t tag]\n"
 }
 
-while getopts 'pr:' flag; do
-  case "${flag}" in
-    p) push_flag='true' ;;
-    r) registry="${OPTARG}" ;;
-    *) print_usage
-       exit 1 ;;
-  esac
+while getopts 'dpr:t:' flag; do
+	case "${flag}" in
+	d) DEPLOY=1 ;;
+	p) push_flag='true' ;;
+	r) registry="${OPTARG}" ;;
+	t) tag="${OPTARG}" ;;
+	*)
+		print_usage
+		exit 1
+		;;
+	esac
 done
 
-if [[ $DEPLOY = 1 ]]
-then
+if [[ ! -z $tag ]]; then
+	tag=":${tag}"
+fi
+
+DB_SIZES=("small" "mid" "large")
+
+DB_PATH="../utilities/tools.descartes.teastore.database/"
+IMAGE_PATH="../services/tools.descartes.teastore.image/"
+PERSISTENCE_PATH="../services/tools.descartes.teastore.persistence/"
+WEBUI_PATH="../services/tools.descartes.teastore.webui/"
+AUTH_PATH="../services/tools.descartes.teastore.auth/"
+RECOMMENDER_PATH="../services/tools.descartes.teastore.recommender/"
+
+if [[ $DEPLOY = 1 ]]; then
 	docker run -it --rm --privileged tonistiigi/binfmt --install all
 	docker buildx create --use --name mybuilder
-	docker buildx build --platform ${DOCKER_PLATFORMS} -t "${registry}teastore-db" ../utilities/tools.descartes.teastore.database/ --push
-	docker buildx build --platform ${DOCKER_PLATFORMS} -t "${registry}teastore-kieker-rabbitmq" ../utilities/tools.descartes.teastore.kieker.rabbitmq/ --push
-	docker buildx build --platform ${DOCKER_PLATFORMS} -t "${registry}teastore-base" ../utilities/tools.descartes.teastore.dockerbase/ --push
-	perl -i -pe's|.*FROM descartesresearch/|FROM '"${registry}"'|g' ../services/tools.descartes.teastore.*/Dockerfile
-	docker buildx build --platform ${DOCKER_PLATFORMS} -t "${registry}teastore-registry" ../services/tools.descartes.teastore.registry/ --push
-	docker buildx build --platform ${DOCKER_PLATFORMS} -t "${registry}teastore-persistence" ../services/tools.descartes.teastore.persistence/ --push
-	docker buildx build --platform ${DOCKER_PLATFORMS} -t "${registry}teastore-image" ../services/tools.descartes.teastore.image/ --push
-	docker buildx build --platform ${DOCKER_PLATFORMS} -t "${registry}teastore-webui" ../services/tools.descartes.teastore.webui/ --push
-	docker buildx build --platform ${DOCKER_PLATFORMS} -t "${registry}teastore-auth" ../services/tools.descartes.teastore.auth/ --push
-	docker buildx build --platform ${DOCKER_PLATFORMS} -t "${registry}teastore-recommender" ../services/tools.descartes.teastore.recommender/ --push
-	perl -i -pe's|.*FROM '"${registry}"'|FROM descartesresearch/|g' ../services/tools.descartes.teastore.*/Dockerfile
+
+  for size in "${DB_SIZES[@]}"
+  do
+    docker buildx build --platform ${DOCKER_PLATFORMS} -t "${registry}teastore-db${tag}-db${size}" --build-arg DB_SIZE=${size} ${DB_PATH} ${push_flag:+--push}
+    docker buildx build --platform ${DOCKER_PLATFORMS} -t "${registry}teastore-image${tag}-db${size}" --build-arg DB_SIZE=${size} ${IMAGE_PATH} -f "${IMAGE_PATH}Dockerfile.prod" ${push_flag:+--push}
+  done
+	docker buildx build --platform ${DOCKER_PLATFORMS} -t "${registry}teastore-persistence${tag}" ${PERSISTENCE_PATH} -f "${PERSISTENCE_PATH}Dockerfile.prod" ${push_flag:+--push}
+	docker buildx build --platform ${DOCKER_PLATFORMS} -t "${registry}teastore-webui${tag}" ${WEBUI_PATH} -f "${WEBUI_PATH}Dockerfile.prod" ${push_flag:+--push}
+	docker buildx build --platform ${DOCKER_PLATFORMS} -t "${registry}teastore-auth${tag}" ${AUTH_PATH} -f "${AUTH_PATH}Dockerfile.prod" ${push_flag:+--push}
+	docker buildx build --platform ${DOCKER_PLATFORMS} -t "${registry}teastore-recommender${tag}" ${RECOMMENDER_PATH} -f "${RECOMMENDER_PATH}Dockerfile.prod" ${push_flag:+--push}
 	docker buildx rm mybuilder
 else
-	registry='descartesresearch/'
-	docker buildx build -t "${registry}teastore-db" ../utilities/tools.descartes.teastore.database/ --load
-	docker buildx build -t "${registry}teastore-kieker-rabbitmq" ../utilities/tools.descartes.teastore.kieker.rabbitmq/ --load
-	docker buildx build -t "${registry}teastore-base" ../utilities/tools.descartes.teastore.dockerbase/ --load
-	docker buildx build -t "${registry}teastore-registry" ../services/tools.descartes.teastore.registry/ --load
-	docker buildx build -t "${registry}teastore-persistence" ../services/tools.descartes.teastore.persistence/ --load
-	docker buildx build -t "${registry}teastore-image" ../services/tools.descartes.teastore.image/ --load
-	docker buildx build -t "${registry}teastore-webui" ../services/tools.descartes.teastore.webui/ --load
-	docker buildx build -t "${registry}teastore-auth" ../services/tools.descartes.teastore.auth/ --load
-	docker buildx build -t "${registry}teastore-recommender" ../services/tools.descartes.teastore.recommender/ --load
+  cd .. && docker compose build --no-cache
 fi
+

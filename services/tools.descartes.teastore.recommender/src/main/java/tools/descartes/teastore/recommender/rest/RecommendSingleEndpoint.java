@@ -24,7 +24,6 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
 
 import org.eclipse.microprofile.metrics.annotation.Timed;
-import org.eclipse.microprofile.metrics.annotation.Counted;
 import tools.descartes.teastore.recommender.algorithm.RecommenderSelector;
 import tools.descartes.teastore.entities.OrderItem;
 import tools.descartes.teastore.entities.Product;
@@ -57,8 +56,7 @@ public class RecommendSingleEndpoint {
 	 *         recommendation failed.
 	 */
 	@POST
-	@Counted(name = "recommendSingle", absolute = true, description = "How many single recommendations have been done.")
-	@Timed(name = "recommendSingleTimer", tags = {"method=post"}, absolute = true, description = "Time and frequency to do a single recommendation.")
+	@Timed(name = "recommendSingle", tags = {"method=post", "url=/recommendsingle"}, absolute = true, description = "Time and frequency to do a single recommendation.")
 	public Response recommend(OrderItem item, @QueryParam("uid") final Long uid) {
 		if (item == null) {
 			throw new NullPointerException("OrderItem must not be null.");
