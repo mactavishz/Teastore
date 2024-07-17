@@ -3,13 +3,12 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - db.yaml
-  # - registry.yaml
   - persistence.yaml
   - auth.yaml
   - image.yaml
   - recommender.yaml
   - webui.yaml
-  # - hpa.yaml
+  - hpa.yaml
 
 configMapGenerator:
   - name: teastore-share-config
