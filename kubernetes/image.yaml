@@ -6,14 +6,16 @@ kind: Service
 metadata:
   name: teastore-image
   labels:
-    app: teastore
-    run: teastore-image
+    app: teastore-image
 spec:
+  type: NodePort
   ports:
-    - port: 8080
+    - name: http
+      port: 8080
+      nodePort: 30084   # expose to the outside
       protocol: TCP
   selector:
-    run: teastore-image
+    app: teastore-image
 
 ---
 
@@ -22,28 +24,36 @@ kind: Deployment
 metadata:
   name: teastore-image
   labels:
-    app: teastore
-    run: teastore-image
+    app: teastore-image
 spec:
   selector:
     matchLabels:
-      app: teastore
-      run: teastore-image
+      app: teastore-image
   template:
     metadata:
       labels:
-        app: teastore
-        run: teastore-image
+        app: teastore-image
     spec:
       containers:
         - name: teastore-image
-          image: descartesresearch/teastore-image
+          image: macsalvation/teastore-image:v0.2.0-dbmid
+          imagePullPolicy: "Always"
+          # image: johnzr/cnae-g8-teastore-image-origin:v1.0
           ports:
             - containerPort: 8080
-          env:
-            - name: HOST_NAME
-              value: "teastore-image"
-            - name: REGISTRY_HOST
-              value: "teastore-registry"
-
+              name: http
+            # - containerPort: 9464
+            #   name: metrics
+          envFrom:
+            - configMapRef:
+                name: teastore-share-config
+            - configMapRef:
+                name: teastore-image-config
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: "1"
+              memory: 1Gi
 ---

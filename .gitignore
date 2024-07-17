@@ -14,7 +14,7 @@ services/tools.descartes.teastore.image/images_static
 images_static
 tools/generated_images
 utilities/tools.descartes.teastore.database/db-dumps/
-benchmark/reports
+benchmark/reports*/
 limbo_checkstyle.out.xml
 interfaces/tools.descartes.teastore.entities/.classpath
 /e2e-tests/node_modules/

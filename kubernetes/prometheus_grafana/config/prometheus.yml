@@ -1,0 +1,33 @@
+global:
+  scrape_interval: 5s
+  external_labels:
+    monitor: 'teastore'
+
+scrape_configs:
+  - job_name: 'Prometheus'
+    static_configs:
+    - targets: ['localhost:9090']
+      labels:
+        instance: prometheus
+
+  - job_name: 'Kube-state-metrics'
+    static_configs:
+    - targets: ['kube-state-metrics.monitoring-tea.svc.cluster.local:8080']
+
+  - job_name: 'TeaStore'
+    static_configs:
+          - targets: ['teastore-persistence.teastore.svc.cluster.local:8080']
+            labels:
+                instance: teastore-persistence
+          - targets: ['teastore-auth.teastore.svc.cluster.local:8080']
+            labels:
+                instance: teastore-auth
+          - targets: ['teastore-recommender.teastore.svc.cluster.local:8080']
+            labels:
+                instance: teastore-recommender
+          - targets: ['teastore-webui.teastore.svc.cluster.local:9464']
+            labels:
+                instance: teastore-webui
+
+
+ 
