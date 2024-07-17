@@ -75,13 +75,6 @@ spec:
                 name: teastore-webui-config
             - configMapRef:
                 name: teastore-share-config
-          # readinessProbe:
-          #   httpGet:
-          #     path: /health
-          #     port: 8080
-          #   periodSeconds: 10
-          #   timeoutSeconds: 5
-          #   failureThreshold: 5
           resources:
             limits:
               cpu: "1"

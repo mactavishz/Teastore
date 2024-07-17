@@ -1,6 +1,7 @@
 BASE_URL=/tools.descartes.teastore.webui/
 SERVICE_HOST=teastore-webui
 SERVICE_PORT=8080
+# please change IMAGE_CDN_HOST to your cluster external IP address
 IMAGE_CDN_HOST=89.58.42.204
 IMAGE_CDN_PORT=30084
 WEBUI_HMR_PORT=3010
