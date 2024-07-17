@@ -41,9 +41,9 @@ while [[ $# -gt 0 ]]; do
 	-p | --protocol)
 		PROTOCOL="$2"
 		if [ $PROTOCOL != "http" ] && [ $PROTOCOL != "https" ]; then
-      echo "Invalid protocol, only http or https is allowed"
-      exit 1
-    fi
+			echo "Invalid protocol, only http or https is allowed"
+			exit 1
+		fi
 		shift
 		shift
 		;;
@@ -89,8 +89,6 @@ for target in "${TEST_TARGETS[@]}"; do
 	fi
 	for file in $test_dir/*.js; do
 		echo $file
-		# remove old benchmark reports
-		rm -rf reports/$target/$WORKLOAD
 		mkdir -p reports/$target/$WORKLOAD
 		echo "Running test $file"
 		k6 run \
@@ -106,9 +104,9 @@ for target in "${TEST_TARGETS[@]}"; do
 			--out csv=reports/$target/$WORKLOAD/$(basename ${file%.*}).csv \
 			"$file"
 		if [ $WORKLOAD != "test" ]; then
-		  # wait for 5 mins to let the system cool down
-		  sleep 300
-    fi
+			# wait for 5 mins to let the system cool down
+			sleep 300
+		fi
 	done
 done
 
