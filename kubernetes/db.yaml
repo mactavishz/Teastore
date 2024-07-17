@@ -44,12 +44,11 @@ spec:
             - containerPort: 3306
               name: http
             # - containerPort: 9464
-          # resources:
-          #   limits:
-          #     cpu: 500m
-          #     memory: 512Mi
-          #   requests:
-          #     cpu: 500m
-          #     memory: 512Mi
+          resources:
+            requests:
+                cpu: 500m
+                memory: 512Mi
+
+            
 
 

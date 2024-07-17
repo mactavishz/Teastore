@@ -82,12 +82,12 @@ spec:
           #   periodSeconds: 10
           #   timeoutSeconds: 5
           #   failureThreshold: 5
-          # resources:
-          #   limits:
-          #     cpu: "1"
-          #     memory: 1Gi
-          #   requests:
-          #     cpu: "1"
-          #     memory: 1Gi
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: "1"
+              memory: 1Gi
 
 ---

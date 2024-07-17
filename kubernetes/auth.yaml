@@ -52,12 +52,12 @@ spec:
                 name: teastore-share-config
             - configMapRef:
                 name: teastore-auth-config
-          # resources:
-          #   limits:
-          #     cpu: 500m
-          #     memory: 512Mi
-          #   requests:
-          #     cpu: 500m
-          #     memory: 512Mi
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 500m
+              memory: 512Mi
 
 ---
