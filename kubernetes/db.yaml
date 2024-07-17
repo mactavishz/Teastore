@@ -5,14 +5,14 @@ kind: Service
 metadata:
   name: teastore-db
   labels:
-    app: teastore
-    run: teastore-db
+    app: teastore-db
 spec:
   ports:
-    - port: 3306
+    - name: mysql
+      port: 3306
       protocol: TCP
   selector:
-    run: teastore-db
+    app: teastore-db
 
 ---
 
@@ -21,25 +21,33 @@ kind: Deployment
 metadata:
   name: teastore-db
   labels:
-    app: teastore
-    run: teastore-db
+    app: teastore-db
 spec:
   selector:
     matchLabels:
-      app: teastore
-      run: teastore-db
+      app: teastore-db
   template:
     metadata:
       labels:
-        app: teastore
-        run: teastore-db
+        app: teastore-db
     spec:
       containers:
         - name: teastore-db
-          image: descartesresearch/teastore-db
+          image: macsalvation/teastore-db:v0.2.0-dbmid
+          imagePullPolicy: "Always"
+          # image: johnzr/cnae-g8-teastore-db-origin:v1.0
           ports:
             - containerPort: 3306
+              name: http
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 500m
+              memory: 512Mi
+
+
             
----
 
 

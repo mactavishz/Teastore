@@ -1,11 +1,60 @@
+kind: Kustomization
+
 resources:
   - namespace.yaml
   - db.yaml
-  - registry.yaml
   - persistence.yaml
   - auth.yaml
   - image.yaml
   - recommender.yaml
   - webui.yaml
+  # enable HPA if you want to test the scaliaibility
+  # - hpa.yaml
+
+configMapGenerator:
+  - name: teastore-share-config
+    literals:
+      - PERSISTENCE_HOST=teastore-persistence
+      - PERSISTENCE_PORT=8080
+      - PERSISTENCE_PORT_SSL=8443
+      - RECOMMENDER_HOST=teastore-recommender
+      - RECOMMENDER_PORT=8080
+      - RECOMMENDER_PORT_SSL=8443
+      - AUTH_HOST=teastore-auth
+      - AUTH_PORT=8080
+      - AUTH_PORT_SSL=8443
+      - IMAGE_HOST=teastore-image
+      - IMAGE_PORT=8080
+      - IMAGE_PORT_SSL=8443
+      - WEBUI_HOST=teastore-webui
+      - WEBUI_PORT=8080
+      - WEBUI_PORT_SSL=8443
+      - DB_HOST=teastore-db
+      - DB_PORT=3306
+  - name: teastore-webui-config
+    env: env/webui-env.txt
+  - name: teastore-recommender-config
+    literals:
+      - SERVICE_HOST=teastore-recommender
+      - SERVICE_PORT=8080
+      - SERVICE_PORT_SSL=8443
+      - RECOMMENDER_RETRAIN_LOOP_TIME=10000
+      - RECOMMENDER_ALGORITHM=SlopeOne
+  - name: teastore-image-config
+    literals:
+      - SERVICE_HOST=teastore-image
+      - SERVICE_PORT=8080
+      - SERVICE_PORT_SSL=8443
+  - name: teastore-auth-config
+    literals:
+      - SERVICE_HOST=teastore-auth
+      - SERVICE_PORT=8080
+      - SERVICE_PORT_SSL=8443
+  - name: teastore-persistence-config
+    literals:
+      - SERVICE_HOST=teastore-persistence
+      - SERVICE_PORT=8080
+      - SERVICE_PORT_SSL=8443
+
 
 namespace: teastore
