@@ -11,10 +11,6 @@ spec:
     - name: mysql
       port: 3306
       protocol: TCP
-    # - name: metrics
-    #   port: 9464
-    #   targetPort: 9464
-    #   protocol: TCP
   selector:
     app: teastore-db
 
@@ -43,11 +39,14 @@ spec:
           ports:
             - containerPort: 3306
               name: http
-            # - containerPort: 9464
           resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
             requests:
-                cpu: 500m
-                memory: 512Mi
+              cpu: 500m
+              memory: 512Mi
+
 
             
 
