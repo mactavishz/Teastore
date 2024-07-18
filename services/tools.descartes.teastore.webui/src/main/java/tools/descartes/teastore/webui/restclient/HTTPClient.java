@@ -196,13 +196,14 @@ public class HTTPClient {
         return count;
     }
 
-    public List<Long> getRecommendations(List<OrderItem> items, long uid) {
+    public List<Long> getRecommendations(List<OrderItem> items, Long uid) {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(recommenderRESTEndpoint).path("recommend").queryParam("uid", uid);
         Response response = null;
         List<Long> entities = new ArrayList<>();
         try {
-            GenericType<List<Long>> listType = new GenericType<List<Long>>() {};
+            GenericType<List<Long>> listType = new GenericType<List<Long>>() {
+            };
             response = target.request(MediaType.APPLICATION_JSON).post(Entity.entity(items, MediaType.APPLICATION_JSON));
             if (response != null) {
                 if (response.getStatus() < 400) {
@@ -407,6 +408,116 @@ public class HTTPClient {
                     .request()
                     .get();
             result = response.readEntity(User.class);
+        } catch (ProcessingException e) {
+            e.printStackTrace();
+        } finally {
+            if (client != null) {
+                client.close();
+            }
+            if (response != null) {
+                response.close();
+            }
+        }
+        return result;
+    }
+
+    public SessionBlob addProductToCart(SessionBlob blob, long productID) {
+        Client client = null;
+        Response response = null;
+        SessionBlob result = null;
+        try {
+            client = ClientBuilder.newClient();
+            response = client.target(authRESTEndpoint)
+                    .path("cart")
+                    .path("add")
+                    .path(String.valueOf(productID))
+                    .request()
+                    .post(Entity.entity(blob, MediaType.APPLICATION_JSON));
+            result = RESTUtil.readThrowAndOrClose(response, SessionBlob.class);
+        } catch (ProcessingException e) {
+            e.printStackTrace();
+        } finally {
+            if (client != null) {
+                client.close();
+            }
+            if (response != null) {
+                response.close();
+            }
+        }
+        return result;
+    }
+
+    public SessionBlob removeProductFromCart(SessionBlob blob, long productID) {
+        Client client = null;
+        Response response = null;
+        SessionBlob result = null;
+        try {
+            client = ClientBuilder.newClient();
+            response = client.target(authRESTEndpoint)
+                    .path("cart")
+                    .path("remove")
+                    .path(String.valueOf(productID))
+                    .request()
+                    .post(Entity.entity(blob, MediaType.APPLICATION_JSON));
+            result = RESTUtil.readThrowAndOrClose(response, SessionBlob.class);
+        } catch (ProcessingException e) {
+            e.printStackTrace();
+        } finally {
+            if (client != null) {
+                client.close();
+            }
+            if (response != null) {
+                response.close();
+            }
+        }
+        return result;
+    }
+
+    public SessionBlob updateQuantity(SessionBlob blob, long productID, int quantity) {
+        Client client = null;
+        Response response = null;
+        SessionBlob result = null;
+        try {
+            client = ClientBuilder.newClient();
+            response = client.target(authRESTEndpoint)
+                    .path("cart")
+                    .path(String.valueOf(productID))
+                    .queryParam("quantity", quantity)
+                    .request()
+                    .put(Entity.entity(blob, MediaType.APPLICATION_JSON));
+            result = RESTUtil.readThrowAndOrClose(response, SessionBlob.class);
+        } catch (ProcessingException e) {
+            e.printStackTrace();
+        } finally {
+            if (client != null) {
+                client.close();
+            }
+            if (response != null) {
+                response.close();
+            }
+        }
+        return result;
+    }
+
+    public SessionBlob placeOrder(SessionBlob blob, String addressName, String address1,
+                                  String address2, String creditCardCompany, String creditCardExpiryDate,
+                                  long totalPriceInCents, String creditCardNumber
+    ) {
+        Client client = null;
+        Response response = null;
+        SessionBlob result = null;
+        try {
+            client = ClientBuilder.newClient();
+            response = client.target(authRESTEndpoint)
+                    .path("useractions")
+                    .path("placeorder")
+                    .queryParam("addressName", addressName).queryParam("address1", address1)
+                    .queryParam("address2", address2).queryParam("creditCardCompany", creditCardCompany)
+                    .queryParam("creditCardNumber", creditCardNumber)
+                    .queryParam("creditCardExpiryDate", creditCardExpiryDate)
+                    .queryParam("totalPriceInCents", totalPriceInCents).request()
+                    .post(Entity.entity(blob, MediaType.APPLICATION_JSON));
+            result = RESTUtil.readThrowAndOrClose(response, SessionBlob.class);
         } catch (ProcessingException e) {
             e.printStackTrace();
         } finally {

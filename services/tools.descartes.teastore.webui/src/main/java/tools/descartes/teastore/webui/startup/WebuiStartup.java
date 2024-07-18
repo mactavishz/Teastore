@@ -49,6 +49,6 @@ public class WebuiStartup implements ServletContextListener {
      * @param event The servlet context event at initialization.
      */
     public void contextInitialized(ServletContextEvent event) {
-		LOG.info(String.format("Auth service initialized on %s\n", serverName));
+		LOG.info(String.format("Webui service initialized on %s\n", serverName));
     }
 }
