@@ -1,7 +1,8 @@
 package tools.descartes.teastore.webui.restclient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
+import jakarta.json.JsonException;
+import jakarta.json.JsonObject;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
@@ -27,6 +28,7 @@ public class HTTPClient {
     private final Logger LOG = LoggerFactory.getLogger(HTTPClient.class);
     private final String persistenceRESTEndpoint = Service.getServiceRESTEndpoint(Service.PERSISTENCE, "PERSISTENCE_HOST", "PERSISTENCE_PORT");
     private final String authRESTEndpoint = Service.getServiceRESTEndpoint(Service.AUTH, "AUTH_HOST", "AUTH_PORT");
+    private final String recommenderRESTEndpoint = Service.getServiceRESTEndpoint(Service.RECOMMENDER, "RECOMMENDER_HOST", "RECOMMENDER_PORT");
 
     public List<Category> getCategories(int startIndex, int limit) {
         Client client = ClientBuilder.newClient();
@@ -133,37 +135,49 @@ public class HTTPClient {
         return entities;
     }
 
-    public List<Order> getOrders(int startIndex, int limit) {
+    public List<Order> getUserOrders(long id, int startIndex, int limit) {
         Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(persistenceRESTEndpoint).path("orders");
+        WebTarget target = client.target(persistenceRESTEndpoint)
+                .path("orders")
+                .path("user")
+                .path(String.valueOf(id));
+        Response response = null;
+        List<Order> entities = new ArrayList<>();
         if (startIndex >= 0) {
             target = target.queryParam("start", startIndex);
         }
         if (limit >= 0) {
             target = target.queryParam("max", limit);
         }
-        GenericType<List<Order>> listType = new GenericType<List<Order>>() {
-        };
-        Response response = target.request(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).get();
-        List<Order> entities = new ArrayList<>();
 
-        if (response != null && response.getStatus() == 200) {
-            try {
-                entities = response.readEntity(listType);
-            } catch (ProcessingException e) {
-                LOG.warn("Response did not conform to expected entity type. List expected.");
+        try {
+            GenericType<List<Order>> listType = new GenericType<List<Order>>() {
+            };
+            response = target.request(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).get();
+
+            if (response != null && response.getStatus() == 200) {
+                try {
+                    entities = response.readEntity(listType);
+                } catch (ProcessingException e) {
+                    LOG.warn("Response did not conform to expected entity type. List expected.");
+                }
+            } else if (response != null) {
+                response.bufferEntity();
             }
-        } else if (response != null) {
-            response.bufferEntity();
-        }
-        if (response != null && response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
-            throw new NotFoundException();
-        } else if (response != null && response.getStatus() == Response.Status.REQUEST_TIMEOUT.getStatusCode()) {
-            throw new TimeoutException();
-        }
-        client.close();
-        if (response != null) {
-            response.close();
+            if (response != null && response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
+                throw new NotFoundException();
+            } else if (response != null && response.getStatus() == Response.Status.REQUEST_TIMEOUT.getStatusCode()) {
+                throw new TimeoutException();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (client != null) {
+                client.close();
+            }
+            if (response != null) {
+                response.close();
+            }
         }
         return entities;
     }
@@ -204,7 +218,7 @@ public class HTTPClient {
         return result;
     }
 
-     public SessionBlob login(SessionBlob blob, String name, String password) {
+    public SessionBlob login(SessionBlob blob, String name, String password) {
         Client client = null;
         Response response = null;
         SessionBlob result = null;
@@ -231,7 +245,7 @@ public class HTTPClient {
         return result;
     }
 
-     public SessionBlob logout(SessionBlob blob) {
+    public SessionBlob logout(SessionBlob blob) {
         Client client = null;
         Response response = null;
         SessionBlob result = null;
@@ -254,5 +268,59 @@ public class HTTPClient {
             }
         }
         return result;
+    }
+
+    public User getUser(long id) {
+        Client client = null;
+        Response response = null;
+        User result = null;
+        try {
+            client = ClientBuilder.newClient();
+            response = client.target(persistenceRESTEndpoint)
+                    .path("users")
+                    .path(String.valueOf(id))
+                    .request()
+                    .get();
+            result = response.readEntity(User.class);
+        } catch (ProcessingException e) {
+            e.printStackTrace();
+        } finally {
+            if (client != null) {
+                client.close();
+            }
+            if (response != null) {
+                response.close();
+            }
+        }
+        return result;
+    }
+
+    public boolean isServiceUp(String serviceBaseURL) {
+        Client client = null;
+        Response response = null;
+        try {
+            client = ClientBuilder.newClient();
+            response = client.target(serviceBaseURL)
+                    .path("health")
+                    .request(MediaType.APPLICATION_JSON)
+                    .get();
+
+            if (response != null && response.getStatus() == Response.Status.OK.getStatusCode()) {
+                JsonObject jsonResponse = response.readEntity(JsonObject.class);
+                String status = jsonResponse.getString("status", "");
+                return "UP".equals(status);
+            }
+        } catch (ProcessingException | JsonException e) {
+            // Log the exception
+            e.printStackTrace();
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+            if (client != null) {
+                client.close();
+            }
+        }
+        return false;
     }
 }
