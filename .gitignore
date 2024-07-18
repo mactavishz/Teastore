@@ -11,6 +11,7 @@ Servers/
 services/tools.descartes.petstore.image/test/
 services/tools.descartes.teastore.image/src/main/resources/db-dumps
 services/tools.descartes.teastore.image/images_static
+services/tools.descartes.teastore.webui/node_modules/
 images_static
 tools/generated_images
 utilities/tools.descartes.teastore.database/db-dumps/
