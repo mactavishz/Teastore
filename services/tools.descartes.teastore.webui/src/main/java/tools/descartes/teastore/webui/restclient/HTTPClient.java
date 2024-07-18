@@ -73,6 +73,74 @@ public class HTTPClient {
         return entities;
     }
 
+    public Category getCategory(long id) {
+        Client client = null;
+        Response response = null;
+        Category result = null;
+        try {
+            client = ClientBuilder.newClient();
+            response = client.target(persistenceRESTEndpoint)
+                    .path("categories")
+                    .path(String.valueOf(id))
+                    .request()
+                    .get();
+            result = response.readEntity(Category.class);
+        } catch (ProcessingException e) {
+            e.printStackTrace();
+        } finally {
+            if (client != null) {
+                client.close();
+            }
+            if (response != null) {
+                response.close();
+            }
+        }
+        return result;
+    }
+
+    public List<Product> getProductsByCategory(long categoryID, int startIndex, int limit) {
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target(persistenceRESTEndpoint).path("products").path("category").path(String.valueOf(categoryID));
+        List<Product> entities = new ArrayList<>();
+        Response response = null;
+        try {
+            if (startIndex >= 0) {
+                target = target.queryParam("start", startIndex);
+            }
+            if (limit >= 0) {
+                target = target.queryParam("max", limit);
+            }
+            GenericType<List<Product>> listType = new GenericType<List<Product>>() {
+            };
+            response = target.request(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).get();
+
+            if (response != null && response.getStatus() == 200) {
+                try {
+                    entities = response.readEntity(listType);
+                } catch (ProcessingException e) {
+                    LOG.warn("Response did not conform to expected entity type. List expected.");
+                }
+            } else if (response != null) {
+                response.bufferEntity();
+            }
+            if (response != null && response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
+                throw new NotFoundException();
+            } else if (response != null && response.getStatus() == Response.Status.REQUEST_TIMEOUT.getStatusCode()) {
+                throw new TimeoutException();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (client != null) {
+                client.close();
+            }
+            if (response != null) {
+                response.close();
+            }
+        }
+        return entities;
+    }
+
     public Product getProduct(Long id) {
         Client client = null;
         Response response = null;
@@ -97,6 +165,63 @@ public class HTTPClient {
             }
         }
         return result;
+    }
+
+    public int getProductsCount(long categoryID) {
+        Client client = null;
+        Response response = null;
+        String text = null;
+        int count = -1;
+        try {
+            client = ClientBuilder.newClient();
+            response = client.target(persistenceRESTEndpoint)
+                    .path("products")
+                    .path("count")
+                    .path(String.valueOf(categoryID))
+                    .request()
+                    .get();
+
+            text = response.readEntity(String.class);
+            count = Integer.parseInt(text);
+        } catch (ProcessingException e) {
+            e.printStackTrace();
+        } finally {
+            if (client != null) {
+                client.close();
+            }
+            if (response != null) {
+                response.close();
+            }
+        }
+        return count;
+    }
+
+    public List<Long> getRecommendations(List<OrderItem> items, long uid) {
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target(recommenderRESTEndpoint).path("recommend").queryParam("uid", uid);
+        Response response = null;
+        List<Long> entities = new ArrayList<>();
+        try {
+            GenericType<List<Long>> listType = new GenericType<List<Long>>() {};
+            response = target.request(MediaType.APPLICATION_JSON).post(Entity.entity(items, MediaType.APPLICATION_JSON));
+            if (response != null) {
+                if (response.getStatus() < 400) {
+                    entities = response.readEntity(listType);
+                } else {
+                    response.bufferEntity();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (client != null) {
+                client.close();
+            }
+            if (response != null) {
+                response.close();
+            }
+        }
+        return entities;
     }
 
 
