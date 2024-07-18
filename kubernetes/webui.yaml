@@ -16,10 +16,10 @@ spec:
       port: 8080
       nodePort: 30080   # expose to the outside
       protocol: TCP
-    - name: metrics
-      port: 9464
-      targetPort: 9464
-      protocol: TCP
+    # - name: metrics
+    #   port: 9464
+    #   targetPort: 9464
+    #   protocol: TCP
   
 
 ---
@@ -66,8 +66,8 @@ spec:
           ports:
             - containerPort: 8080
               name: http
-            - containerPort: 9464
-              name: metrics
+            # - containerPort: 9464
+            #   name: metrics
             # - containerPort: 3010
             #   name: hmr
           envFrom:
