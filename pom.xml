@@ -46,6 +46,7 @@
         <module>services/tools.descartes.teastore.persistence</module>
         <module>services/tools.descartes.teastore.recommender</module>
         <module>services/tools.descartes.teastore.auth</module>
+        <module>services/tools.descartes.teastore.webui</module>
     </modules>
 
     <build>

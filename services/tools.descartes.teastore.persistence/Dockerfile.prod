@@ -1,13 +1,19 @@
 FROM icr.io/appcafe/open-liberty:kernel-slim-java17-openj9-ubi
 
-ENV WARM_ENDPOINT_URL=localhost:${SERVICE_PORT}
-ENV WARM_OPENAPI_ENDPOINT_URL=localhost:${SERVICE_PORT}/openapi
-ENV OPENJ9_SCC=false
+ENV SERVICE_PORT=8080
+ENV WARM_ENDPOINT=false
+ENV WARM_OPENAPI_ENDPOINT=false
 
 COPY --chown=1001:0 /src/main/liberty/config /config
 
 RUN features.sh
 
 COPY --chown=1001:0 target/*.war /config/apps
+
+# Create the jdbc directory
+RUN mkdir -p /config/jdbc
+
+# Copy the MySQL Connector JAR
+COPY --chown=1001:0 mysql-connector-java-5.1.44-bin.jar /config/jdbc/
 
 RUN configure.sh

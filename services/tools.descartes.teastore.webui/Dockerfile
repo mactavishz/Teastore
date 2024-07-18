@@ -1,11 +1,9 @@
-FROM node:22.3.0
-WORKDIR /web
+FROM icr.io/appcafe/open-liberty:kernel-slim-java17-openj9-ubi
 
-COPY . .
-RUN npm install --verbose
+COPY --chown=1001:0 /src/main/liberty/config /config
 
-EXPOSE 8080
-EXPOSE 3010
-EXPOSE 9464
+RUN features.sh
 
-CMD npm run dev
+COPY --chown=1001:0 target/*.war /config/apps
+
+RUN configure.sh

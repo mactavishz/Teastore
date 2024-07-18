@@ -16,10 +16,10 @@ spec:
       port: 8080
       nodePort: 30080   # expose to the outside
       protocol: TCP
-    - name: metrics
-      port: 9464
-      targetPort: 9464
-      protocol: TCP
+    # - name: metrics
+    #   port: 9464
+    #   targetPort: 9464
+    #   protocol: TCP
   
 
 ---
@@ -60,14 +60,14 @@ spec:
     spec:
       containers:
         - name: teastore-webui
-          image: macsalvation/teastore-webui:v0.2.0
+          image: macsalvation/teastore-webui:v0.2.0-open-liberty-webui
           imagePullPolicy: "Always"
           # image: johnzr/cnae-g8-teastore-webui-origin:v1.0
           ports:
             - containerPort: 8080
               name: http
-            - containerPort: 9464
-              name: metrics
+            # - containerPort: 9464
+            #   name: metrics
             # - containerPort: 3010
             #   name: hmr
           envFrom:
