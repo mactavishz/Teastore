@@ -1,0 +1,26 @@
+<server description="TeaStore recommender">
+    <!-- tag::features[] -->
+    <featureManager>
+        <feature>jakartaee-10.0</feature>
+        <feature>microProfile-6.1</feature>
+        <feature>pages-3.1</feature>
+    </featureManager>
+    <!-- end::features[] -->
+
+    <!-- YOU NEED TO CHANGE THIS -->
+    <variable name="context.root" defaultValue="/tools.descartes.teastore.webui"/>
+
+    <applicationManager autoExpand="true"/>
+    <!-- tag::webApplication[] -->
+    <!-- YOU NEED TO CHANGE THIS -->
+    <webApplication location="tools.descartes.teastore.webui.war" contextRoot="${context.root}"/>
+    <!-- end::webApplication[] -->
+    <mpMetrics authentication="false"/>
+
+    <!-- tag::logging[] -->
+    <logging consoleLogLevel="INFO"/>
+    <!-- end::logging[] -->
+
+    <httpEndpoint host="*" httpPort="${service.port}" httpsPort="${service.port.ssl}"
+              id="defaultHttpEndpoint"/>
+</server>
