@@ -7,6 +7,6 @@ COPY mysql.cnf /etc/mysql/conf.d/custom.cnf
 COPY setup.sql /docker-entrypoint-initdb.d/setup_0.sql
 COPY db-dumps/teadb_${DB_SIZE}.sql /docker-entrypoint-initdb.d/setup_1.sql
 
-ENV MYSQL_ROOT_PASSWORD rootpassword
+ENV MYSQL_ROOT_PASSWORD=rootpassword
 
 EXPOSE 3306

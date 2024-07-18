@@ -102,13 +102,10 @@ services:
     container_name: teastore-webui
     build:
       context: services/tools.descartes.teastore.webui
-      dockerfile: Dockerfile
-    volumes:
-      - ./services/tools.descartes.teastore.webui:/web:rw
-      - frontend_node_modules:/web/node_modules
+      dockerfile: Dockerfile.prod
     env_file:
-      - ./env/dev.env
       - services/tools.descartes.teastore.webui/env/dev.env
+      - ./env/dev.env
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
       interval: 10s
@@ -129,14 +126,9 @@ services:
       HOST_NAME: "webui"
     expose:
       - "8080"
-      - "3010" # HMR port
     ports:
       - "8080:8080"
-      - "3010:3010" # HMR port
-      - "9464:9464" # Metrics port
 networks:
   default:
     external: true
     name: teastore-network
-volumes:
-  frontend_node_modules:
