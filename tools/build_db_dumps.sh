@@ -6,7 +6,7 @@ SETUP_SQL="../utilities/tools.descartes.teastore.database/setup.sql"
 JAR_FILE=$(realpath $JAR_FILE)
 SETUP_SQL=$(realpath $SETUP_SQL)
 DB_NAME="teadb"
-MYSQL_VER="8.4.0"
+MYSQL_VER="10.4.12"
 
 mkdir -p ./dumps/mysql
 rm -rf ./dumps/mysql/*
@@ -21,7 +21,7 @@ do
   echo "Removing the database container if it exists..."
   docker rm -f dbgenerator
   echo "Starting the database container..."
-  docker run --name dbgenerator --network dbgenerator-network -p 3306:3306 -e MYSQL_ROOT_PASSWORD="rootpassword" -d mysql:$MYSQL_VER
+  docker run --name dbgenerator --network dbgenerator-network -p 3306:3306 -e MYSQL_ROOT_PASSWORD="rootpassword" -d mariadb:$MYSQL_VER
   echo "Waiting for the database to be ready..."
   until docker exec dbgenerator sh -c 'timeout 1 bash -c "< /dev/tcp/localhost/3306"'; do
     echo "Database connection is not ready ..."

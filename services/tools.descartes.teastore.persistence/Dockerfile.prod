@@ -10,4 +10,9 @@ RUN features.sh
 
 COPY --chown=1001:0 target/*.war /config/apps
 
-RUN configure.sh
+# Create the jdbc directory
+RUN mkdir -p /config/jdbc
+
+# Copy the MySQL Connector JAR
+COPY --chown=1001:0 mysql-connector-java-5.1.44-bin.jar /config/jdbc/
+
