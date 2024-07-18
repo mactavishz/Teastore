@@ -6,6 +6,6 @@ COPY setup.sql /docker-entrypoint-initdb.d/setup_0.sql
 COPY db-dumps/teadb_${DB_SIZE}.sql /docker-entrypoint-initdb.d/setup_1.sql
 RUN sed -i "s/max_connections.*/max_connections = 2048/g" /etc/mysql/my.cnf
 
-ENV MYSQL_ROOT_PASSWORD rootpassword
+ENV MYSQL_ROOT_PASSWORD=rootpassword
 
 EXPOSE 3306
