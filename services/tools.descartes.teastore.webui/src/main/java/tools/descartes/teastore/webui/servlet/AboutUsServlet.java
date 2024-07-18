@@ -47,7 +47,7 @@ public class AboutUsServlet extends AbstractUIServlet {
     checkforCookie(request, response);
     String WebUI = Service.WEBUI.getServiceName();
     request.setAttribute("portraitAndre", String.format("/%s/images/andreBauer.png", WebUI));
-    request.setAttribute("portraitJohannes",String.format("/%s/images/JohannesGrohmann.png", WebUI));
+    request.setAttribute("portraitJohannes",String.format("/%s/images/johannesGrohmann.png", WebUI));
     request.setAttribute("portraitJoakim", String.format("/%s/images/joakimKistowski.png", WebUI));
     request.setAttribute("portraitSimon",String.format("/%s/images/simonEismann.png", WebUI));
     request.setAttribute("portraitNorbert", String.format("/%s/images/norbertSchmitt.png", WebUI));
