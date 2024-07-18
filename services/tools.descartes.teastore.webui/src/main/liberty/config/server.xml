@@ -1,4 +1,4 @@
-<server description="TeaStore recommender">
+<server description="TeaStore webui">
     <!-- tag::features[] -->
     <featureManager>
         <feature>jakartaee-10.0</feature>
