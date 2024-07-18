@@ -8,8 +8,8 @@
 	<welcome-file-list>
 		<welcome-file>index</welcome-file>
 	</welcome-file-list>
-<!--	<error-page>-->
-<!--		<location>/error</location>-->
-<!--	</error-page>-->
+	<error-page>
+		<location>/error</location>
+	</error-page>
 	<absolute-ordering/>
 </web-app>

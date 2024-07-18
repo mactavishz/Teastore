@@ -23,7 +23,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.ws.rs.core.MediaType;
 import tools.descartes.teastore.webui.restclient.HTTPClient;
 import tools.descartes.teastore.utils.Service;
 
@@ -36,11 +35,6 @@ import tools.descartes.teastore.utils.Service;
 public class StatusServlet extends AbstractUIServlet {
   private static final long serialVersionUID = 1L;
   private static final HTTPClient client = new HTTPClient();
-  private final String persistenceBaseURL = Service.getServiceBaseURL("PERSISTENCE_HOST", "PERSISTENCE_PORT");
-  private final String authBaseURL = Service.getServiceBaseURL("AUTH_HOST", "AUTH_PORT");
-  private final String webuiBaseURL = Service.getServiceBaseURL("WEBUI_HOST", "WEBUI_PORT");
-  private final String imageBaseURL = Service.getServiceBaseURL("IMAGE_CDN_HOST", "IMAGE_CDN_PORT");
-  private final String recommenderBaseURL = Service.getServiceBaseURL("RECOMMENDER_HOST", "RECOMMENDER_PORT");
 
   /**
    * @see HttpServlet#HttpServlet()
