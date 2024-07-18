@@ -1,9 +1,0 @@
-{
-  "name": "teastore-webui",
-  "dockerComposeFile": [
-      "../../../docker-compose.yaml"
-  ],
-  "service": "webui", // The service in docker-compose.yml that we want vs code to use as a dev containers 
-  "shutdownAction": "none",
-  "workspaceFolder": "/web/"
-}
