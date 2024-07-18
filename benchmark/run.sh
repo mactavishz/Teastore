@@ -103,10 +103,10 @@ for target in "${TEST_TARGETS[@]}"; do
 			-e WORKLOAD="$WORKLOAD" \
 			--out csv=reports/$target/$WORKLOAD/$(basename ${file%.*}).csv \
 			"$file"
-		# if [ $WORKLOAD != "test" ]; then
-		# 	# wait for 5 mins to let the system cool down
-		# 	sleep 300
-		# fi
+		if [ $WORKLOAD != "test" ]; then
+			# wait for 5 mins to let the system cool down
+			sleep 300
+		fi
 	done
 done
 
