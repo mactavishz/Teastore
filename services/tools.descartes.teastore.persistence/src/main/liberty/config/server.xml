@@ -20,7 +20,13 @@
         <fileset dir="jdbc" includes="*.jar"/>
     </library>
 
-    <jdbcDriver id="MySQLJDBCDriver" libraryRef="global"/>
+    <dataSource id="TeaStoreDS" jndiName="jdbc/TeaStoreDB">
+        <jdbcDriver id="MySQLJDBCDriver" libraryRef="global"/>
+        <properties serverName="${db.host}" portNumber="${db.port}" databaseName="${db.name}"
+                    user="${db.user}" password="${db.password}"/>
+        <!-- Connection Pool Configuration -->
+         <connectionManager maxPoolSize="10" minPoolSize="2" agedTimeout="15m" reapTime="2m" connectionTimeout="5s" maxIdleTime="10m"/>
+    </dataSource>
 
     <!-- tag::webApplication[] -->
     <!-- YOU NEED TO CHANGE THIS -->
