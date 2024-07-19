@@ -2,19 +2,19 @@ services:
   db:
     container_name: teastore-db
     build:
-        context: ./utilities/tools.descartes.teastore.database
-        dockerfile: Dockerfile
-        args:
-          - DB_SIZE=${DB_SIZE:-mid}
+      context: ./utilities/tools.descartes.teastore.database
+      dockerfile: Dockerfile
+      args:
+        - DB_SIZE=${DB_SIZE:-mid}
+    deploy:
+      resources:
+        limits:
+          cpus: 0.5
+          memory: 512M
     expose:
       - "3306"
     ports:
       - "3306:3306"
-    healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
   persistence:
     container_name: teastore-persistence
     build:
@@ -22,12 +22,17 @@ services:
       dockerfile: Dockerfile.prod
     depends_on:
       db:
-        condition: service_healthy
+        condition: service_started
     env_file:
       - ./services/tools.descartes.teastore.persistence/env/dev.env
       - ./env/dev.env
+    deploy:
+      resources:
+        limits:
+          cpus: 1.0
+          memory: 1G
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -42,14 +47,19 @@ services:
       dockerfile: Dockerfile.prod
     depends_on:
       db:
-        condition: service_healthy
+        condition: service_started
       persistence:
         condition: service_healthy
     env_file:
       - ./services/tools.descartes.teastore.auth/env/dev.env
       - ./env/dev.env
+    deploy:
+      resources:
+        limits:
+          cpus: 0.5
+          memory: 512M
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -67,8 +77,13 @@ services:
     env_file:
       - ./services/tools.descartes.teastore.image/env/dev.env
       - ./env/dev.env
+    deploy:
+      resources:
+        limits:
+          cpus: 1.0
+          memory: 1G
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -83,14 +98,19 @@ services:
       dockerfile: Dockerfile.prod
     depends_on:
       db:
-        condition: service_healthy
+        condition: service_started
       persistence:
         condition: service_healthy
     env_file:
       - ./services/tools.descartes.teastore.recommender/env/dev.env
       - ./env/dev.env
+    deploy:
+      resources:
+        limits:
+          cpus: 0.5
+          memory: 512M
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -110,13 +130,18 @@ services:
       - ./env/dev.env
       - services/tools.descartes.teastore.webui/env/dev.env
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 10s
       timeout: 5s
       retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: 1.0
+          memory: 1G
     depends_on:
       db:
-        condition: service_healthy
+        condition: service_started
       persistence:
         condition: service_healthy
       auth:
@@ -138,5 +163,3 @@ networks:
   default:
     external: true
     name: teastore-network
-volumes:
-  frontend_node_modules:
