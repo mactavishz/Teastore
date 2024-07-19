@@ -38,7 +38,7 @@ configMapGenerator:
       - SERVICE_HOST=teastore-recommender
       - SERVICE_PORT=8080
       - SERVICE_PORT_SSL=8443
-      - RECOMMENDER_RETRAIN_LOOP_TIME=10000
+      - RECOMMENDER_RETRAIN_LOOP_TIME=0
       - RECOMMENDER_ALGORITHM=SlopeOne
   - name: teastore-image-config
     literals:
@@ -55,6 +55,7 @@ configMapGenerator:
       - SERVICE_HOST=teastore-persistence
       - SERVICE_PORT=8080
       - SERVICE_PORT_SSL=8443
+      - DB_NAME=teadb
       - DB_USER=teauser
       - DB_PASSWORD=teapassword
 
