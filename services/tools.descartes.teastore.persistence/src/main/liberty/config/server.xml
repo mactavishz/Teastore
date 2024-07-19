@@ -33,5 +33,10 @@
     <!-- end::logging[] -->
 
     <httpEndpoint host="*" httpPort="${service.port}" httpsPort="${service.port.ssl}"
-                  id="defaultHttpEndpoint"/>
+                  id="defaultHttpEndpoint">
+        <compression serverPreferredAlgorithm="gzip">
+          <types>+application/*</types>
+          <types>-text/plain</types>
+        </compression>
+    </httpEndpoint>
 </server>
