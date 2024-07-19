@@ -15,14 +15,17 @@ const WorkloadConfig = {
     { duration: "1m", target: getTarget(0) },
   ],
   scalability: [
+    { duration: "1m", target: getTarget(128) },
+    { duration: "3m", target: getTarget(128) },
     { duration: "1m", target: getTarget(256) },
     { duration: "3m", target: getTarget(256) },
     { duration: "1m", target: getTarget(512) },
     { duration: "3m", target: getTarget(512) },
     { duration: "1m", target: getTarget(1024) },
     { duration: "3m", target: getTarget(1024) },
-    { duration: "1m", target: getTarget(2048) },
-    { duration: "3m", target: getTarget(2048) },
+    { duration: "1m", target: getTarget(512) },
+    { duration: "1m", target: getTarget(256) },
+    { duration: "1m", target: getTarget(128) },
     { duration: "1m", target: getTarget(0) },
   ],
   breakpoint: [
@@ -43,7 +46,7 @@ function getTarget(defaultValue) {
       val = defaultValue;
     }
   } catch (err) {
-    val = defaultValue
+    val = defaultValue;
   }
   return val;
 }
