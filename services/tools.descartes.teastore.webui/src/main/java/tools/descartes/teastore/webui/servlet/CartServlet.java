@@ -39,7 +39,6 @@ import tools.descartes.teastore.webui.restclient.HTTPClient;
 @WebServlet("/cart")
 public class CartServlet extends AbstractUIServlet {
   private static final long serialVersionUID = 1L;
-  private static final HTTPClient client = new HTTPClient();
 
   /**
    * @see HttpServlet#HttpServlet()
@@ -65,21 +64,21 @@ public class CartServlet extends AbstractUIServlet {
 
     HashMap<Long, Product> products = new HashMap<Long, Product>();
     for (Long id : ids) {
-      Product product = client.getProduct(id);
+      Product product = HTTPClient.getProduct(id);
       products.put(product.getId(), product);
     }
 
     request.setAttribute("storeIcon", String.format("/%s/images/icon.png", Service.WEBUI.getServiceName()));
     request.setAttribute("title", "TeaStore Cart");
-    request.setAttribute("CategoryList", client.getCategories(-1, -1));
+    request.setAttribute("CategoryList", HTTPClient.getCategories(-1, -1));
     request.setAttribute("OrderItems", orderItems);
     request.setAttribute("Products", products);
-    request.setAttribute("login", client.isLoggedIn(getSessionBlob(request)));
+    request.setAttribute("login", HTTPClient.isLoggedIn(getSessionBlob(request)));
 
-    List<Long> productIds = client.getRecommendations(blob.getOrderItems(), blob.getUid());
+    List<Long> productIds = HTTPClient.getRecommendations(blob.getOrderItems(), blob.getUid());
     List<Product> ads = new LinkedList<Product>();
     for (Long productId : productIds) {
-      ads.add(client.getProduct(productId));
+      ads.add(HTTPClient.getProduct(productId));
     }
 
     if (ads.size() > 3) {

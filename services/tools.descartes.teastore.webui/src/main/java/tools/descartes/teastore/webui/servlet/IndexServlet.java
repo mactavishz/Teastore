@@ -32,7 +32,6 @@ import tools.descartes.teastore.webui.restclient.HTTPClient;
 public class IndexServlet extends AbstractUIServlet {
 
 	private static final long serialVersionUID = 1L;
-	private static final HTTPClient client = new HTTPClient();
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -48,9 +47,9 @@ public class IndexServlet extends AbstractUIServlet {
 	protected void handleGETRequest(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		checkforCookie(request, response);
-		request.setAttribute("CategoryList", client.getCategories(-1, -1));
+		request.setAttribute("CategoryList", HTTPClient.getCategories(-1, -1));
 		request.setAttribute("title", "TeaStore Home");
-		request.setAttribute("login", client.isLoggedIn(getSessionBlob(request)));
+		request.setAttribute("login", HTTPClient.isLoggedIn(getSessionBlob(request)));
 		request.setAttribute("storeIcon", String.format("/%s/images/icon.png", Service.WEBUI.getServiceName()));
 		request.getRequestDispatcher("WEB-INF/pages/index.jsp").forward(request, response);
 	}

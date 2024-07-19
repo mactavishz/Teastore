@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<%@ page contentType="text/html;charset=UTF-8" session="false" %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%><%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%><%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ page contentType="text/html;charset=UTF-8" session="false" %><%@ taglib prefix="c" uri="jakarta.tags.core"%><%@ taglib uri="jakarta.tags.functions" prefix="fn"%><%@ taglib uri="jakarta.tags.fmt" prefix="fmt"%>
 <html lang="en">
 <head>
 <meta charset="utf-8">

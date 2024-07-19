@@ -25,13 +25,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HTTPClient {
-    private final Logger LOG = LoggerFactory.getLogger(HTTPClient.class);
-    private final String persistenceRESTEndpoint = Service.getServiceRESTEndpoint(Service.PERSISTENCE, "PERSISTENCE_HOST", "PERSISTENCE_PORT");
-    private final String authRESTEndpoint = Service.getServiceRESTEndpoint(Service.AUTH, "AUTH_HOST", "AUTH_PORT");
-    private final String recommenderRESTEndpoint = Service.getServiceRESTEndpoint(Service.RECOMMENDER, "RECOMMENDER_HOST", "RECOMMENDER_PORT");
+    public static final Logger LOG = LoggerFactory.getLogger(HTTPClient.class);
+    public static final String persistenceRESTEndpoint = Service.getServiceRESTEndpoint(Service.PERSISTENCE, "PERSISTENCE_HOST", "PERSISTENCE_PORT");
+    public static final String authRESTEndpoint = Service.getServiceRESTEndpoint(Service.AUTH, "AUTH_HOST", "AUTH_PORT");
+    public static final String recommenderRESTEndpoint = Service.getServiceRESTEndpoint(Service.RECOMMENDER, "RECOMMENDER_HOST", "RECOMMENDER_PORT");
+    private static Client client = ClientBuilder.newClient();
 
-    public List<Category> getCategories(int startIndex, int limit) {
-        Client client = ClientBuilder.newClient();
+    public static void closeClient() {
+        if (client != null) {
+            client.close();
+        }
+    }
+
+    public static List<Category> getCategories(int startIndex, int limit) {
         WebTarget target = client.target(persistenceRESTEndpoint).path("categories");
         List<Category> entities = new ArrayList<>();
         Response response = null;
@@ -63,9 +69,6 @@ public class HTTPClient {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (client != null) {
-                client.close();
-            }
             if (response != null) {
                 response.close();
             }
@@ -73,12 +76,10 @@ public class HTTPClient {
         return entities;
     }
 
-    public Category getCategory(long id) {
-        Client client = null;
+    public static Category getCategory(long id) {
         Response response = null;
         Category result = null;
         try {
-            client = ClientBuilder.newClient();
             response = client.target(persistenceRESTEndpoint)
                     .path("categories")
                     .path(String.valueOf(id))
@@ -88,9 +89,6 @@ public class HTTPClient {
         } catch (ProcessingException e) {
             e.printStackTrace();
         } finally {
-            if (client != null) {
-                client.close();
-            }
             if (response != null) {
                 response.close();
             }
@@ -98,8 +96,7 @@ public class HTTPClient {
         return result;
     }
 
-    public List<Product> getProductsByCategory(long categoryID, int startIndex, int limit) {
-        Client client = ClientBuilder.newClient();
+    public static List<Product> getProductsByCategory(long categoryID, int startIndex, int limit) {
         WebTarget target = client.target(persistenceRESTEndpoint).path("products").path("category").path(String.valueOf(categoryID));
         List<Product> entities = new ArrayList<>();
         Response response = null;
@@ -131,9 +128,6 @@ public class HTTPClient {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (client != null) {
-                client.close();
-            }
             if (response != null) {
                 response.close();
             }
@@ -141,12 +135,10 @@ public class HTTPClient {
         return entities;
     }
 
-    public Product getProduct(Long id) {
-        Client client = null;
+    public static Product getProduct(Long id) {
         Response response = null;
         Product result = null;
         try {
-            client = ClientBuilder.newClient();
             response = client.target(persistenceRESTEndpoint)
                     .path("products")
                     .path(String.valueOf(id))
@@ -157,9 +149,6 @@ public class HTTPClient {
         } catch (ProcessingException e) {
             e.printStackTrace();
         } finally {
-            if (client != null) {
-                client.close();
-            }
             if (response != null) {
                 response.close();
             }
@@ -167,13 +156,11 @@ public class HTTPClient {
         return result;
     }
 
-    public int getProductsCount(long categoryID) {
-        Client client = null;
+    public static int getProductsCount(long categoryID) {
         Response response = null;
         String text = null;
         int count = -1;
         try {
-            client = ClientBuilder.newClient();
             response = client.target(persistenceRESTEndpoint)
                     .path("products")
                     .path("count")
@@ -186,9 +173,6 @@ public class HTTPClient {
         } catch (ProcessingException e) {
             e.printStackTrace();
         } finally {
-            if (client != null) {
-                client.close();
-            }
             if (response != null) {
                 response.close();
             }
@@ -196,8 +180,7 @@ public class HTTPClient {
         return count;
     }
 
-    public List<Long> getRecommendations(List<OrderItem> items, Long uid) {
-        Client client = ClientBuilder.newClient();
+    public static List<Long> getRecommendations(List<OrderItem> items, Long uid) {
         WebTarget target = client.target(recommenderRESTEndpoint).path("recommend").queryParam("uid", uid);
         Response response = null;
         List<Long> entities = new ArrayList<>();
@@ -215,9 +198,6 @@ public class HTTPClient {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (client != null) {
-                client.close();
-            }
             if (response != null) {
                 response.close();
             }
@@ -225,44 +205,7 @@ public class HTTPClient {
         return entities;
     }
 
-
-    public List<OrderItem> getOrderItems(int startIndex, int limit) {
-        Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(persistenceRESTEndpoint).path("orderitems");
-        if (startIndex >= 0) {
-            target = target.queryParam("start", startIndex);
-        }
-        if (limit >= 0) {
-            target = target.queryParam("max", limit);
-        }
-        GenericType<List<OrderItem>> listType = new GenericType<List<OrderItem>>() {
-        };
-        Response response = target.request(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).get();
-        List<OrderItem> entities = new ArrayList<>();
-
-        if (response != null && response.getStatus() == 200) {
-            try {
-                entities = response.readEntity(listType);
-            } catch (ProcessingException e) {
-                LOG.warn("Response did not conform to expected entity type. List expected.");
-            }
-        } else if (response != null) {
-            response.bufferEntity();
-        }
-        if (response != null && response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
-            throw new NotFoundException();
-        } else if (response != null && response.getStatus() == Response.Status.REQUEST_TIMEOUT.getStatusCode()) {
-            throw new TimeoutException();
-        }
-        client.close();
-        if (response != null) {
-            response.close();
-        }
-        return entities;
-    }
-
-    public List<Order> getUserOrders(long id, int startIndex, int limit) {
-        Client client = ClientBuilder.newClient();
+    public static List<Order> getUserOrders(long id, int startIndex, int limit) {
         WebTarget target = client.target(persistenceRESTEndpoint)
                 .path("orders")
                 .path("user")
@@ -298,9 +241,6 @@ public class HTTPClient {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (client != null) {
-                client.close();
-            }
             if (response != null) {
                 response.close();
             }
@@ -308,13 +248,11 @@ public class HTTPClient {
         return entities;
     }
 
-    public boolean isLoggedIn(SessionBlob blob) {
-        Client client = null;
+    public static boolean isLoggedIn(SessionBlob blob) {
         Response response = null;
         boolean result = false;
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            client = ClientBuilder.newClient();
             response = client.target(authRESTEndpoint)
                     .path("useractions")
                     .path("isloggedin")
@@ -334,9 +272,6 @@ public class HTTPClient {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         } finally {
-            if (client != null) {
-                client.close();
-            }
             if (response != null) {
                 response.close();
             }
@@ -344,12 +279,10 @@ public class HTTPClient {
         return result;
     }
 
-    public SessionBlob login(SessionBlob blob, String name, String password) {
-        Client client = null;
+    public static SessionBlob login(SessionBlob blob, String name, String password) {
         Response response = null;
         SessionBlob result = null;
         try {
-            client = ClientBuilder.newClient();
             response = client.target(authRESTEndpoint)
                     .path("useractions")
                     .path("login")
@@ -361,9 +294,6 @@ public class HTTPClient {
         } catch (ProcessingException e) {
             e.printStackTrace();
         } finally {
-            if (client != null) {
-                client.close();
-            }
             if (response != null) {
                 response.close();
             }
@@ -371,24 +301,29 @@ public class HTTPClient {
         return result;
     }
 
-    public SessionBlob logout(SessionBlob blob) {
-        Client client = null;
+    public static SessionBlob logout(SessionBlob blob) {
         Response response = null;
         SessionBlob result = null;
+        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            client = ClientBuilder.newClient();
             response = client.target(authRESTEndpoint)
                     .path("useractions")
                     .path("isloggedin")
                     .request()
                     .post(Entity.entity(blob, MediaType.APPLICATION_JSON));
-            result = RESTUtil.readThrowAndOrClose(response, SessionBlob.class);
+             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+                String responseBody = response.readEntity(String.class);
+                if (responseBody == null || responseBody.isEmpty()) {
+                    return null;
+                }
+                SessionBlob responseBlob = objectMapper.readValue(responseBody, SessionBlob.class);
+                result = responseBlob;
+            }
         } catch (ProcessingException e) {
             e.printStackTrace();
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         } finally {
-            if (client != null) {
-                client.close();
-            }
             if (response != null) {
                 response.close();
             }
@@ -396,12 +331,10 @@ public class HTTPClient {
         return result;
     }
 
-    public User getUser(long id) {
-        Client client = null;
+    public static User getUser(long id) {
         Response response = null;
         User result = null;
         try {
-            client = ClientBuilder.newClient();
             response = client.target(persistenceRESTEndpoint)
                     .path("users")
                     .path(String.valueOf(id))
@@ -411,9 +344,6 @@ public class HTTPClient {
         } catch (ProcessingException e) {
             e.printStackTrace();
         } finally {
-            if (client != null) {
-                client.close();
-            }
             if (response != null) {
                 response.close();
             }
@@ -421,12 +351,10 @@ public class HTTPClient {
         return result;
     }
 
-    public SessionBlob addProductToCart(SessionBlob blob, long productID) {
-        Client client = null;
+    public static SessionBlob addProductToCart(SessionBlob blob, long productID) {
         Response response = null;
         SessionBlob result = null;
         try {
-            client = ClientBuilder.newClient();
             response = client.target(authRESTEndpoint)
                     .path("cart")
                     .path("add")
@@ -437,9 +365,6 @@ public class HTTPClient {
         } catch (ProcessingException e) {
             e.printStackTrace();
         } finally {
-            if (client != null) {
-                client.close();
-            }
             if (response != null) {
                 response.close();
             }
@@ -447,12 +372,10 @@ public class HTTPClient {
         return result;
     }
 
-    public SessionBlob removeProductFromCart(SessionBlob blob, long productID) {
-        Client client = null;
+    public static SessionBlob removeProductFromCart(SessionBlob blob, long productID) {
         Response response = null;
         SessionBlob result = null;
         try {
-            client = ClientBuilder.newClient();
             response = client.target(authRESTEndpoint)
                     .path("cart")
                     .path("remove")
@@ -463,9 +386,6 @@ public class HTTPClient {
         } catch (ProcessingException e) {
             e.printStackTrace();
         } finally {
-            if (client != null) {
-                client.close();
-            }
             if (response != null) {
                 response.close();
             }
@@ -473,12 +393,10 @@ public class HTTPClient {
         return result;
     }
 
-    public SessionBlob updateQuantity(SessionBlob blob, long productID, int quantity) {
-        Client client = null;
+    public static SessionBlob updateQuantity(SessionBlob blob, long productID, int quantity) {
         Response response = null;
         SessionBlob result = null;
         try {
-            client = ClientBuilder.newClient();
             response = client.target(authRESTEndpoint)
                     .path("cart")
                     .path(String.valueOf(productID))
@@ -489,9 +407,6 @@ public class HTTPClient {
         } catch (ProcessingException e) {
             e.printStackTrace();
         } finally {
-            if (client != null) {
-                client.close();
-            }
             if (response != null) {
                 response.close();
             }
@@ -499,15 +414,13 @@ public class HTTPClient {
         return result;
     }
 
-    public SessionBlob placeOrder(SessionBlob blob, String addressName, String address1,
+    public static SessionBlob placeOrder(SessionBlob blob, String addressName, String address1,
                                   String address2, String creditCardCompany, String creditCardExpiryDate,
                                   long totalPriceInCents, String creditCardNumber
     ) {
-        Client client = null;
         Response response = null;
         SessionBlob result = null;
         try {
-            client = ClientBuilder.newClient();
             response = client.target(authRESTEndpoint)
                     .path("useractions")
                     .path("placeorder")
@@ -521,9 +434,6 @@ public class HTTPClient {
         } catch (ProcessingException e) {
             e.printStackTrace();
         } finally {
-            if (client != null) {
-                client.close();
-            }
             if (response != null) {
                 response.close();
             }
@@ -531,11 +441,9 @@ public class HTTPClient {
         return result;
     }
 
-    public boolean isServiceUp(String serviceBaseURL) {
-        Client client = null;
+    public static boolean isServiceUp(String serviceBaseURL) {
         Response response = null;
         try {
-            client = ClientBuilder.newClient();
             response = client.target(serviceBaseURL)
                     .path("health")
                     .request(MediaType.APPLICATION_JSON)
@@ -552,9 +460,6 @@ public class HTTPClient {
         } finally {
             if (response != null) {
                 response.close();
-            }
-            if (client != null) {
-                client.close();
             }
         }
         return false;

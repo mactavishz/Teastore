@@ -31,7 +31,6 @@ import tools.descartes.teastore.utils.Service;
 @WebServlet("/error")
 public class ErrorServlet extends AbstractUIServlet {
 	private static final long serialVersionUID = 1L;
-	private static final HTTPClient client = new HTTPClient();
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -52,11 +51,11 @@ public class ErrorServlet extends AbstractUIServlet {
 		if (statusCode == null) {
 			redirect("/", response);
 		} else {
-			request.setAttribute("CategoryList", client.getCategories(-1, -1));
+			request.setAttribute("CategoryList", HTTPClient.getCategories(-1, -1));
 			request.setAttribute("storeIcon", String.format("/%s/images/icon.png", Service.WEBUI.getServiceName()));
 			request.setAttribute("errorImage", String.format("/%s/images/error.png", Service.WEBUI.getServiceName()));
 			request.setAttribute("title", "TeaStore Error ");
-			request.setAttribute("login", client.isLoggedIn(getSessionBlob(request)));
+			request.setAttribute("login", HTTPClient.isLoggedIn(getSessionBlob(request)));
 			request.getRequestDispatcher("WEB-INF/pages/error.jsp").forward(request, response);
 
 		}

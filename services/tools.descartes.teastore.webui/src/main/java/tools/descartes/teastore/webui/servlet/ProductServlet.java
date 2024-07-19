@@ -27,7 +27,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import tools.descartes.teastore.webui.servlet.elhelper.ELHelperUtils;
 import tools.descartes.teastore.entities.OrderItem;
 import tools.descartes.teastore.entities.Product;
-import tools.descartes.teastore.entities.message.SessionBlob;
 import tools.descartes.teastore.utils.Service;
 import tools.descartes.teastore.webui.restclient.HTTPClient;
 
@@ -39,7 +38,6 @@ import tools.descartes.teastore.webui.restclient.HTTPClient;
 @WebServlet("/product")
 public class ProductServlet extends AbstractUIServlet {
   private static final long serialVersionUID = 1L;
-  private static final HTTPClient client = new HTTPClient();
 
   /**
    * @see HttpServlet#HttpServlet()
@@ -57,11 +55,10 @@ public class ProductServlet extends AbstractUIServlet {
     checkforCookie(request, response);
     if (request.getParameter("id") != null) {
       Long id = Long.valueOf(request.getParameter("id"));
-      request.setAttribute("CategoryList", client.getCategories(-1, -1));
+      request.setAttribute("CategoryList", HTTPClient.getCategories(-1, -1));
       request.setAttribute("title", "TeaStore Product");
-      SessionBlob blob = getSessionBlob(request);
-      request.setAttribute("login", client.isLoggedIn(getSessionBlob(request)));
-      Product p = client.getProduct(id);
+      request.setAttribute("login", HTTPClient.isLoggedIn(getSessionBlob(request)));
+      Product p = HTTPClient.getProduct(id);
       request.setAttribute("product", p);
 
       List<OrderItem> items = new LinkedList<>();
@@ -70,10 +67,10 @@ public class ProductServlet extends AbstractUIServlet {
       oi.setQuantity(1);
       items.add(oi);
       items.addAll(getSessionBlob(request).getOrderItems());
-      List<Long> productIds = client.getRecommendations(items, getSessionBlob(request).getUid());
+      List<Long> productIds = HTTPClient.getRecommendations(items, getSessionBlob(request).getUid());
       List<Product> ads = new LinkedList<Product>();
       for (Long productId : productIds) {
-        ads.add(client.getProduct(productId));
+        ads.add(HTTPClient.getProduct(productId));
       }
 
       if (ads.size() > 3) {

@@ -18,17 +18,22 @@ import tools.descartes.teastore.utils.TimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PersistenceClient {
-    private final Logger LOG = LoggerFactory.getLogger(PersistenceClient.class);
-    private final String persistenceRESTEndpoint = Service.getServiceRESTEndpoint(Service.PERSISTENCE, "PERSISTENCE_HOST", "PERSISTENCE_PORT");
-    private final String recommenderRESTEndpoint = Service.getSelfServiceRESTEndpoint(Service.RECOMMENDER);
+public class HTTPClient {
+    private final static Logger LOG = LoggerFactory.getLogger(HTTPClient.class);
+    private final static String persistenceRESTEndpoint = Service.getServiceRESTEndpoint(Service.PERSISTENCE, "PERSISTENCE_HOST", "PERSISTENCE_PORT");
+    private final static String recommenderRESTEndpoint = Service.getSelfServiceRESTEndpoint(Service.RECOMMENDER);
+    private final static Client client = ClientBuilder.newClient();
 
-    public boolean isPersistenceAvailable() {
-        Client client = null;
+    public static void closeClient() {
+        if (client != null) {
+            client.close();
+        }
+    }
+
+    public static boolean isPersistenceAvailable() {
         Response response = null;
         boolean result = false;
         try {
-            client = ClientBuilder.newClient();
             response = client.target(persistenceRESTEndpoint)
                     .path("generatedb")
                     .path("finished")
@@ -42,15 +47,11 @@ public class PersistenceClient {
             if (response != null) {
                 response.close();
             }
-            if (client != null) {
-                client.close();
-            }
         }
         return result;
     }
 
-    public List<OrderItem> getOrderItems(int startIndex, int limit) {
-        Client client = ClientBuilder.newClient();
+    public static List<OrderItem> getOrderItems(int startIndex, int limit) {
         WebTarget target = client.target(persistenceRESTEndpoint).path("orderitems");
         if (startIndex >= 0) {
             target = target.queryParam("start", startIndex);
@@ -77,15 +78,13 @@ public class PersistenceClient {
         } else if (response != null && response.getStatus() == Response.Status.REQUEST_TIMEOUT.getStatusCode()) {
             throw new TimeoutException();
         }
-        client.close();
         if (response != null) {
             response.close();
         }
         return entities;
     }
 
-    public List<Order> getOrders(int startIndex, int limit) {
-        Client client = ClientBuilder.newClient();
+    public static List<Order> getOrders(int startIndex, int limit) {
         WebTarget target = client.target(persistenceRESTEndpoint).path("orders");
         if (startIndex >= 0) {
             target = target.queryParam("start", startIndex);
@@ -112,15 +111,13 @@ public class PersistenceClient {
         } else if (response != null && response.getStatus() == Response.Status.REQUEST_TIMEOUT.getStatusCode()) {
             throw new TimeoutException();
         }
-        client.close();
         if (response != null) {
             response.close();
         }
         return entities;
     }
 
-    public List<Long> getTrainTimestamps() {
-        Client client = ClientBuilder.newClient();
+    public static List<Long> getTrainTimestamps() {
         WebTarget target = client.target(recommenderRESTEndpoint).path("train/timestamp");
         Response response = target.request(MediaType.TEXT_PLAIN).accept(MediaType.TEXT_PLAIN).get();
         List<Long> list = new ArrayList<>();
@@ -139,7 +136,6 @@ public class PersistenceClient {
         } else if (response != null && response.getStatus() == Response.Status.REQUEST_TIMEOUT.getStatusCode()) {
             throw new TimeoutException();
         }
-        client.close();
         if (response != null) {
             response.close();
         }

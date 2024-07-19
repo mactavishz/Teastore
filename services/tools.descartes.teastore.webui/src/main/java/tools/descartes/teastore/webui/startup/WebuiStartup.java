@@ -19,6 +19,7 @@ import jakarta.servlet.annotation.WebListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.descartes.teastore.utils.Service;
+import tools.descartes.teastore.webui.restclient.HTTPClient;
 
 /**
  * Application Lifecycle Listener implementation class Registry Client Startup.
@@ -42,6 +43,7 @@ public class WebuiStartup implements ServletContextListener {
      */
     public void contextDestroyed(ServletContextEvent event)  {
 		LOG.info(String.format("Webui service on %s destroyed\n", serverName));
+		HTTPClient.closeClient();
     }
 
 	/**

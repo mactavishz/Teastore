@@ -34,7 +34,6 @@ import tools.descartes.teastore.utils.Service;
 @WebServlet("/status")
 public class StatusServlet extends AbstractUIServlet {
   private static final long serialVersionUID = 1L;
-  private static final HTTPClient client = new HTTPClient();
 
   /**
    * @see HttpServlet#HttpServlet()
@@ -65,7 +64,7 @@ public class StatusServlet extends AbstractUIServlet {
     try {
       String baseURL = Service.getServiceBaseURL(host, port);
       String serverName  = Service.getServerName(host, port);
-      boolean isHealthy = client.isServiceUp(baseURL);
+      boolean isHealthy = HTTPClient.isServiceUp(baseURL);
       if (isHealthy) {
         servers.add(serverName);
       }

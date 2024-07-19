@@ -37,7 +37,6 @@ import tools.descartes.teastore.webui.restclient.HTTPClient;
 @WebServlet("/category")
 public class CategoryServlet extends AbstractUIServlet {
   private static final long serialVersionUID = 1L;
-  private static final HTTPClient client = new HTTPClient();
   private static final int INITIAL_PRODUCT_DISPLAY_COUNT = 20;
   private static final List<Integer> PRODUCT_DISPLAY_COUNT_OPTIONS = Arrays.asList(5, 10, 20, 30,
       50);
@@ -59,8 +58,8 @@ public class CategoryServlet extends AbstractUIServlet {
       checkforCookie(request, response);
 
       long categoryID = Long.parseLong(request.getParameter("category"));
-      Category category = client.getCategory(categoryID);
-      int products = client.getProductsCount(categoryID);
+      Category category = HTTPClient.getCategory(categoryID);
+      int products = HTTPClient.getProductsCount(categoryID);
       int numberProducts = INITIAL_PRODUCT_DISPLAY_COUNT;
       if (request.getAttribute("numberProducts") != null) {
         numberProducts = Integer.parseInt(request.getAttribute("numberProducts").toString());
@@ -77,11 +76,11 @@ public class CategoryServlet extends AbstractUIServlet {
 
       ArrayList<String> navigation = createNavigation(products, page, numberProducts);
 
-      List<Product> productlist = client.getProductsByCategory(categoryID, (page - 1) * numberProducts, numberProducts);
+      List<Product> productlist = HTTPClient.getProductsByCategory(categoryID, (page - 1) * numberProducts, numberProducts);
       request.setAttribute("productImages", getProductPreviewImagesMap(productlist));
-      request.setAttribute("CategoryList", client.getCategories(-1, -1));
+      request.setAttribute("CategoryList", HTTPClient.getCategories(-1, -1));
       request.setAttribute("title", "TeaStore Categorie " + category.getName());
-      request.setAttribute("login", client.isLoggedIn(getSessionBlob(request)));
+      request.setAttribute("login", HTTPClient.isLoggedIn(getSessionBlob(request)));
       request.setAttribute("storeIcon", String.format("/%s/images/icon.png", Service.WEBUI.getServiceName()));
       request.setAttribute("Productslist", productlist);
       request.setAttribute("category", category.getName());

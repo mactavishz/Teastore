@@ -29,7 +29,6 @@ import tools.descartes.teastore.webui.restclient.HTTPClient;
  */
 @WebServlet("/loginAction")
 public class LoginActionServlet extends AbstractUIServlet {
-	private static final HTTPClient client = new HTTPClient();
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -58,7 +57,7 @@ public class LoginActionServlet extends AbstractUIServlet {
 			throws ServletException, IOException {
 		boolean login = false;
 		if (request.getParameter("username") != null && request.getParameter("password") != null) {
-			SessionBlob blob = client.login(getSessionBlob(request),
+			SessionBlob blob = HTTPClient.login(getSessionBlob(request),
 					request.getParameter("username"), request.getParameter("password"));
 			login = (blob != null && blob.getSid() != null);
 
@@ -76,7 +75,7 @@ public class LoginActionServlet extends AbstractUIServlet {
 			}
 
 		} else if (request.getParameter("logout") != null) {
-			SessionBlob blob = client.logout(getSessionBlob(request));
+			SessionBlob blob = HTTPClient.logout(getSessionBlob(request));
 			saveSessionBlob(blob, response);
 			destroySessionBlob(blob, response);
 			redirect("/", response, MESSAGECOOKIE, SUCESSLOGOUT);

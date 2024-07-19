@@ -30,7 +30,6 @@ import tools.descartes.teastore.webui.restclient.HTTPClient;
 @WebServlet("/about")
 public class AboutUsServlet extends AbstractUIServlet {
   private static final long serialVersionUID = 1L;
-  private static final HTTPClient client = new HTTPClient();
   /**
    * @see HttpServlet#HttpServlet()
    */
@@ -55,7 +54,7 @@ public class AboutUsServlet extends AbstractUIServlet {
     request.setAttribute("descartesLogo", String.format("/%s/images/descartesLogo.png", WebUI));
     request.setAttribute("storeIcon", String.format("/%s/images/icon.png", WebUI));
     request.setAttribute("title", "TeaStore About Us");
-    request.setAttribute("login", client.isLoggedIn(getSessionBlob(request)));
+    request.setAttribute("login", HTTPClient.isLoggedIn(getSessionBlob(request)));
     request.getRequestDispatcher("WEB-INF/pages/about.jsp").forward(request, response);
   }
 

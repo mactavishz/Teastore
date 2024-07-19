@@ -37,7 +37,6 @@ import tools.descartes.teastore.webui.restclient.HTTPClient;
 @WebServlet("/cartAction")
 public class CartActionServlet extends AbstractUIServlet {
     private static final long serialVersionUID = 1L;
-    private static final HTTPClient client = new HTTPClient();
     private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("MM/yyyy");
 
     /**
@@ -57,13 +56,13 @@ public class CartActionServlet extends AbstractUIServlet {
             String param = (String) paramo;
             if (param.contains("addToCart")) {
                 long productID = Long.parseLong(request.getParameter("productid"));
-                SessionBlob blob = client.addProductToCart(getSessionBlob(request), productID);
+                SessionBlob blob = HTTPClient.addProductToCart(getSessionBlob(request), productID);
                 saveSessionBlob(blob, response);
                 redirect("/cart", response, MESSAGECOOKIE, String.format(ADDPRODUCT, productID));
                 break;
             } else if (param.contains("removeProduct")) {
                 long productID = Long.parseLong(param.substring("removeProduct_".length()));
-                SessionBlob blob = client.removeProductFromCart(getSessionBlob(request),
+                SessionBlob blob = HTTPClient.removeProductFromCart(getSessionBlob(request),
                         productID);
                 saveSessionBlob(blob, response);
                 redirect("/cart", response, MESSAGECOOKIE, String.format(REMOVEPRODUCT, productID));
@@ -74,7 +73,7 @@ public class CartActionServlet extends AbstractUIServlet {
                 redirect("/cart", response, MESSAGECOOKIE, CARTUPDATED);
                 break;
             } else if (param.contains("proceedtoCheckout")) {
-                if (client.isLoggedIn(getSessionBlob(request))) {
+                if (HTTPClient.isLoggedIn(getSessionBlob(request))) {
                     List<OrderItem> orderItems = getSessionBlob(request).getOrderItems();
                     updateOrder(request, orderItems, response);
                     redirect("/order", response);
@@ -110,7 +109,7 @@ public class CartActionServlet extends AbstractUIServlet {
             for (OrderItem item : blob.getOrderItems()) {
                 price += item.getQuantity() * item.getUnitPriceInCents();
             }
-            blob = client.placeOrder(getSessionBlob(request), infos[0] + " " + infos[1], infos[2],
+            blob = HTTPClient.placeOrder(getSessionBlob(request), infos[0] + " " + infos[1], infos[2],
                     infos[3], infos[4],
                     YearMonth.parse(infos[6], DTF).atDay(1).format(DateTimeFormatter.ISO_LOCAL_DATE), price, infos[5]);
             saveSessionBlob(blob, response);
@@ -152,7 +151,7 @@ public class CartActionServlet extends AbstractUIServlet {
         SessionBlob blob = getSessionBlob(request);
         for (OrderItem orderItem : orderItems) {
             if (request.getParameter("orderitem_" + orderItem.getProductId()) != null) {
-                blob = client.updateQuantity(blob, orderItem.getProductId(),
+                blob = HTTPClient.updateQuantity(blob, orderItem.getProductId(),
                         Integer.parseInt(request.getParameter("orderitem_" + orderItem.getProductId())));
             }
         }

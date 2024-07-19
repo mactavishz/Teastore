@@ -24,17 +24,14 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import jakarta.ws.rs.core.Response;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import tools.descartes.teastore.utils.NotFoundException;
-import tools.descartes.teastore.recommender.restclient.PersistenceClient;
+import tools.descartes.teastore.recommender.restclient.HTTPClient;
 import tools.descartes.teastore.recommender.algorithm.RecommenderSelector;
 import tools.descartes.teastore.entities.Order;
 import tools.descartes.teastore.entities.OrderItem;
-import tools.descartes.teastore.utils.RegistryClient;
 
 /**
  * This class organizes the communication with the other services and
@@ -60,8 +57,6 @@ public final class TrainingSynchronizer {
 	private static TrainingSynchronizer instance;
 
 	private boolean isReady = false;
-
-	private PersistenceClient persistenceClient = new PersistenceClient();
 
 	/**
 	 * @return the isReady
@@ -134,7 +129,7 @@ public final class TrainingSynchronizer {
 		while (true) {
 			boolean result;
 			try {
-				result = persistenceClient.isPersistenceAvailable();
+				result = HTTPClient.isPersistenceAvailable();
 				if (result) {
 					break;
 				}
@@ -174,7 +169,7 @@ public final class TrainingSynchronizer {
 		List<Order> orders = null;
 		// retrieve
 		try {
-			items = persistenceClient.getOrderItems(-1, -1);
+			items = HTTPClient.getOrderItems(-1, -1);
 			long noItems = items.size();
 			LOG.info("Retrieved " + noItems + " orderItems, starting retrieving of orders now.");
 		} catch (NotFoundException e) {
@@ -184,7 +179,7 @@ public final class TrainingSynchronizer {
 			return -1;
 		}
 		try {
-			orders = persistenceClient.getOrders(-1, -1);
+			orders = HTTPClient.getOrders(-1, -1);
 			long noOrders = orders.size();
 			LOG.info("Retrieved " + noOrders + " orders, starting training now.");
 		} catch (NotFoundException e) {
@@ -204,7 +199,7 @@ public final class TrainingSynchronizer {
 
 	private void filterLists(List<OrderItem> orderItems, List<Order> orders) {
 		// since we are not registered ourselves, we can multicast to all services
-		List<Long> maxTimestamps = persistenceClient.getTrainTimestamps();
+		List<Long> maxTimestamps = HTTPClient.getTrainTimestamps();
 		for (Long ts : maxTimestamps) {
 			if (ts == null) {
 				LOG.warn("One service response was null and is therefore not available for time-check.");
