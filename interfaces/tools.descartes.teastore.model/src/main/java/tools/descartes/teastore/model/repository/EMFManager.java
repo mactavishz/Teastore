@@ -88,36 +88,8 @@ final class EMFManager {
 
 	private static HashMap<String, String> createPersistencePropertiesFromJavaEnv() {
 		HashMap<String, String> persistenceProperties = new HashMap<String, String>();
-		String dbhost = null;
-		String dbport = null;
-		String url = MYSQL_URL_PREFIX;
-		dbhost = System.getenv("DB_HOST");
-
-		if (dbhost == null || dbhost.isEmpty()) {
-			LOG.info("Database host not set. Falling back to default host at " + MYSQL_DEFAULT_HOST + ".");
-			dbhost = MYSQL_DEFAULT_HOST;
-		}
-		dbport = System.getenv("DB_PORT");
-		if (dbport == null) {
-			LOG.info("Database port not set. Falling back to default port at " + MYSQL_DEFAULT_PORT + ".");
-			dbport = MYSQL_DEFAULT_PORT;
-		}
-		String dbuser = System.getenv("DB_USER");
-		if (dbuser != null) {
-			LOG.info("Database user set to \"" + dbuser + "\".");
-			persistenceProperties.put("jakarta.persistence.jdbc.user", dbuser);
-		}
-		String dbpassword = System.getenv("DB_PASSWORD");
-		if (dbpassword != null) {
-			LOG.info("Database password set from DB_PASSWORD environment variable.");
-			persistenceProperties.put("jakarta.persistence.jdbc.password", dbpassword);
-		}
-		url += dbhost;
-		url += ":";
-		url += dbport;
-		url += MYSQL_URL_POSTFIX;
-		LOG.info("Setting jdbc url to \"" + url + "\".");
-		persistenceProperties.put("jakarta.persistence.jdbc.url", url);
+		// Use the JNDI name of the data source we configured in server.xml
+		persistenceProperties.put("jakarta.persistence.nonJtaDataSource", "jdbc/TeaStoreDB");
 		return persistenceProperties;
 	}
 
