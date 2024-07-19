@@ -23,7 +23,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
 
-import tools.descartes.teastore.auth.restclient.PersistenceClient;
+import tools.descartes.teastore.auth.restclient.HTTPClient;
 import tools.descartes.teastore.auth.security.ShaSecurityProvider;
 import tools.descartes.teastore.entities.OrderItem;
 import tools.descartes.teastore.entities.Product;
@@ -42,7 +42,6 @@ import org.eclipse.microprofile.metrics.annotation.Timed;
 @Produces({ "application/json" })
 @Consumes({ "application/json" })
 public class AuthCartRest {
-  private final PersistenceClient persistenceClient = new PersistenceClient();
 
   /**
    * Adds product to cart. If the product is already in the cart the quantity is
@@ -66,7 +65,7 @@ public class AuthCartRest {
 
     Product product;
     try {
-      product = persistenceClient.getProduct(pid);
+      product = HTTPClient.getProduct(pid);
     } catch (TimeoutException e) {
       return Response.status(408).build();
     } catch (NotFoundException e) {

@@ -24,6 +24,7 @@ import tools.descartes.teastore.recommender.servlet.TrainingSynchronizer;
 import tools.descartes.teastore.utils.EnvVarNotFoundException;
 import tools.descartes.teastore.utils.RegistryClient;
 import tools.descartes.teastore.utils.Service;
+import tools.descartes.teastore.recommender.restclient.HTTPClient;
 
 /**
  * Startup Handler for the Recommender Service.
@@ -57,6 +58,7 @@ public class RecommenderStartup implements ServletContextListener {
     public void contextDestroyed(ServletContextEvent event) {
         LOG.info(String.format("Recommender service on %s destroyed\n", serverName));
         client.destroy();
+        HTTPClient.closeClient();
         if (retrainDaemon != null) {
             retrainDaemon.stop();
         }

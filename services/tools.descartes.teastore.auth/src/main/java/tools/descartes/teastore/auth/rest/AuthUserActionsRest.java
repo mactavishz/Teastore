@@ -24,7 +24,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
 
-import tools.descartes.teastore.auth.restclient.PersistenceClient;
+import tools.descartes.teastore.auth.restclient.HTTPClient;
 import tools.descartes.teastore.auth.security.BCryptProvider;
 import tools.descartes.teastore.auth.security.RandomSessionIdGenerator;
 import tools.descartes.teastore.auth.security.ShaSecurityProvider;
@@ -47,7 +47,6 @@ import org.eclipse.microprofile.metrics.annotation.Timed;
 @Produces({"application/json"})
 @Consumes({"application/json"})
 public class AuthUserActionsRest {
-    private final PersistenceClient persistenceClient = new PersistenceClient();
     private final Logger LOG = LoggerFactory.getLogger(AuthUserActionsRest.class);
 
     /**
@@ -104,14 +103,14 @@ public class AuthUserActionsRest {
 
         long orderId;
         try {
-            orderId = persistenceClient.createOrder(blob.getOrder());
+            orderId = HTTPClient.createOrder(blob.getOrder());
         } catch (NotFoundException e) {
             return Response.status(404).build();
         }
         for (OrderItem item : blob.getOrderItems()) {
             try {
                 item.setOrderId(orderId);
-                persistenceClient.createOrderItem(item);
+                HTTPClient.createOrderItem(item);
                 ;
             } catch (TimeoutException e) {
                 return Response.status(408).build();
@@ -149,7 +148,7 @@ public class AuthUserActionsRest {
                           @QueryParam("password") String password) {
         User user;
         try {
-            user = persistenceClient.getUser("name", name);
+            user = HTTPClient.getUser("name", name);
         } catch (TimeoutException e) {
             return Response.status(408).build();
         } catch (NotFoundException e) {

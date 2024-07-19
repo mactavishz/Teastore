@@ -16,16 +16,21 @@ import tools.descartes.teastore.utils.NotFoundException;
 import tools.descartes.teastore.utils.Service;
 import tools.descartes.teastore.utils.TimeoutException;
 
-public class PersistenceClient {
-    private final Logger LOG = LoggerFactory.getLogger(PersistenceClient.class);
-    private final String persistenceRESTEndpoint = Service.getServiceRESTEndpoint(Service.PERSISTENCE, "PERSISTENCE_HOST", "PERSISTENCE_PORT");
+public class HTTPClient {
+    private final static Logger LOG = LoggerFactory.getLogger(HTTPClient.class);
+    private final static String persistenceRESTEndpoint = Service.getServiceRESTEndpoint(Service.PERSISTENCE, "PERSISTENCE_HOST", "PERSISTENCE_PORT");
+    private final static Client client = ClientBuilder.newClient();
 
-    public Product getProduct(Long id){
-        Client client = null;
+    public static void closeClient() {
+        if (client != null) {
+            client.close();
+        }
+    }
+
+    public static Product getProduct(Long id){
         Response response = null;
         Product result = null;
         try {
-            client = ClientBuilder.newClient();
             response = client.target(persistenceRESTEndpoint)
                     .path("products")
                     .path(String.valueOf(id))
@@ -36,9 +41,6 @@ public class PersistenceClient {
         } catch (ProcessingException e) {
             e.printStackTrace();
         } finally {
-            if (client != null) {
-                client.close();
-            }
             if (response != null) {
                 response.close();
             }
@@ -46,12 +48,10 @@ public class PersistenceClient {
         return result;
     }
 
-    public long createOrder(Order order){
-        Client client = null;
+    public static long createOrder(Order order){
         Response response = null;
         long id = -1L;
         try {
-            client = ClientBuilder.newClient();
             response = client.target(persistenceRESTEndpoint)
                     .path("orders")
                     .request()
@@ -78,9 +78,6 @@ public class PersistenceClient {
             e.printStackTrace();
             id = -1;
         } finally {
-            if (client != null) {
-                client.close();
-            }
             if (response != null) {
                 response.close();
             }
@@ -88,13 +85,10 @@ public class PersistenceClient {
         return id;
     }
 
-
-    public long createOrderItem(OrderItem orderItem){
-        Client client = null;
+    public static long createOrderItem(OrderItem orderItem){
         Response response = null;
         long id = -1L;
         try {
-            client =ClientBuilder.newClient();
             response = client.target(persistenceRESTEndpoint)
                     .path("orderitems")
                     .request()
@@ -120,9 +114,6 @@ public class PersistenceClient {
             e.printStackTrace();
             id = -1;
         } finally {
-            if (client != null) {
-                client.close();
-            }
             if (response != null) {
                 response.close();
             }
@@ -130,13 +121,10 @@ public class PersistenceClient {
         return id;
     }
 
-
-    public User getUser(String propertyName, String propertyValue){
-        Client client = null;
+    public static User getUser(String propertyName, String propertyValue){
         User user = null;
         Response response = null;
         try {
-            client = ClientBuilder.newClient();
             response = client.target(persistenceRESTEndpoint)
                     .path("users")
                     .path(propertyName)
@@ -162,9 +150,6 @@ public class PersistenceClient {
         } finally {
             if (response != null) {
                 response.close();
-            }
-            if (client != null) {
-                client.close();
             }
         }
         return user;
