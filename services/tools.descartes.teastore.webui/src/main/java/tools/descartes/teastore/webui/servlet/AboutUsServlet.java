@@ -52,9 +52,9 @@ public class AboutUsServlet extends AbstractUIServlet {
     request.setAttribute("portraitNorbert", String.format("/%s/images/norbertSchmitt.png", WebUI));
     request.setAttribute("portraitKounev", String.format("/%s/images/samuelKounev.png", WebUI));
     request.setAttribute("descartesLogo", String.format("/%s/images/descartesLogo.png", WebUI));
-    request.setAttribute("storeIcon", String.format("/%s/images/icon.png", WebUI));
+    request.setAttribute("storeIcon", ICON_URL);
     request.setAttribute("title", "TeaStore About Us");
-    request.setAttribute("login", HTTPClient.isLoggedIn(getSessionBlob(request)));
+    request.setAttribute("login", isUserLoggedInLocal(request));
     request.getRequestDispatcher("pages/about.jsp").forward(request, response);
   }
 

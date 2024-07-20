@@ -19,8 +19,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import tools.descartes.teastore.utils.Service;
-import tools.descartes.teastore.webui.restclient.HTTPClient;
 
 /**
  * Servlet implementation for the web view of "Login".
@@ -45,10 +43,10 @@ public class LoginServlet extends AbstractUIServlet {
 	protected void handleGETRequest(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		checkforCookie(request, response);
-		request.setAttribute("CategoryList", HTTPClient.getCategories(-1, -1));
+		request.setAttribute("CategoryList", getCategories());
 		request.setAttribute("title", "TeaStore Login");
-		request.setAttribute("login", HTTPClient.isLoggedIn(getSessionBlob(request)));
-		request.setAttribute("storeIcon", String.format("/%s/images/icon.png", Service.WEBUI.getServiceName()));
+		request.setAttribute("login", isUserLoggedInLocal(request));
+		request.setAttribute("storeIcon", ICON_URL);
 		request.setAttribute("referer", request.getHeader("Referer"));
 
 		request.getRequestDispatcher("pages/login.jsp").forward(request, response);

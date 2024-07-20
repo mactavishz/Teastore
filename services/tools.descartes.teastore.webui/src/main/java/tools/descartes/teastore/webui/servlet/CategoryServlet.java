@@ -78,10 +78,10 @@ public class CategoryServlet extends AbstractUIServlet {
 
       List<Product> productlist = HTTPClient.getProductsByCategory(categoryID, (page - 1) * numberProducts, numberProducts);
       request.setAttribute("productImages", getProductPreviewImagesMap(productlist));
-      request.setAttribute("CategoryList", HTTPClient.getCategories(-1, -1));
+      request.setAttribute("CategoryList", getCategories());
       request.setAttribute("title", "TeaStore Categorie " + category.getName());
-      request.setAttribute("login", HTTPClient.isLoggedIn(getSessionBlob(request)));
-      request.setAttribute("storeIcon", String.format("/%s/images/icon.png", Service.WEBUI.getServiceName()));
+      request.setAttribute("login", isUserLoggedInLocal(request));
+      request.setAttribute("storeIcon", ICON_URL);
       request.setAttribute("Productslist", productlist);
       request.setAttribute("category", category.getName());
       request.setAttribute("categoryID", categoryID);

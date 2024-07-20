@@ -49,7 +49,7 @@ public class StatusServlet extends AbstractUIServlet {
   protected void handleGETRequest(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException{
     checkforCookie(request, response);
-    request.setAttribute("storeIcon", String.format("/%s/images/icon.png", Service.WEBUI.getServiceName()));
+    request.setAttribute("storeIcon", ICON_URL);
     request.setAttribute("title", "TeaStore Status");
     request.setAttribute("webuiservers", getServer("WEBUI_HOST", "WEBUI_PORT"));
     request.setAttribute("authenticationservers", getServer("AUTH_HOST", "AUTH_PORT"));

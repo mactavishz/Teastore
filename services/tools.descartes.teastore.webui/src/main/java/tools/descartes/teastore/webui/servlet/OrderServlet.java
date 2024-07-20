@@ -45,7 +45,7 @@ public class OrderServlet extends AbstractUIServlet {
 	protected void handleGETRequest(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		checkforCookie(request, response);
-		if (getSessionBlob(request).getOrderItems().size() == 0) {
+		if (getSessionBlob(request).getOrderItems().isEmpty()) {
 			redirect("/", response);
 		} else {
 			doPost(request, response);
@@ -58,8 +58,8 @@ public class OrderServlet extends AbstractUIServlet {
 	@Override
 	protected void handlePOSTRequest(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		request.setAttribute("CategoryList", HTTPClient.getCategories(-1, -1));
-		request.setAttribute("storeIcon", String.format("/%s/images/icon.png", Service.WEBUI.getServiceName()));
+		request.setAttribute("CategoryList", getCategories());
+		request.setAttribute("storeIcon", ICON_URL);
 		request.setAttribute("title", "TeaStore Order");
 		request.setAttribute("login", HTTPClient.isLoggedIn(getSessionBlob(request)));
 		request.getRequestDispatcher("pages/order.jsp").forward(request, response);

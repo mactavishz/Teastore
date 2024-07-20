@@ -32,6 +32,9 @@
         </compression>
     </httpEndpoint>
 
-    <webContainer deferServletLoad="false" />
+    <httpOptions maxKeepAliveRequests="-1" />
+    <webContainer deferServletLoad="false" skipMetaInfResourcesProcessing="true" />
+    <applicationMonitor dropinsEnabled="false" updateTrigger="disabled"/>
+    <config updateTrigger="disabled"/>
     <jspEngine javaSourceLevel="17" prepareJSPs="0" keepGenerated="true" />
 </server>

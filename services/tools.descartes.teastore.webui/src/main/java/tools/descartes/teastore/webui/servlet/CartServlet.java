@@ -17,7 +17,6 @@ package tools.descartes.teastore.webui.servlet;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 import jakarta.servlet.ServletException;
@@ -68,35 +67,20 @@ public class CartServlet extends AbstractUIServlet {
       products.put(product.getId(), product);
     }
 
-    request.setAttribute("storeIcon", String.format("/%s/images/icon.png", Service.WEBUI.getServiceName()));
+    request.setAttribute("storeIcon", ICON_URL);
     request.setAttribute("title", "TeaStore Cart");
-    request.setAttribute("CategoryList", HTTPClient.getCategories(-1, -1));
+    request.setAttribute("CategoryList", getCategories());
     request.setAttribute("OrderItems", orderItems);
     request.setAttribute("Products", products);
     request.setAttribute("login", HTTPClient.isLoggedIn(getSessionBlob(request)));
-
-    List<Long> productIds = HTTPClient.getRecommendations(blob.getOrderItems(), blob.getUid());
-    List<Product> ads = new LinkedList<Product>();
-    for (Long productId : productIds) {
-      ads.add(HTTPClient.getProduct(productId));
-    }
-
-    if (ads.size() > 3) {
-      ads.subList(3, ads.size()).clear();
-    }
-    request.setAttribute("Advertisment", ads);
-    request.setAttribute("productImages", getProductPreviewImagesMap(ads));
+    request.setAttribute("productPreviewImageBaseURL", getProductPreviewImageBaseURL());
     request.getRequestDispatcher("pages/cart.jsp").forward(request, response);
-
   }
 
-  private HashMap<Long, String> getProductPreviewImagesMap(List<Product> products) {
-    HashMap<Long, String> productImages = new HashMap<>();
+
+  private String getProductPreviewImageBaseURL() {
     String imageBaseURL = Service.getServiceBaseURL("IMAGE_CDN_HOST", "IMAGE_CDN_PORT");
     String imageContext = Service.IMAGE.getServiceName();
-    for (Product product : products) {
-      productImages.put(product.getId(), String.format("%s/%s/preview/%s.png", imageBaseURL, imageContext, product.getId()));
-    }
-    return productImages;
+    return String.format("%s/%s/preview/", imageBaseURL, imageContext);
   }
 }

@@ -20,6 +20,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import tools.descartes.teastore.entities.message.SessionBlob;
 import tools.descartes.teastore.utils.Service;
 import tools.descartes.teastore.webui.restclient.HTTPClient;
 
@@ -47,10 +48,10 @@ public class IndexServlet extends AbstractUIServlet {
 	protected void handleGETRequest(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		checkforCookie(request, response);
-		request.setAttribute("CategoryList", HTTPClient.getCategories(-1, -1));
+		request.setAttribute("CategoryList", getCategories());
 		request.setAttribute("title", "TeaStore Home");
-		request.setAttribute("login", HTTPClient.isLoggedIn(getSessionBlob(request)));
-		request.setAttribute("storeIcon", String.format("/%s/images/icon.png", Service.WEBUI.getServiceName()));
+		request.setAttribute("login", isUserLoggedInLocal(request));
+		request.setAttribute("storeIcon", ICON_URL);
 		request.getRequestDispatcher("pages/index.jsp").forward(request, response);
 	}
 

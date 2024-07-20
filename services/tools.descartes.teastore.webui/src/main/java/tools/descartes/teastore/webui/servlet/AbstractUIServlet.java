@@ -20,6 +20,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -34,6 +35,7 @@ import tools.descartes.teastore.utils.Service;
 import tools.descartes.teastore.utils.NotFoundException;
 import tools.descartes.teastore.entities.Category;
 import tools.descartes.teastore.entities.message.SessionBlob;
+import tools.descartes.teastore.webui.restclient.HTTPClient;
 
 /**
  * Abstract servlet for the webUI.
@@ -42,6 +44,9 @@ import tools.descartes.teastore.entities.message.SessionBlob;
  * @author Simon Eismann
  */
 public abstract class AbstractUIServlet extends HttpServlet {
+	protected static final String ICON_URL =  String.format("/%s/images/icon.png", Service.WEBUI.getServiceName());
+	protected static final String ERROR_IMAGE_URL = String.format("/%s/images/icon.png", Service.WEBUI.getServiceName());
+	protected static List<Category> categories = new ArrayList<>();
 
 	private static final long serialVersionUID = 1L;
 	/**
@@ -88,6 +93,18 @@ public abstract class AbstractUIServlet extends HttpServlet {
 	 * Text for removed product.
 	 */
 	protected static final String REMOVEPRODUCT = "Product %s is removed from cart!";
+
+	protected boolean isUserLoggedInLocal(HttpServletRequest request) {
+		SessionBlob blob = getSessionBlob(request);
+		return blob.getToken() != null && !blob.getToken().isEmpty() && blob.getUid() != null && blob.getUid() > 0;
+	}
+
+	protected List<Category> getCategories() {
+		if (categories.isEmpty()) {
+			categories = HTTPClient.getCategories(-1, -1);
+		}
+		return categories;
+	}
 
 	/**
 	 * Try to read the SessionBlob from the cookie. If no SessioBlob exist, a new
@@ -292,7 +309,7 @@ public abstract class AbstractUIServlet extends HttpServlet {
 		request.setAttribute("messageparagraph", "WebUI got a timeout waiting for service \"" + service.getServiceName()
 				+ "\" to respond. Note the that service may itself have been waiting for another service.");
 		request.setAttribute("login", false);
-		request.getRequestDispatcher("WEB-INF/pages/error.jsp").forward(request, response);
+		request.getRequestDispatcher("pages/error.jsp").forward(request, response);
 	}
 
 	private void serveExceptionResponse(HttpServletRequest request, HttpServletResponse response, Exception e)
@@ -308,7 +325,7 @@ public abstract class AbstractUIServlet extends HttpServlet {
 		request.setAttribute("messagetitle", "500: Internal Exception: " + e.getMessage());
 		request.setAttribute("messageparagraph", exceptionAsString);
 		request.setAttribute("login", false);
-		request.getRequestDispatcher("WEB-INF/pages/error.jsp").forward(request, response);
+		request.getRequestDispatcher("pages/error.jsp").forward(request, response);
 	}
 
 	private void serveNotFoundException(HttpServletRequest request, HttpServletResponse response, Exception e)
@@ -324,6 +341,6 @@ public abstract class AbstractUIServlet extends HttpServlet {
 		request.setAttribute("messagetitle", "404: Not Found Exception: " + e.getMessage());
 		request.setAttribute("messageparagraph", exceptionAsString);
 		request.setAttribute("login", false);
-		request.getRequestDispatcher("WEB-INF/pages/error.jsp").forward(request, response);
+		request.getRequestDispatcher("pages/error.jsp").forward(request, response);
 	}
 }

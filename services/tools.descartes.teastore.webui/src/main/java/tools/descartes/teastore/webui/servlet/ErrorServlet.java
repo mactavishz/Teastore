@@ -21,7 +21,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import tools.descartes.teastore.webui.restclient.HTTPClient;
-import tools.descartes.teastore.utils.Service;
 
 /**
  * Servlet implementation for the web view of "Error page".
@@ -51,11 +50,11 @@ public class ErrorServlet extends AbstractUIServlet {
 		if (statusCode == null) {
 			redirect("/", response);
 		} else {
-			request.setAttribute("CategoryList", HTTPClient.getCategories(-1, -1));
-			request.setAttribute("storeIcon", String.format("/%s/images/icon.png", Service.WEBUI.getServiceName()));
-			request.setAttribute("errorImage", String.format("/%s/images/error.png", Service.WEBUI.getServiceName()));
+			request.setAttribute("CategoryList", getCategories());
+			request.setAttribute("storeIcon", ICON_URL);
+			request.setAttribute("errorImage", ERROR_IMAGE_URL);
 			request.setAttribute("title", "TeaStore Error ");
-			request.setAttribute("login", HTTPClient.isLoggedIn(getSessionBlob(request)));
+			request.setAttribute("login", isUserLoggedInLocal(request));
 			request.getRequestDispatcher("pages/error.jsp").forward(request, response);
 
 		}

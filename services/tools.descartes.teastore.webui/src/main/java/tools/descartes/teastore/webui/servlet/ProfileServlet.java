@@ -21,6 +21,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import tools.descartes.teastore.entities.message.SessionBlob;
 import tools.descartes.teastore.webui.servlet.elhelper.ELHelperUtils;
 import tools.descartes.teastore.utils.Service;
 import tools.descartes.teastore.webui.restclient.HTTPClient;
@@ -48,17 +49,19 @@ public class ProfileServlet extends AbstractUIServlet {
   protected void handleGETRequest(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
     checkforCookie(request, response);
-    if (!HTTPClient.isLoggedIn(getSessionBlob(request))) {
+    boolean isLoggedIn = HTTPClient.isLoggedIn(getSessionBlob(request));
+    if (!isLoggedIn) {
       redirect("/", response);
     } else {
 
-      request.setAttribute("storeIcon", String.format("/%s/images/icon.png", Service.WEBUI.getServiceName()));
-      request.setAttribute("CategoryList", HTTPClient.getCategories(-1, -1));
+      SessionBlob blob = getSessionBlob(request);
+      request.setAttribute("storeIcon", ICON_URL);
+      request.setAttribute("CategoryList", getCategories());
       request.setAttribute("title", "TeaStore Home");
-      request.setAttribute("User", HTTPClient.getUser(getSessionBlob(request).getUid()));
-      request.setAttribute("Orders", HTTPClient.getUserOrders(getSessionBlob(request).getUid(), -1, -1));
+      request.setAttribute("User", HTTPClient.getUser(blob.getUid()));
+      request.setAttribute("Orders", HTTPClient.getUserOrders(blob.getUid(), -1, -1));
       request.setAttribute("helper", ELHelperUtils.UTILS);
-      request.setAttribute("login", HTTPClient.isLoggedIn(getSessionBlob(request)));
+      request.setAttribute("login", true);
       request.getRequestDispatcher("pages/profile.jsp").forward(request, response);
     }
   }
