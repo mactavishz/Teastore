@@ -86,7 +86,7 @@ public class CartServlet extends AbstractUIServlet {
     }
     request.setAttribute("Advertisment", ads);
     request.setAttribute("productImages", getProductPreviewImagesMap(ads));
-    request.getRequestDispatcher("WEB-INF/pages/cart.jsp").forward(request, response);
+    request.getRequestDispatcher("pages/cart.jsp").forward(request, response);
 
   }
 

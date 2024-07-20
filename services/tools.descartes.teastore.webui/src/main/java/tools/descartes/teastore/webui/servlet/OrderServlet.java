@@ -62,7 +62,7 @@ public class OrderServlet extends AbstractUIServlet {
 		request.setAttribute("storeIcon", String.format("/%s/images/icon.png", Service.WEBUI.getServiceName()));
 		request.setAttribute("title", "TeaStore Order");
 		request.setAttribute("login", HTTPClient.isLoggedIn(getSessionBlob(request)));
-		request.getRequestDispatcher("WEB-INF/pages/order.jsp").forward(request, response);
+		request.getRequestDispatcher("pages/order.jsp").forward(request, response);
 	}
 
 }

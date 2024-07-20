@@ -33,5 +33,5 @@
     </httpEndpoint>
 
     <webContainer deferServletLoad="false" />
-    <jspEngine javaSourceLevel="17" prepareJSPs="0" />
+    <jspEngine javaSourceLevel="17" prepareJSPs="0" keepGenerated="true" />
 </server>

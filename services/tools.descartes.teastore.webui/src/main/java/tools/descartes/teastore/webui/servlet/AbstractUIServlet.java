@@ -127,6 +127,7 @@ public abstract class AbstractUIServlet extends HttpServlet {
 		ObjectMapper o = new ObjectMapper();
 		try {
 			Cookie cookie = new Cookie(BLOB, URLEncoder.encode(o.writeValueAsString(blob), "UTF-8"));
+			cookie.setHttpOnly(true);
 			response.addCookie(cookie);
 		} catch (JsonProcessingException | UnsupportedEncodingException e) {
 			throw new IllegalStateException("Could not save blob!");

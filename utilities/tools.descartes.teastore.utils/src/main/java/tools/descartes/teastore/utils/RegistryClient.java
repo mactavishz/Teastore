@@ -19,6 +19,7 @@ import jakarta.enterprise.concurrent.ManagedScheduledExecutorService;
 public class RegistryClient {
     private final Logger LOG = LoggerFactory.getLogger(RegistryClient.class);
     private ManagedScheduledExecutorService availabilityScheduler;
+    private final static Client client = ClientBuilder.newClient();
 
     public RegistryClient() {
         try {
@@ -34,6 +35,9 @@ public class RegistryClient {
         if (availabilityScheduler != null) {
             availabilityScheduler.shutdown();
         }
+        if (client != null) {
+            client.close();
+        }
     }
 
     public void runAfterServiceIsAvailable(String serviceBaseURL, Runnable callback) {
@@ -47,10 +51,8 @@ public class RegistryClient {
     }
 
     public boolean isServiceUp(String serviceBaseURL) {
-        Client client = null;
         Response response = null;
         try {
-            client = ClientBuilder.newClient();
             response = client.target(serviceBaseURL)
                     .path("health")
                     .request(MediaType.APPLICATION_JSON)
@@ -67,9 +69,6 @@ public class RegistryClient {
         } finally {
             if (response != null) {
                 response.close();
-            }
-            if (client != null) {
-                client.close();
             }
         }
         return false;

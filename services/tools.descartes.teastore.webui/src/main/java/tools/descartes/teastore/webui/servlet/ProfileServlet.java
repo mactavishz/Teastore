@@ -59,7 +59,7 @@ public class ProfileServlet extends AbstractUIServlet {
       request.setAttribute("Orders", HTTPClient.getUserOrders(getSessionBlob(request).getUid(), -1, -1));
       request.setAttribute("helper", ELHelperUtils.UTILS);
       request.setAttribute("login", HTTPClient.isLoggedIn(getSessionBlob(request)));
-      request.getRequestDispatcher("WEB-INF/pages/profile.jsp").forward(request, response);
+      request.getRequestDispatcher("pages/profile.jsp").forward(request, response);
     }
   }
 

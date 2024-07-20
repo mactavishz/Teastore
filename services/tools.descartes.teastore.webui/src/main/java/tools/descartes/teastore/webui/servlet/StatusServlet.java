@@ -56,7 +56,7 @@ public class StatusServlet extends AbstractUIServlet {
     request.setAttribute("persistenceservers", getServer("PERSISTENCE_HOST", "PERSISTENCE_PORT"));
     request.setAttribute("imageservers", getServer("IMAGE_HOST", "IMAGE_PORT"));
     request.setAttribute("recommenderservers", getServer("RECOMMENDER_HOST", "RECOMMENDER_PORT"));
-    request.getRequestDispatcher("WEB-INF/pages/status.jsp").forward(request, response);
+    request.getRequestDispatcher("pages/status.jsp").forward(request, response);
   }
 
   private List<String> getServer(String host, String port) {

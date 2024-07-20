@@ -89,7 +89,7 @@ public class CategoryServlet extends AbstractUIServlet {
       request.setAttribute("pagination", navigation);
       request.setAttribute("pagenumber", page);
       request.setAttribute("productdisplaycountoptions", PRODUCT_DISPLAY_COUNT_OPTIONS);
-      request.getRequestDispatcher("WEB-INF/pages/category.jsp").forward(request, response);
+      request.getRequestDispatcher("pages/category.jsp").forward(request, response);
     } else {
       redirect("/", response);
     }

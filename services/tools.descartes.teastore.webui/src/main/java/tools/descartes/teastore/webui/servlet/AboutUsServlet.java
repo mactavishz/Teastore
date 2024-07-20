@@ -55,7 +55,7 @@ public class AboutUsServlet extends AbstractUIServlet {
     request.setAttribute("storeIcon", String.format("/%s/images/icon.png", WebUI));
     request.setAttribute("title", "TeaStore About Us");
     request.setAttribute("login", HTTPClient.isLoggedIn(getSessionBlob(request)));
-    request.getRequestDispatcher("WEB-INF/pages/about.jsp").forward(request, response);
+    request.getRequestDispatcher("pages/about.jsp").forward(request, response);
   }
 
 }

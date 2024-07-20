@@ -83,7 +83,7 @@ public class ProductServlet extends AbstractUIServlet {
       request.setAttribute("storeIcon", String.format("/%s/images/icon.png", Service.WEBUI.getServiceName()));
       request.setAttribute("helper", ELHelperUtils.UTILS);
 
-      request.getRequestDispatcher("WEB-INF/pages/product.jsp").forward(request, response);
+      request.getRequestDispatcher("pages/product.jsp").forward(request, response);
     } else {
       redirect("/", response);
     }

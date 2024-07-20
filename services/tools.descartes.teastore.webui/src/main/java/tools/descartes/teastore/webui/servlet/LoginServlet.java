@@ -51,7 +51,7 @@ public class LoginServlet extends AbstractUIServlet {
 		request.setAttribute("storeIcon", String.format("/%s/images/icon.png", Service.WEBUI.getServiceName()));
 		request.setAttribute("referer", request.getHeader("Referer"));
 
-		request.getRequestDispatcher("WEB-INF/pages/login.jsp").forward(request, response);
+		request.getRequestDispatcher("pages/login.jsp").forward(request, response);
 	}
 
 }

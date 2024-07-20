@@ -51,7 +51,7 @@ public class IndexServlet extends AbstractUIServlet {
 		request.setAttribute("title", "TeaStore Home");
 		request.setAttribute("login", HTTPClient.isLoggedIn(getSessionBlob(request)));
 		request.setAttribute("storeIcon", String.format("/%s/images/icon.png", Service.WEBUI.getServiceName()));
-		request.getRequestDispatcher("WEB-INF/pages/index.jsp").forward(request, response);
+		request.getRequestDispatcher("pages/index.jsp").forward(request, response);
 	}
 
 }

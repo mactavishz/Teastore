@@ -56,7 +56,7 @@ public class ErrorServlet extends AbstractUIServlet {
 			request.setAttribute("errorImage", String.format("/%s/images/error.png", Service.WEBUI.getServiceName()));
 			request.setAttribute("title", "TeaStore Error ");
 			request.setAttribute("login", HTTPClient.isLoggedIn(getSessionBlob(request)));
-			request.getRequestDispatcher("WEB-INF/pages/error.jsp").forward(request, response);
+			request.getRequestDispatcher("pages/error.jsp").forward(request, response);
 
 		}
 	}
