@@ -20,7 +20,7 @@
         <fileset dir="jdbc" includes="*.jar"/>
     </library>
 
-    <dataSource id="TeaStoreDS" jndiName="jdbc/TeaStoreDB">
+    <dataSource id="TeaStoreDS" jndiName="jdbc/TeaStoreDB" statementCacheSize="60">
         <jdbcDriver id="MySQLJDBCDriver" libraryRef="global"/>
         <properties serverName="${db.host}" portNumber="${db.port}" databaseName="${db.name}"
                     user="${db.user}" password="${db.password}"/>
@@ -45,4 +45,9 @@
           <types>-text/plain</types>
         </compression>
     </httpEndpoint>
+
+    <httpOptions maxKeepAliveRequests="-1" />
+    <webContainer deferServletLoad="false" skipMetaInfResourcesProcessing="true" />
+    <applicationMonitor dropinsEnabled="false" updateTrigger="disabled"/>
+    <config updateTrigger="disabled"/>
 </server>
