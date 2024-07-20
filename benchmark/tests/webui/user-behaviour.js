@@ -53,11 +53,11 @@ export default function (data) {
 
 function visitHomePage(data) {
   const res = http[webuiConfig.home.method.toLowerCase()](
-    webuiConfig.base + webuiConfig.home.url
+    webuiConfig.base + webuiConfig.home.url,
   );
   visitHomePageTrend.add(res.timings.duration);
   let ok = check(res, {
-    "status is 200": (r) => r.status === 200,
+    "status is ok": (r) => r.status < 400,
   });
   if (!ok) {
     console.log(`Failed to visit home page with status ${res.status}`);
@@ -74,44 +74,44 @@ function browse(data) {
     let res = http[webuiConfig.category.method.toLowerCase()](
       webuiConfig.base +
         webuiConfig.category.url +
-        `?category=${randCategoryId}&page=${randPageId}`
+        `?category=${randCategoryId}&page=${randPageId}`,
     );
     categoryTrend.add(res.timings.duration);
     let ok = check(res, {
-      "status is 200": (r) => r.status === 200,
+      "status is ok": (r) => r.status < 400,
     });
     if (!ok) {
       console.log(
-        `Failed to browse category ${randCategoryId} page ${randPageId} with status ${res.status}`
+        `Failed to browse category ${randCategoryId} page ${randPageId} with status ${res.status}`,
       );
       sleep(1);
     } else {
       console.log(
-        `Browsed category ${randCategoryId} page ${randPageId} with status ${res.status}`
+        `Browsed category ${randCategoryId} page ${randPageId} with status ${res.status}`,
       );
       sleep(1);
       // browse 2 random products
       for (let i = 0; i < 5; i++) {
         let randProductId = randomInt(
           CATEGORY_COUNT + 2,
-          PRODUCT_COUNT_PER_CATEGORY * CATEGORY_COUNT
+          PRODUCT_COUNT_PER_CATEGORY * CATEGORY_COUNT,
         );
         res = http[webuiConfig.product.method.toLowerCase()](
           webuiConfig.base +
             webuiConfig.product.url +
-            `?product=${randProductId}`
+            `?product=${randProductId}`,
         );
         productTrend.add(res.timings.duration);
         ok = check(res, {
-          "status is 200": (r) => r.status === 200,
+          "status is ok": (r) => r.status < 400,
         });
         if (!ok) {
           console.log(
-            `Failed to browse product ${randProductId} with status ${res.status}`
+            `Failed to browse product ${randProductId} with status ${res.status}`,
           );
         } else {
           console.log(
-            `Browsed product ${randProductId} with status ${res.status}`
+            `Browsed product ${randProductId} with status ${res.status}`,
           );
         }
         sleep(1);
@@ -123,20 +123,20 @@ function browse(data) {
             {
               addToCart: "addToCart",
               productid: randProductId,
-            }
+            },
           );
           addToCartTrend.add(res.timings.duration);
           ok = check(res, {
-            "status is 200": (r) => r.status === 200,
+            "status is ok": (r) => r.status < 400,
           });
           if (!ok) {
             console.log(
-              `Failed to add product ${randProductId} to cart with status ${res.status}`
+              `Failed to add product ${randProductId} to cart with status ${res.status}`,
             );
           } else {
             data.cartProductIds = [...data.cartProductIds, randProductId];
             console.log(
-              `Added product ${randProductId} to cart with status ${res.status}`
+              `Added product ${randProductId} to cart with status ${res.status}`,
             );
           }
           sleep(1);
@@ -161,14 +161,14 @@ function placeOrder(data) {
     return;
   }
   let res = http[webuiConfig.cart.method.toLowerCase()](
-    webuiConfig.base + webuiConfig.cart.url
+    webuiConfig.base + webuiConfig.cart.url,
   );
   cartTrend.add(res.timings.duration);
   let ok = check(res, {
-    "status is 200": (r) => r.status === 200,
+    "status is ok": (r) => r.status < 400,
   });
   if (!ok) {
-    console.log(`Failed to visit order page with status ${res.status}`);
+    console.log(`Failed to visit cart page with status ${res.status}`);
   } else {
     console.log(`Visited cart page with status ${res.status}`);
   }
@@ -176,26 +176,27 @@ function placeOrder(data) {
   let removeProductChoice = choice();
   // 50% chance to remove one product from cart
   if (removeProductChoice) {
-    const rmPid = data.cartProductIds[randomInt(0, data.cartProductIds.length - 1)]
+    const rmPid =
+      data.cartProductIds[randomInt(0, data.cartProductIds.length - 1)];
     data.cartProductIds = data.cartProductIds.filter((pid) => pid !== rmPid);
     if (rmPid) {
       let formData = {};
       formData[`removeProduct_${rmPid}`] = "whatever";
       res = http[webuiConfig.cartAction.method.toLowerCase()](
         webuiConfig.base + webuiConfig.cartAction.url,
-        formData
+        formData,
       );
       removeFromCartTrend.add(res.timings.duration);
       ok = check(res, {
-        "status is 200": (r) => r.status === 200,
+        "status is ok": (r) => r.status < 400,
       });
       if (!ok) {
         console.log(
-          `Failed to remove product ${rmPid} from cart with status ${res.status}`
+          `Failed to remove product ${rmPid} from cart with status ${res.status}`,
         );
       } else {
         console.log(
-          `Removed product ${rmPid} from cart with status ${res.status}`
+          `Removed product ${rmPid} from cart with status ${res.status}`,
         );
       }
       sleep(1);
@@ -205,11 +206,11 @@ function placeOrder(data) {
     return;
   }
   res = http[webuiConfig.order.method.toLowerCase()](
-    webuiConfig.base + webuiConfig.order.url
+    webuiConfig.base + webuiConfig.order.url,
   );
   orderTrend.add(res.timings.duration);
   ok = check(res, {
-    "status is 200": (r) => r.status === 200,
+    "status is ok": (r) => r.status < 400,
   });
   if (!ok) {
     console.log(`Failed to visit order page with status ${res.status}`);
@@ -219,11 +220,11 @@ function placeOrder(data) {
   sleep(1);
   res = http[webuiConfig.cartAction.method.toLowerCase()](
     webuiConfig.base + webuiConfig.cartAction.url,
-    user_data
+    user_data,
   );
   placeOrderTrend.add(res.timings.duration);
   ok = check(res, {
-    "status is 200": (r) => r.status === 200,
+    "status is ok": (r) => r.status < 400,
   });
   if (!ok) {
     console.log(`Failed to place order with status ${res.status}`);
@@ -235,11 +236,11 @@ function placeOrder(data) {
 
 function login(data) {
   let res = http[webuiConfig.login.method.toLowerCase()](
-    webuiConfig.base + webuiConfig.login.url
+    webuiConfig.base + webuiConfig.login.url,
   );
   loginPageTrend.add(res.timings.duration);
   let ok = check(res, {
-    "status is 200": (r) => r.status === 200,
+    "status is ok": (r) => r.status < 400,
   });
   if (!ok) {
     console.log(`Failed to visit login page with status ${res.status}`);
@@ -254,7 +255,7 @@ function login(data) {
     });
     loginTrend.add(res.timings.duration);
     ok = check(res, {
-      "status is 200": (r) => r.status === 200,
+      "status is ok": (r) => r.status < 400,
     });
     if (!ok) {
       console.log(`Failed to login with status ${res.status}`);
@@ -268,10 +269,10 @@ function login(data) {
 
 function profile(data) {
   let res = http[webuiConfig.profile.method.toLowerCase()](
-    webuiConfig.base + webuiConfig.profile.url
+    webuiConfig.base + webuiConfig.profile.url,
   );
   let ok = check(res, {
-    "status is 200": (r) => r.status === 200,
+    "status is ok": (r) => r.status < 400,
   });
   if (!ok) {
     console.log(`Failed to visit profile page with status ${res.status}`);
@@ -284,11 +285,11 @@ function profile(data) {
 function logout(data) {
   let res = http[webuiConfig.loginAction.method.toLowerCase()](
     webuiConfig.base + webuiConfig.loginAction.url,
-    { logout: "" }
+    { logout: "" },
   );
   logoutTrend.add(res.timings.duration);
   let ok = check(res, {
-    "status is 200": (r) => r.status === 200,
+    "status is ok": (r) => r.status < 400,
   });
   if (!ok) {
     console.log(`Failed to logout with status ${res.status}`);
