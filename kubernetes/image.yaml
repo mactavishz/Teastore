@@ -1,6 +1,4 @@
-
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -12,13 +10,12 @@ spec:
   ports:
     - name: http
       port: 8080
-      nodePort: 30084   # expose to the outside
+      nodePort: 30084 # expose to the outside
       protocol: TCP
   selector:
     app: teastore-image
 
 ---
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -39,6 +36,10 @@ spec:
           image: macsalvation/teastore-image:v0.2.0-dbmid
           imagePullPolicy: "Always"
           # image: johnzr/cnae-g8-teastore-image-origin:v1.0
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
           ports:
             - containerPort: 8080
               name: http
@@ -57,3 +58,4 @@ spec:
               cpu: "1"
               memory: 1Gi
 ---
+

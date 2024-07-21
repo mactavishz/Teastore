@@ -38,6 +38,10 @@ spec:
           # image: johnzr/cnae-g8-teastore-recommender-origin:v1.0
           ports:
             - containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
           envFrom:
             - configMapRef:
                 name: teastore-share-config
