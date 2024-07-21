@@ -64,6 +64,10 @@ spec:
               name: http
             - containerPort: 9464
               name: metrics
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
             # - containerPort: 3010
             #   name: hmr
           envFrom:
