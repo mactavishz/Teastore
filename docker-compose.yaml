@@ -163,3 +163,5 @@ networks:
   default:
     external: true
     name: teastore-network
+volumes:
+  frontend_node_modules:
