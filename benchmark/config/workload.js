@@ -23,8 +23,6 @@ const WorkloadConfig = {
     { duration: "3m", target: getTarget(512) },
     { duration: "1m", target: getTarget(1024) },
     { duration: "3m", target: getTarget(1024) },
-    { duration: "1m", target: getTarget(2048) },
-    { duration: "3m", target: getTarget(2048) },
     { duration: "1m", target: getTarget(1024) },
     { duration: "1m", target: getTarget(512) },
     { duration: "1m", target: getTarget(256) },
