@@ -1,8 +1,8 @@
 const WorkloadConfig = {
   test: [
-    { duration: "30s", target: getTarget(30) },
-    { duration: "30s", target: getTarget(30) },
-    { duration: "30s", target: getTarget(0) },
+    { duration: "15s", target: getTarget(10) },
+    { duration: "15s", target: getTarget(10) },
+    { duration: "10s", target: getTarget(0) },
   ],
   average: [
     { duration: "1m", target: getTarget(200) },

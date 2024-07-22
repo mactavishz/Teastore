@@ -4,6 +4,7 @@ BASE_URL=""
 WORKLOAD="test"
 PROTOCOL="http"
 OUTPUT_DIR="reports"
+NO_SLEEP=false
 WEBUI_PORT=${WEBUI_PORT:-"30080"}
 RECOMMENDER_PORT=${RECOMMENDER_PORT:-"30082"}
 PERSISTENCE_PORT=${PERSISTENCE_PORT:-"30083"}
@@ -29,6 +30,7 @@ while [[ $# -gt 0 ]]; do
 		echo "  -p, --protocol <http|https>  The protocol to use for the test. Default: http"
 		echo "  -w, --workload <name>        The workload name to run, available workloads: test, average, stress, breakpoint. Default: test"
 		echo "  -t, --targets <list>         The list of comma seperated target services to test. Default: recommender,persistence,image,auth,webui"
+		echo "  -n, --no-sleep               Do not sleep after the test. Default: false"
 		echo "  -o  --output <path>          The output path for the reports. Default: reports"
 		echo "  -c --compress                Compress the reports folder after the test"
 		exit 0
@@ -62,6 +64,11 @@ while [[ $# -gt 0 ]]; do
 		shift
 		shift
 		;;
+	-n | --no-sleep)
+        NO_SLEEP=true
+        shift
+        shift
+        ;;
 	-o | --output)
 	    OUTPUT_DIR="$2"
         shift
@@ -85,7 +92,9 @@ done
 
 echo "Running benchmark on $BASE_URL"
 echo "Selected workload: $WORKLOAD"
+echo "No sleep after each test: $NO_SLEEP"
 echo "Test target services:" "${TEST_TARGETS[@]}"
+echo "Output directory: $OUTPUT_DIR"
 
 # loop through the test targets
 for target in "${TEST_TARGETS[@]}"; do
@@ -110,7 +119,7 @@ for target in "${TEST_TARGETS[@]}"; do
 			-e WORKLOAD="$WORKLOAD" \
 			--out csv=$OUTPUT_DIR/$target/$WORKLOAD/$(basename ${file%.*}).csv \
 			"$file"
-		if [ $WORKLOAD != "test" ]; then
+		if [ $NO_SLEEP == false ]; then
 			# wait for 5 mins to let the system cool down
 			sleep 300
 		fi
