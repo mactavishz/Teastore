@@ -33,6 +33,7 @@ do
   echo "Generating data for the $size database..."
   # use a java 17 docker container to run the jar file to generate the data for the database with different arguments: small, mid, large
   docker run --network dbgenerator-network --rm \
+    -e DB_GENERATE=true \
     -e DB_HOST=dbgenerator -e DB_PORT=3306 \
     -e DB_USER="root" \
     -e DB_PASSWORD="rootpassword" \
