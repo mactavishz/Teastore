@@ -89,6 +89,10 @@ final class EMFManager {
 	private static HashMap<String, String> createPersistencePropertiesFromJavaEnv() {
 		HashMap<String, String> persistenceProperties = new HashMap<String, String>();
 		// Use the JNDI name of the data source we configured in server.xml
+		String isDBGenerator = System.getenv("DB_GENERATE");
+		if (isDBGenerator != null && isDBGenerator.equals("true")) {
+			return  createPersistencePropertiesForDBGenerator();
+		}
 		persistenceProperties.put("jakarta.persistence.nonJtaDataSource", "jdbc/TeaStoreDB");
 		return persistenceProperties;
 	}
@@ -98,12 +102,39 @@ final class EMFManager {
 	 * instead of the usual MySQL/MariaDB database.
 	 * @return The configuration. Pass this to {@link #configureEMFWithProperties(HashMap)}.
 	 */
-	static HashMap<String, String> createPersistencePropertieForInMemoryDB() {
+	static HashMap<String, String> createPersistencePropertiesForDBGenerator() {
 		HashMap<String, String> persistenceProperties = new HashMap<String, String>();
-		persistenceProperties.put(DRIVER_PROPERTY, IN_MEMORY_DRIVER_VALUE);
-		persistenceProperties.put(JDBC_URL_PROPERTY, IN_MEMORY_JDBC_URL_VALUE);
-		persistenceProperties.put(USER_PROPERTY, IN_MEMORY_USER_VALUE);
-		persistenceProperties.put(PASSWORD_PROPERTY, IN_MEMORY_PASSWORD_VALUE);
+		String dbhost = null;
+		String dbport = null;
+		String url = MYSQL_URL_PREFIX;
+
+		dbhost = System.getenv("DB_HOST");
+
+		if (dbhost == null || dbhost.isEmpty()) {
+			LOG.info("Database host not set. Falling back to default host at " + MYSQL_DEFAULT_HOST + ".");
+			dbhost = MYSQL_DEFAULT_HOST;
+		}
+		dbport = System.getenv("DB_PORT");
+		if (dbport == null) {
+			LOG.info("Database port not set. Falling back to default port at " + MYSQL_DEFAULT_PORT + ".");
+			dbport = MYSQL_DEFAULT_PORT;
+		}
+		String dbuser = System.getenv("DB_USER");
+		if (dbuser != null) {
+			LOG.info("Database user set to \"" + dbuser + "\".");
+			persistenceProperties.put("jakarta.persistence.jdbc.user", dbuser);
+		}
+		String dbpassword = System.getenv("DB_PASSWORD");
+		if (dbpassword != null) {
+			LOG.info("Database password set from DB_PASSWORD environment variable.");
+			persistenceProperties.put("jakarta.persistence.jdbc.password", dbpassword);
+		}
+		url += dbhost;
+		url += ":";
+		url += dbport;
+		url += MYSQL_URL_POSTFIX;
+		LOG.info("Setting jdbc url to \"" + url + "\".");
+		persistenceProperties.put("jakarta.persistence.jdbc.url", url);
 		return persistenceProperties;
 	}
 }
