@@ -6,6 +6,7 @@ JAR_FILE=$(realpath $JAR_FILE)
 DB_SIZES=("small" "mid" "large")
 
 mkdir -p ../services/tools.descartes.teastore.image/generated_images/
+chmod -R 777 ../services/tools.descartes.teastore.image/generated_images/
 
 for size in "${DB_SIZES[@]}"
 do
@@ -20,6 +21,7 @@ do
   echo "Moving static images to the image service..."
   rm -rf ../services/tools.descartes.teastore.image/generated_images/db-"$size"
   mv ./generated_images/db-"$size" ../services/tools.descartes.teastore.image/generated_images/
+  chmod -R 777 ../services/tools.descartes.teastore.image/generated_images/db-"$size"
 done
 
 echo "All static images are generated successfully."
