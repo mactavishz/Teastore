@@ -1,5 +1,4 @@
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -14,16 +13,14 @@ spec:
   ports:
     - name: http
       port: 8080
-      nodePort: 30080   # expose to the outside
+      nodePort: 30080 # expose to the outside
       protocol: TCP
-    - name: metrics
-      port: 9464
-      targetPort: 9464
-      protocol: TCP
-  
+    # - name: metrics
+    #   port: 9464
+    #   targetPort: 9464
+    #   protocol: TCP
 
 ---
-
 # apiVersion: networking.k8s.io/v1
 # kind: Ingress
 # metadata:
@@ -43,7 +40,6 @@ spec:
 #               number: 8080
 
 ---
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -60,14 +56,18 @@ spec:
     spec:
       containers:
         - name: teastore-webui
-          image: macsalvation/teastore-webui:v0.2.0
+          image: macsalvation/teastore-webui:v0.2.0-open-liberty-webui
           imagePullPolicy: "Always"
           # image: johnzr/cnae-g8-teastore-webui-origin:v1.0
           ports:
             - containerPort: 8080
               name: http
-            - containerPort: 9464
-              name: metrics
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            # - containerPort: 9464
+            #   name: metrics
             # - containerPort: 3010
             #   name: hmr
           envFrom:
@@ -83,6 +83,5 @@ spec:
               cpu: "1"
               memory: 1Gi
 
-
-
 ---
+

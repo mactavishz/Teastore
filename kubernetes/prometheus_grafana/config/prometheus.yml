@@ -25,7 +25,7 @@ scrape_configs:
           - targets: ['teastore-recommender.teastore.svc.cluster.local:8080']
             labels:
                 instance: teastore-recommender
-          - targets: ['teastore-webui.teastore.svc.cluster.local:9464']
+          - targets: ['teastore-webui.teastore.svc.cluster.local:8080']
             labels:
                 instance: teastore-webui
 

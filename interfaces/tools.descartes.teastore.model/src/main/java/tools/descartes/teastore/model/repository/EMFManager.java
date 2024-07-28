@@ -88,9 +88,26 @@ final class EMFManager {
 
 	private static HashMap<String, String> createPersistencePropertiesFromJavaEnv() {
 		HashMap<String, String> persistenceProperties = new HashMap<String, String>();
+		// Use the JNDI name of the data source we configured in server.xml
+		String isDBGenerator = System.getenv("DB_GENERATE");
+		if (isDBGenerator != null && isDBGenerator.equals("true")) {
+			return  createPersistencePropertiesForDBGenerator();
+		}
+		persistenceProperties.put("jakarta.persistence.nonJtaDataSource", "jdbc/TeaStoreDB");
+		return persistenceProperties;
+	}
+
+	/**
+	 * Create a persistence property map to configure the EMFManager to use an in-memory database
+	 * instead of the usual MySQL/MariaDB database.
+	 * @return The configuration. Pass this to {@link #configureEMFWithProperties(HashMap)}.
+	 */
+	static HashMap<String, String> createPersistencePropertiesForDBGenerator() {
+		HashMap<String, String> persistenceProperties = new HashMap<String, String>();
 		String dbhost = null;
 		String dbport = null;
 		String url = MYSQL_URL_PREFIX;
+
 		dbhost = System.getenv("DB_HOST");
 
 		if (dbhost == null || dbhost.isEmpty()) {
@@ -118,20 +135,6 @@ final class EMFManager {
 		url += MYSQL_URL_POSTFIX;
 		LOG.info("Setting jdbc url to \"" + url + "\".");
 		persistenceProperties.put("jakarta.persistence.jdbc.url", url);
-		return persistenceProperties;
-	}
-
-	/**
-	 * Create a persistence property map to configure the EMFManager to use an in-memory database
-	 * instead of the usual MySQL/MariaDB database.
-	 * @return The configuration. Pass this to {@link #configureEMFWithProperties(HashMap)}.
-	 */
-	static HashMap<String, String> createPersistencePropertieForInMemoryDB() {
-		HashMap<String, String> persistenceProperties = new HashMap<String, String>();
-		persistenceProperties.put(DRIVER_PROPERTY, IN_MEMORY_DRIVER_VALUE);
-		persistenceProperties.put(JDBC_URL_PROPERTY, IN_MEMORY_JDBC_URL_VALUE);
-		persistenceProperties.put(USER_PROPERTY, IN_MEMORY_USER_VALUE);
-		persistenceProperties.put(PASSWORD_PROPERTY, IN_MEMORY_PASSWORD_VALUE);
 		return persistenceProperties;
 	}
 }

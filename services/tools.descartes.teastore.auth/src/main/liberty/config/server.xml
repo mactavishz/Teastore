@@ -1,10 +1,14 @@
 <!-- YOU NEED TO CHANGE THIS -->
 <server description="TeaStore Auth">
     <!-- tag::features[] -->
-    <featureManager>
-        <feature>jakartaee-10.0</feature>
-        <feature>microProfile-6.1</feature>
+     <featureManager>
+        <feature>restfulWS-3.1</feature>
+        <feature>restfulWSClient-3.1</feature>
+        <feature>mpHealth-4.0</feature>
+        <feature>mpMetrics-5.1</feature>
+        <feature>jsonb-3.0</feature>
         <feature>concurrent-3.0</feature>
+         <feature>pages-3.1</feature>
     </featureManager>
 
     <!-- YOU NEED TO CHANGE THIS -->
@@ -22,5 +26,15 @@
     <!-- end::logging[] -->
 
     <httpEndpoint host="*" httpPort="${service.port}" httpsPort="${service.port.ssl}"
-                  id="defaultHttpEndpoint"/>
+                  id="defaultHttpEndpoint">
+        <compression serverPreferredAlgorithm="gzip">
+          <types>+application/*</types>
+          <types>-text/plain</types>
+        </compression>
+    </httpEndpoint>
+
+    <httpOptions maxKeepAliveRequests="-1" />
+    <webContainer deferServletLoad="false" skipMetaInfResourcesProcessing="true" />
+    <applicationMonitor dropinsEnabled="false" updateTrigger="disabled"/>
+    <config updateTrigger="disabled"/>
 </server>

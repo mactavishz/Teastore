@@ -1,0 +1,40 @@
+<server description="TeaStore webui">
+    <!-- tag::features[] -->
+    <featureManager>
+        <feature>restfulWS-3.1</feature>
+        <feature>restfulWSClient-3.1</feature>
+        <feature>pages-3.1</feature>
+        <feature>mpHealth-4.0</feature>
+        <feature>mpMetrics-5.1</feature>
+        <feature>jsonb-3.0</feature>
+    </featureManager>
+    <!-- end::features[] -->
+
+    <!-- YOU NEED TO CHANGE THIS -->
+    <variable name="context.root" defaultValue="/tools.descartes.teastore.webui"/>
+
+    <applicationManager autoExpand="true"/>
+    <!-- tag::webApplication[] -->
+    <!-- YOU NEED TO CHANGE THIS -->
+    <webApplication location="tools.descartes.teastore.webui.war" contextRoot="${context.root}"/>
+    <!-- end::webApplication[] -->
+    <mpMetrics authentication="false"/>
+
+    <!-- tag::logging[] -->
+    <logging consoleLogLevel="INFO"/>
+    <!-- end::logging[] -->
+
+    <httpEndpoint host="*" httpPort="${service.port}" httpsPort="${service.port.ssl}"
+              id="defaultHttpEndpoint">
+        <compression serverPreferredAlgorithm="gzip">
+          <types>+application/*</types>
+          <types>-text/plain</types>
+        </compression>
+    </httpEndpoint>
+
+    <httpOptions maxKeepAliveRequests="-1" />
+    <webContainer deferServletLoad="false" skipMetaInfResourcesProcessing="true" />
+    <applicationMonitor dropinsEnabled="false" updateTrigger="disabled"/>
+    <config updateTrigger="disabled"/>
+    <jspEngine javaSourceLevel="17" prepareJSPs="0" keepGenerated="true" />
+</server>

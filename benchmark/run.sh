@@ -3,6 +3,8 @@
 BASE_URL=""
 WORKLOAD="test"
 PROTOCOL="http"
+OUTPUT_DIR="reports"
+NO_SLEEP=false
 WEBUI_PORT=${WEBUI_PORT:-"30080"}
 RECOMMENDER_PORT=${RECOMMENDER_PORT:-"30082"}
 PERSISTENCE_PORT=${PERSISTENCE_PORT:-"30083"}
@@ -28,6 +30,8 @@ while [[ $# -gt 0 ]]; do
 		echo "  -p, --protocol <http|https>  The protocol to use for the test. Default: http"
 		echo "  -w, --workload <name>        The workload name to run, available workloads: test, average, stress, breakpoint. Default: test"
 		echo "  -t, --targets <list>         The list of comma seperated target services to test. Default: recommender,persistence,image,auth,webui"
+		echo "  -n, --no-sleep               Do not sleep after the test. Default: false"
+		echo "  -o  --output <path>          The output path for the reports. Default: reports"
 		echo "  -c --compress                Compress the reports folder after the test"
 		exit 0
 		;;
@@ -41,9 +45,9 @@ while [[ $# -gt 0 ]]; do
 	-p | --protocol)
 		PROTOCOL="$2"
 		if [ $PROTOCOL != "http" ] && [ $PROTOCOL != "https" ]; then
-      echo "Invalid protocol, only http or https is allowed"
-      exit 1
-    fi
+			echo "Invalid protocol, only http or https is allowed"
+			exit 1
+		fi
 		shift
 		shift
 		;;
@@ -60,6 +64,16 @@ while [[ $# -gt 0 ]]; do
 		shift
 		shift
 		;;
+	-n | --no-sleep)
+        NO_SLEEP=true
+        shift
+        shift
+        ;;
+	-o | --output)
+	    OUTPUT_DIR="$2"
+        shift
+        shift
+        ;;
 	-u | --user)
 		USER="$2"
 		shift
@@ -78,7 +92,9 @@ done
 
 echo "Running benchmark on $BASE_URL"
 echo "Selected workload: $WORKLOAD"
+echo "No sleep after each test: $NO_SLEEP"
 echo "Test target services:" "${TEST_TARGETS[@]}"
+echo "Output directory: $OUTPUT_DIR"
 
 # loop through the test targets
 for target in "${TEST_TARGETS[@]}"; do
@@ -89,9 +105,7 @@ for target in "${TEST_TARGETS[@]}"; do
 	fi
 	for file in $test_dir/*.js; do
 		echo $file
-		# remove old benchmark reports
-		rm -rf reports/$target/$WORKLOAD
-		mkdir -p reports/$target/$WORKLOAD
+		mkdir -p $OUTPUT_DIR/$target/$WORKLOAD
 		echo "Running test $file"
 		k6 run \
 			-e AUTH_BASE_URL="$PROTOCOL://$BASE_URL:$AUTH_PORT" \
@@ -101,19 +115,19 @@ for target in "${TEST_TARGETS[@]}"; do
 			-e WEBUI_BASE_URL="$PROTOCOL://$BASE_URL:$WEBUI_PORT" \
 			-e USER="$USER" \
 			-e K6_WEB_DASHBOARD="true" \
-			-e K6_WEB_DASHBOARD_EXPORT=reports/$target/$WORKLOAD/$(basename ${file%.*}).html \
+			-e K6_WEB_DASHBOARD_EXPORT=$OUTPUT_DIR/$target/$WORKLOAD/$(basename ${file%.*}).html \
 			-e WORKLOAD="$WORKLOAD" \
-			--out csv=reports/$target/$WORKLOAD/$(basename ${file%.*}).csv \
+			--out csv=$OUTPUT_DIR/$target/$WORKLOAD/$(basename ${file%.*}).csv \
 			"$file"
-		if [ $WORKLOAD != "test" ]; then
-		  # wait for 5 mins to let the system cool down
-		  sleep 300
-    fi
+		if [ $NO_SLEEP == false ]; then
+			# wait for 5 mins to let the system cool down
+			sleep 300
+		fi
 	done
 done
 
 # compress the report folder with timestamp using xz to have a high compression ratio
 if [ $COMPRESS ]; then
-	echo "Compressing the reports folder"
-	tar --exclude='.DS_Store' -cJf reports-$(date +%Y%m%d%H%M%S).tar.xz reports
+	echo "Compressing the $OUTPUT_DIR folder"
+	tar --exclude='.DS_Store' -cJf reports-$(date +%Y%m%d%H%M%S).tar.xz "$OUTPUT_DIR"
 fi

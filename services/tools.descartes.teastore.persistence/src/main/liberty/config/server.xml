@@ -2,10 +2,14 @@
 <server description="TeaStore persistence">
     <!-- tag::features[] -->
     <featureManager>
-        <feature>jakartaee-10.0</feature>
-        <feature>microProfile-6.1</feature>
+        <feature>restfulWS-3.1</feature>
+        <feature>restfulWSClient-3.1</feature>
+        <feature>mpHealth-4.0</feature>
+        <feature>mpMetrics-5.1</feature>
+        <feature>jsonb-3.0</feature>
         <feature>persistence-3.1</feature>
         <feature>xmlBinding-4.0</feature>
+        <feature>pages-3.1</feature>
     </featureManager>
     <!-- end::features[] -->
 
@@ -16,7 +20,13 @@
         <fileset dir="jdbc" includes="*.jar"/>
     </library>
 
-    <jdbcDriver id="MySQLJDBCDriver" libraryRef="global"/>
+    <dataSource id="TeaStoreDS" jndiName="jdbc/TeaStoreDB" statementCacheSize="60">
+        <jdbcDriver id="MySQLJDBCDriver" libraryRef="global"/>
+        <properties serverName="${db.host}" portNumber="${db.port}" databaseName="${db.name}"
+                    user="${db.user}" password="${db.password}"/>
+        <!-- Connection Pool Configuration -->
+         <connectionManager maxPoolSize="10" minPoolSize="2" agedTimeout="15m" reapTime="2m" connectionTimeout="5s" maxIdleTime="10m"/>
+    </dataSource>
 
     <!-- tag::webApplication[] -->
     <!-- YOU NEED TO CHANGE THIS -->
@@ -29,5 +39,15 @@
     <!-- end::logging[] -->
 
     <httpEndpoint host="*" httpPort="${service.port}" httpsPort="${service.port.ssl}"
-                  id="defaultHttpEndpoint"/>
+                  id="defaultHttpEndpoint">
+        <compression serverPreferredAlgorithm="gzip">
+          <types>+application/*</types>
+          <types>-text/plain</types>
+        </compression>
+    </httpEndpoint>
+
+    <httpOptions maxKeepAliveRequests="-1" />
+    <webContainer deferServletLoad="false" skipMetaInfResourcesProcessing="true" />
+    <applicationMonitor dropinsEnabled="false" updateTrigger="disabled"/>
+    <config updateTrigger="disabled"/>
 </server>

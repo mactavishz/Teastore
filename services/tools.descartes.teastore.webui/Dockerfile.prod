@@ -1,11 +1,13 @@
-FROM node:22.3.0-alpine
-WORKDIR /web
+FROM icr.io/appcafe/open-liberty:kernel-slim-java17-openj9-ubi
 
+ENV SERVICE_PORT=8080
+ENV WARM_ENDPOINT=false
+ENV WARM_OPENAPI_ENDPOINT=false
 
-COPY . .
-RUN npm install --verbose && npm run build
+COPY --chown=1001:0 /src/main/liberty/config /config
 
-ENV NODE_ENV=production
-EXPOSE 9464
+RUN features.sh
 
-CMD npm run start
+COPY --chown=1001:0 target/*.war /config/apps
+
+RUN configure.sh
