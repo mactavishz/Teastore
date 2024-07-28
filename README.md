@@ -7,7 +7,7 @@ Check out the [REPRODUCTION.md](/REPRODUCTION.md) to see how to develop, deploy 
 ### Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/)
-- [JDK 17](https://openjdk.org/projects/jdk/17)
+- [JDK 17](https://openjdk.org/projects/jdk/17), using [SDKMAN](https://sdkman.io/) is recommended
 - [Maven](https://maven.apache.org/download.cgi)
 
 ## Quick Start
@@ -22,7 +22,16 @@ cd tools && ./build.sh
 
 This will build the databases in **3 sizes** and the static images correspond to different database sizes for the TeaStore project.
 
-2. Build the docker images for the TeaStore project
+2. Create the network for the TeaStore project
+
+In the root directory of the project, run the following command:
+
+```bash
+# this is only needed once
+docker network create teastore-network
+```
+
+3. Build the docker images for the TeaStore project
 
 In the root directory of the project, run the following command:
 
@@ -32,15 +41,6 @@ docker compose build
 
 # or specify the size: "small", "mid", "large"
 docker compose build --build-arg DB_SIZE=small
-```
-
-3. Create the network for the TeaStore project
-
-In the root directory of the project, run the following command:
-
-```bash
-# this is only needed once
-docker network create teastore-network
 ```
 
 4. Start the TeaStore project
