@@ -54,3 +54,28 @@ docker compose up -d
 5. Access the Web Interface
 
 Go to [http://localhost:8080/tools.descartes.teastore.webui/](http://localhost:8080/tools.descartes.teastore.webui/) to access the web interface of the TeaStore project.
+
+6. Develop an individual service
+
+We assume that you will only develop one service at a time.
+
+To develop an individual service, you can use the following command:
+
+```bash
+# Follow step 4 to start the TeaStore project
+docker compose up -d
+
+# Stop the service you want to develop, e.g. persistence, auth, recommender, webui, image etc.
+docker compose down <service-name>
+
+# For example, to develop the webui service
+docker compose down webui
+
+# Start the service you want using maven
+mvn -am -pl :<service-name> liberty:devc -DskipTests
+
+# For example, to develop the webui service
+mvn -am -pl :webui liberty:devc -DskipTests
+```
+
+After that, you can modify the source code of the service and the changes will be automatically reflected in the running service.
