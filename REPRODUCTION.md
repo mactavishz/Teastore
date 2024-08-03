@@ -6,7 +6,6 @@ This document describes how to develop, deploy and reproduce the evaluation of t
 
 The following steps are only used to run the system locally via docker compose. If you want to reproduce the benchmarking results of system, please refer to the next section.
 
-
 ```bash
 # step 1: build the databases, corresponding static images and Java artifacts
 cd ./tools && ./build.sh && cd ..
@@ -44,7 +43,6 @@ You can also open the HTML files to check the benchmark results in a more human-
 
 ### Reproducing the benchmark
 
-
 ```bash
 cd benchmark
 
@@ -72,6 +70,34 @@ The `-H` flag is used to specify the target host (Kubernetes cluster's node IP),
 ### Benchmarking scripts
 
 All benchmarking scripts are implemented using [K6](https://k6.io/) and are located in the `benchmark/tests` directory.
+
+### Generating the Graphs
+
+We have provided a python script to generate the graphs for the reports generated from our benchmarking scripts.
+
+```bash
+cd benchmark
+
+# set up the virtual environment
+python -m venv .venv
+
+# install the dependencies
+pip install -r ./requirements.txt
+
+# activate the virtual environment
+source .venv/bin/activate
+
+# check if the python is using the virtual environment
+which python
+
+# generate the graphs for the reports in the `reports` directory
+python ./charts/generate.py
+
+# generate the graphs for a custom directory
+python ./charts/generate.py ./my-dir > ./my-dir/stdout.txt
+```
+
+The directory of the reports could be located anywhere, as long as you provide the correct path to the script. The default directory is `./reports`.
 
 ### Caveats
 
