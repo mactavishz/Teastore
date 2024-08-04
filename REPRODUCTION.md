@@ -160,11 +160,42 @@ All components are exposed by `NodePort` to the outside for testing purpose.
 | auth | localhost:30085 |
 
 
-### How to run:
+### How to run (with kustomize):
 
-Because we simulate the image-CDN with nginx (within cluster), you must specify the cluster's external IP in the file `/kubernetes/env/webui-env.txt`.
+#### 1. Set environment variables
+Because we simulate the image-CDN with nginx (within cluster), you must specify the cluster's external IP in the file `kubernetes/env/webui-env.txt`.
 
 e.g. `IMAGE_CDN_HOST=< cluster external IP >`
+
+#### 2. Start TeaStore with kustomize:
+```bash
+cd kubernetes
+kubectl apply -k ./
+```
+
+#### 3. Start Prometheus + Grafana with kustomize:
+```bash
+cd kuberetes/prometheus_grafana
+kubectl apply -k ./
+```
+
+#### 4. Start Kube-state-metrics:
+```bash
+cd kubernetes/kube-state-metrics
+kubectl apply -k ./
+```
+
+#### 5. Metrics-server:
+Metrics-server is also needed, please check if your cluster already has it.<br/>
+Many kubernetes distributions have it by default, e.g. K3S.<br/>
+If not, you can install it by:
+```bash
+cd kubernetes/metrics-server
+kubectl apply -f ./
+```
+
+
+
 
 Run TeaStore with kustomize:
 ```bash
