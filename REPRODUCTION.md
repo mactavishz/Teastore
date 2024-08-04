@@ -21,9 +21,9 @@ docker compose up -d
 
 The experiment was conducted on a Kubernetes cluster with 4 nodes on [Linode](https://www.linode.com/) with the following configuration:
 
-- 8 CPU cores
-- 16 GB RAM
-- 320 GB SSD storage
+- 8 vCPU cores (2 cores per node)
+- 16 GB RAM (4 GB per node)
+- 320 GB SSD storage (80 GB per node)
 - Region: Frankfurt, Germany
 - Kubernetes version: 1.29
 
