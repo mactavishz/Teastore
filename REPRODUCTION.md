@@ -129,18 +129,14 @@ If you wish to get a fairer benchmark result, we recommend to warm up the system
 
 ## Kubernetes
 
-### Kubernetes Infomation:
+### Namespace:
 
 - Teastore resources are in the namespace `teastore`.
 - Prometheus + Grafana are in the namespace `monitoring-tea`.
 
 Both of them are in the same cluster and managed by `kustomize`.
 
-### TeaStore:
-
-This is designed to run TeaStore in Kubernetes and get test data from it.
-
-All images are rebuilt to expose 9464 and pass certain environment variables for testing.
+### Images:
 
 These are all images built for refactored TeaStore:
 ```
@@ -152,50 +148,23 @@ macsalvation/teastore-db:v0.2.0-dbmid
 macsalvation/teastore-auth:v0.2.0
 ```
 
-### HPA(Horizontal Pod Autoscaler):
-HPA is enabled for recommender/auth/image/webui/persistence in TeaStore.
-
-If you run it on the `docker-desktop`, you need to install metrics-server first.
-
-*If you run it on e.g. `K3S`, you can ignore the installation of metrics-server.*
-
-```bash
-cd metrics-server
-kubectl apply -f ./
-```
-
-
+### Ports:
 All components are exposed by `NodePort` to the outside for testing purpose.
 
-### Mapping:
 | Component | IP:Port |
 |:---------|:---------|
 | webui | localhost:30080 |
-| registry | localhost:30081 |
 | recommender | localhost:30082 |
 | persistence | localhost:30083 |
 | image | localhost:30084 |
 | auth | localhost:30085 |
 
 
+### How to run:
 
+Because we simulate the image-CDN with nginx (within cluster), you must specify the cluster's external IP in the file `/kubernetes/env/webui-env.txt`.
 
-# Prometheus:
-
-Prometheus and Grafana are used to monitor TeaStore.
-
-Prometheus is authorized through `RBAC`（Role Based Access Control） to monitor across namespaces.
-
-Prometheus’s configuration file is in `prometheus_grafana/config/prometheus.yaml`.
-In this file, the scraping target is set.
-
-# Grafana
-Grafana connects to Prometheus `http://prometheus-service.monitoring.svc:9090` to get data and visualize it.
-
-Grafana default username and password are `admin` and `admin`.
-
-
-# How to run with kustomize:
+e.g. `IMAGE_CDN_HOST=< cluster external IP >`
 
 Run TeaStore with kustomize:
 ```bash
@@ -228,6 +197,44 @@ kubectl delete -k ./
 ```
 
 
-# Data persistence
+
+
+### HPA(Horizontal Pod Autoscaler):
+HPA is enabled for webui/recommender/auth/image/persistence in TeaStore.
+
+If you run it on the `docker-desktop`, you need to install metrics-server first.
+
+*If you run it on e.g. `K3S`, you can ignore the installation of metrics-server.*
+
+```bash
+cd metrics-server
+kubectl apply -f ./
+```
+
+
+
+
+
+
+
+# Prometheus:
+
+Prometheus and Grafana are used to monitor TeaStore.
+
+Prometheus is authorized through `RBAC`（Role Based Access Control） to monitor across namespaces.
+
+Prometheus’s configuration file is in `prometheus_grafana/config/prometheus.yaml`.
+In this file, the scraping target is set.
+
+# Grafana
+Grafana connects to Prometheus `http://prometheus-service.monitoring.svc:9090` to get data and visualize it.
+
+Grafana default username and password are `admin` and `admin`.
+
+
+
+
+
+### Data persistence
 Note that 'emptyDir' method is chosen to store data, so the data will be deleted after retart.
 
