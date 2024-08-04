@@ -167,17 +167,25 @@ Because we simulate the image-CDN with nginx (within cluster), you must specify 
 
 e.g. `IMAGE_CDN_HOST=< cluster external IP >`
 
+
 #### 2. Start TeaStore with kustomize:
 ```bash
 cd kubernetes
 kubectl apply -k ./
 ```
 
+
 #### 3. Start Prometheus + Grafana with kustomize:
 ```bash
 cd kuberetes/prometheus_grafana
 kubectl apply -k ./
 ```
+- Data source: Prometheus and Grafana are preconfigured to be connected, means that Grafana uses Prometheus as the default data source.
+
+- Prometheus scrape config: `kubernetes/prometheus_grafana/config/prometheus.yaml`
+
+- Grafana dashboard: `kubernetes/prometheus_grafana/dashboards/*.json`
+
 
 #### 4. Start Kube-state-metrics:
 ```bash
@@ -196,36 +204,6 @@ kubectl apply -f ./
 
 
 
-
-Run TeaStore with kustomize:
-```bash
-# start
-kubectl apply -k ./
-
-# refactored
-kubectl apply -k . --set-string IMAGE_CDN_HOST=image-cdn.domain.com
-
-# update
-kubectl apply -k ./
-
-# stop
-kubectl delete -k ./
-```
-
-Run Prometheus + Grafana with kustomize:
-```bash
-# go to the directory
-cd prometheus_grafana
-
-# start
-kubectl apply -k ./
-
-# update
-kubectl apply -k ./
-
-# stop
-kubectl delete -k ./
-```
 
 
 
