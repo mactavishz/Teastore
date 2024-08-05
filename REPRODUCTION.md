@@ -31,19 +31,19 @@ This is the same configuration as the one used in the baseline evaluation of the
 
 ## Kubernetes Information
 
-### 1. Namespace:
+### 1. Namespace
 
 - Teastore resources are in the namespace `teastore`.
 - Prometheus + Grafana are in the namespace `monitoring-tea`.
 
 Both of them are in the same cluster and managed by `kustomize`.
 
-### 2. Images:
+### 2. Images
 
 These are all images built for refactored TeaStore:
 
 ```
-macsalvation/teastore-webui:v0.2.0-open-liberty-webui
+macsalvation/teastore-webui:v0.2.0-nodejs-webui
 macsalvation/teastore-recommender:v0.2.0
 macsalvation/teastore-persistence:v0.2.0
 macsalvation/teastore-image:v0.2.0-dbmid
@@ -51,7 +51,7 @@ macsalvation/teastore-db:v0.2.0-dbmid
 macsalvation/teastore-auth:v0.2.0
 ```
 
-### 3. Ports:
+### 3. Ports
 
 All components are exposed by `NodePort` to the outside for testing purpose.
 
@@ -63,7 +63,7 @@ All components are exposed by `NodePort` to the outside for testing purpose.
 | image       | localhost:30084 |
 | auth        | localhost:30085 |
 
-### 4. Data persistence:
+### 4. Data persistence
 
 Note that 'emptyDir' method is chosen to store data, so the data will be deleted after retart.
 
@@ -75,7 +75,7 @@ Because we simulate the image-CDN with nginx (within cluster), you must specify 
 
 e.g. `IMAGE_CDN_HOST=< cluster external IP >`
 
-#### 2. Start TeaStore with kustomize:
+#### 2. Start TeaStore with kustomize
 
 ```bash
 cd kubernetes
@@ -85,7 +85,7 @@ kubectl apply -k ./
 - HPA: HPA could be enabled for webui/recommender/auth/image/persistence in TeaStore.
   In order to enable HPA, you need to uncomment `- hpa.yaml` under `resources` section in `kubernetes/kustomization.yaml` .
 
-#### 3. Start Prometheus + Grafana with kustomize:
+#### 3. Start Prometheus + Grafana with kustomize
 
 ```bash
 cd kuberetes/prometheus_grafana
@@ -102,14 +102,14 @@ kubectl apply -k ./
 
 - Grafana default username and password are `admin` and `admin`.
 
-#### 4. Start Kube-state-metrics:
+#### 4. Start Kube-state-metrics
 
 ```bash
 cd kubernetes/kube-state-metrics
 kubectl apply -k ./
 ```
 
-#### 5. Metrics-server:
+#### 5. Metrics-server
 
 Metrics-server is also needed, please check if your cluster already has it.<br/>
 Many kubernetes distributions have it by default, e.g. K3S.<br/>
