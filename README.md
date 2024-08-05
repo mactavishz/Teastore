@@ -59,13 +59,13 @@ Go to [http://localhost:8080/tools.descartes.teastore.webui/](http://localhost:8
 
 We assume that you will only develop one service at a time.
 
-To develop an individual service, you can use the following command:
+To develop an individual Java microservice, you can use the following command:
 
 ```bash
 # Follow step 4 to start the TeaStore project
 docker compose up -d
 
-# Stop the service you want to develop, e.g. persistence, auth, recommender, webui, image etc.
+# Stop the service you want to develop, e.g. persistence, auth, recommender, webui
 docker compose down <service-name>
 
 # For example, to develop the webui service
