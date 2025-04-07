@@ -1,8 +1,15 @@
 # TeaStore - Runnable Refactored System
 
-This branch contains the runnable refactored system for the TeaStore project.
+This branch contains the runnable refactored system for the [TeaStore](https://github.com/DescartesResearch/TeaStore) project.
 
 Check out the [REPRODUCTION.md](/REPRODUCTION.md) to see how to develop, deploy and reproduce the evaluation.
+
+Currently, there are different refactored versions of the TeaStore project on different branches:
+
+- [open-liberty](https://github.com/mactavishz/Teastore/tree/open-liberty): this branch contains the refactored system using Open Liberty, the frontend remains largely unchanged. This is also syncronized with the main branch.
+- [frontend-remix](https://github.com/mactavishz/Teastore/tree/frontend-remix): this branch contains all the refactored system using Open Liberty and a new frontend using React and Remix. The frontend is completely rewritten and the backend is also refactored to use Open Liberty.
+- [original](https://github.com/mactavishz/Teastore/tree/original): this branch contains the original system of the TeaStore project.
+
 
 ### Prerequisites
 
