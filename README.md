@@ -1,6 +1,6 @@
 # TeaStore
 
-This repository contains the refactored version of an online store based on the [TeaStore](https://github.com/DescartesResearch/TeaStore) project.
+This repository contains the refactored versions of an online store based on the [TeaStore](https://github.com/DescartesResearch/TeaStore) project.
 
 Currently, there are different refactored versions of the TeaStore project on different branches:
 
