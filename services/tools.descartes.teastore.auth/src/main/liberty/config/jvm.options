@@ -1,9 +1,0 @@
--Xms256m
--XX:+UseZGC
--XX:MaxGCPauseMillis=200
--XX:+DisableExplicitGC
--XX:+AlwaysPreTouch
--Xss512k
--XX:+UseStringDeduplication
--XX:+UseTLAB
--XX:TLABSize=256k
